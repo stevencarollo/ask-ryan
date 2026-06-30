@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ask Ryan - AI Real Estate Coaching from Ryan Serhant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #D4AF37;
+            --dark: #1a1a1a;
+            --light: #f5f5f5;
+            --text: #2d2d2d;
+            --border: #e0e0e0;
+            --success: #4ade80;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 4.5em;
+            margin-bottom: 20px;
+            color: var(--primary);
+            font-weight: 800;
+            letter-spacing: -2px;
+        }
+
+        .hero .tagline {
+            font-size: 1.4em;
+            color: #ddd;
+            margin-bottom: 40px;
+            font-weight: 300;
+            max-width: 600px;
+        }
+
+        .hero p {
+            font-size: 1.1em;
+            color: #aaa;
+            max-width: 700px;
+            margin-bottom: 50px;
+            line-height: 1.8;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary) 0%, #c9a227 100%);
+            color: var(--dark);
+            padding: 18px 50px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1em;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            box-shadow: 0 10px 40px rgba(212, 175, 55, 0.3);
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 50px rgba(212, 175, 55, 0.4);
+        }
+
+        .features {
+            background: white;
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .features h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3em;
+            margin-bottom: 60px;
+            color: var(--primary);
+        }
+
+        .features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .feature-card {
+            padding: 40px;
+            background: #f9f9f9;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .feature-card h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.8;
+        }
+
+        .icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        .about {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .about h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3em;
+            margin-bottom: 40px;
+            color: var(--primary);
+        }
+
+        .about-content {
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.9;
+            font-size: 1.1em;
+            color: #ddd;
+        }
+
+        .stats {
+            background: white;
+            padding: 80px 20px;
+        }
+
+        .stats-grid {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            text-align: center;
+        }
+
+        .stat {
+            padding: 30px;
+        }
+
+        .stat-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5em;
+            color: var(--primary);
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.1em;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .pricing {
+            background: #f9f9f9;
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .pricing h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3em;
+            margin-bottom: 50px;
+            color: var(--primary);
+        }
+
+        .pricing-card {
+            background: white;
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 50px 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 2px solid var(--primary);
+        }
+
+        .price {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5em;
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+
+        .price-label {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+        }
+
+        .features-list {
+            text-align: left;
+            margin-bottom: 40px;
+            line-height: 2.2;
+        }
+
+        .features-list li {
+            list-style: none;
+            color: #666;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .features-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 1.2em;
+        }
+
+        footer {
+            background: var(--dark);
+            color: #888;
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        footer p {
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.8em;
+            }
+
+            .hero .tagline {
+                font-size: 1.2em;
+            }
+
+            .features h2,
+            .about h2,
+            .pricing h2 {
+                font-size: 2em;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        nav {
+            background: var(--dark);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--primary);
+        }
+
+        nav .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8em;
+            color: var(--primary);
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        nav a {
+            color: #aaa;
+            text-decoration: none;
+            margin-left: 30px;
+            transition: color 0.3s ease;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                gap: 15px;
+                font-size: 0.9em;
+            }
+
+            nav a {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/" class="logo">🎯 Ask Ryan</a>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#about">About</a>
+            <a href="#pricing">Pricing</a>
+            <a href="/frontend.html" class="cta-button" style="margin: 0; padding: 10px 25px; font-size: 0.9em;">Try Now</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>Ask Ryan</h1>
+        <p class="tagline">Get Real Estate Coaching from Ryan Serhant's 500K+ Words of Wisdom</p>
+        <p>Powered by AI • Trained on Books, Videos, Courses & Podcasts • Completely Free</p>
+        <a href="/frontend.html" class="cta-button">Start Coaching →</a>
+    </section>
+
+    <section class="features" id="features">
+        <h2>Why Ask Ryan?</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="icon">🎯</div>
+                <h3>Direct & Practical</h3>
+                <p>Get straight-to-the-point advice based on Ryan's real-world real estate experience and proven frameworks.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">⚡</div>
+                <h3>Instant Answers</h3>
+                <p>No waiting. Get AI-powered responses trained on Ryan's best content in seconds, not hours.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">📚</div>
+                <h3>500K+ Words</h3>
+                <p>Trained on 150+ sources including bestselling books, YouTube videos, courses, and podcasts.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">🎤</div>
+                <h3>Ryan's Voice</h3>
+                <p>Responses capture Ryan's signature style—confident, motivational, and action-oriented.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">📄</div>
+                <h3>Upload Documents</h3>
+                <p>Attach contracts, listings, offers, and proposals for expert analysis in Ryan's voice.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">💰</div>
+                <h3>100% Free</h3>
+                <p>No subscriptions, no hidden costs, no credit card required. Forever free for all real estate agents.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="about" id="about">
+        <h2>About Ask Ryan</h2>
+        <div class="about-content">
+            <p>Ask Ryan is an AI coaching tool designed specifically for real estate agents. Built from over 500,000 words of Ryan Serhant's best content—including his bestselling books, YouTube videos, training courses, and podcasts—this tool gives you instant access to his proven frameworks and strategies.</p>
+            <p style="margin-top: 30px;">Whether you're struggling with price objections, need help closing deals, want to build your personal brand, or need guidance on any aspect of real estate sales, Ask Ryan has the answers. And the best part? It's completely free, forever.</p>
+        </div>
+    </section>
+
+    <section class="stats">
+        <div class="stats-grid">
+            <div class="stat">
+                <div class="stat-number">500K+</div>
+                <div class="stat-label">Words of Content</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">150+</div>
+                <div class="stat-label">Sources Analyzed</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">$0</div>
+                <div class="stat-label">Cost. Forever Free.</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">10x</div>
+                <div class="stat-label">Faster Than Claude</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pricing" id="pricing">
+        <h2>Simple Pricing</h2>
+        <div class="pricing-card">
+            <div class="price">$0</div>
+            <div class="price-label">Forever</div>
+            <ul class="features-list">
+                <li>Unlimited questions</li>
+                <li>Upload documents</li>
+                <li>500K+ words of content</li>
+                <li>Instant responses</li>
+                <li>Ryan's voice & style</li>
+                <li>No credit card required</li>
+            </ul>
+            <a href="/frontend.html" class="cta-button">Start Free →</a>
+        </div>
+    </section>
+
+    <footer>
+        <p><strong>Ask Ryan</strong> — AI Real Estate Coaching</p>
+        <p>Content trained on Ryan Serhant's public materials • Not affiliated with SERHANT.</p>
+        <p>&copy; 2026. Built with ❤️ for real estate agents.</p>
+    </footer>
+</body>
+</html>
