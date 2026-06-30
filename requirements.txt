@@ -16,9 +16,9 @@ PyPDF2>=3.0.1
 python-docx>=0.8.11
 beautifulsoup4>=4.12.2
 
-# Database
-supabase==1.4.0
+# Database (optional - commented out for now)
+# supabase==2.7.4
 
-# Utilities
-pandas>=2.0.0
-numpy>=1.24.0
+# Utilities (optional)
+# pandas>=2.0.0
+# numpy>=1.24.0
