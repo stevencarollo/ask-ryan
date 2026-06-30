@@ -331,6 +331,32 @@ def extract_text_from_file(file_path: str, file_name: str) -> str:
             except:
                 return "[DOCX extraction requires python-docx. Showing file name: " + file_name + "]"
 
+        elif ext in [".xlsx", ".xls"]:
+            try:
+                import openpyxl
+                wb = openpyxl.load_workbook(file_path)
+                text = ""
+                for sheet in wb.sheetnames:
+                    ws = wb[sheet]
+                    text += f"\n--- Sheet: {sheet} ---\n"
+                    for row in ws.iter_rows(values_only=True):
+                        text += " | ".join([str(cell) if cell is not None else "" for cell in row]) + "\n"
+                return text if text.strip() else "[Excel file is empty]"
+            except:
+                return "[Excel extraction requires openpyxl. Showing file name: " + file_name + "]"
+
+        elif ext == ".csv":
+            try:
+                import csv
+                with open(file_path, "r", encoding="utf-8") as f:
+                    reader = csv.reader(f)
+                    text = ""
+                    for row in reader:
+                        text += " | ".join(row) + "\n"
+                return text if text.strip() else "[CSV file is empty]"
+            except:
+                return "[CSV extraction failed. Showing file name: " + file_name + "]"
+
         elif ext in [".jpg", ".jpeg", ".png"]:
             return f"[Image file detected: {file_name}. For full OCR, integrate with Tesseract or Claude Vision API]"
 
