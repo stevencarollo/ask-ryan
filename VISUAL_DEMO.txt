@@ -1,0 +1,233 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                   RYAN SERHANT RESPONSE TOOL - WEB UI                       ║
+║                                                                            ║
+║  🎯 Ryan Serhant Response Tool              [⚙️ Settings] [? Help]        ║
+╠════════════════════════════════════════════════════════════════════════════╣
+║                                                                            ║
+║  Your Personal AI Coach Powered by Ryan's Wisdom                          ║
+║  Get instant guidance in his voice with citations to his best advice      ║
+║                                                                            ║
+║  ┌─────────────────────────────────────────────────────────────────────┐  ║
+║  │ 🔍 Ask any real estate question...                            ⌕ ⚙  │  ║
+║  │ How do I overcome price objections?                                 │  ║
+║  │                                                                     │  ║
+║  │                                          [Search] or [Go Deeper]   │  ║
+║  └─────────────────────────────────────────────────────────────────────┘  ║
+║                                                                            ║
+║  ✓ Recent: objection handling  ·  closing techniques  ·  time management  ║
+║                                                                            ║
+╠════════════════════════════════════════════════════════════════════════════╣
+║                                                                            ║
+║  🔄 Searching (retrieved 5 chunks) → Generating response → Ranking cites  ║
+║  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  ║
+║                                                                            ║
+╠════════════════════════════════════════════════════════════════════════════╣
+║  RYAN'S ANSWER                                        ✓ Confidence: 89%   ║
+╠════════════════════════════════════════════════════════════════════════════╣
+║                                                                            ║
+║  Listen, price objections are the easiest ones to overcome because        ║
+║  they're not really about price—they're about VALUE. Here's what you do:  ║
+║                                                                            ║
+║  First, never defend the price. That's weakness. Instead, ask: "What      ║
+║  specifically concerns you about the investment?" Nine times out of ten,  ║
+║  they don't actually understand what they're buying or what you're        ║
+║  bringing to the table.                                                   ║
+║                                                                            ║
+║  Then—and this is critical—reframe the conversation. Don't talk about     ║
+║  what the property COSTS. Talk about what it MAKES or SAVES or            ║
+║  PROVIDES. You're not selling a house, you're selling their future.       ║
+║  You're selling peace of mind. You're selling the lifestyle they want.    ║
+║                                                                            ║
+║  Here's the script I use: "I hear you on price. What I'm really asking    ║
+║  is—are we talking about the same property? Because if you saw someone    ║
+║  else sell something similar for less, that's actually concerning to me.   ║
+║  Either they're missing something you need, or we need to talk about      ║
+║  what makes THIS property worth the premium."                             ║
+║                                                                            ║
+║  Then be quiet. Let them talk. Most agents jump in and start justifying.   ║
+║  Don't do that. The person who talks first loses.                          ║
+║                                                                            ║
+║  One more thing: sometimes price IS the real issue—they legitimately      ║
+║  can't afford it or the market won't bear it. That's okay. You pivot to   ║
+║  creative solutions: seller financing, lease options, staging to          ║
+║  increase perceived value. But you never, ever apologize for quality.     ║
+║                                                                            ║
+║  The bottom line: price objections mean they're interested. No interest   ║
+║  = no objections. So treat it like the opportunity it is.                 ║
+║                                                                            ║
+║  📖 Reading time: 79 seconds  |  📊 From 3 sources  |  ⏱️ Generated in 245ms  ║
+║                                                                            ║
+║  [🎤 Listen] [📋 Copy] [↗️ Share] [👍 Helpful] [👎 Needs work]           ║
+║                                                                            ║
+╠════════════════════════════════════════════════════════════════════════════╣
+║  SOURCES                                                                   ║
+╠════════════════════════════════════════════════════════════════════════════╣
+║                                                                            ║
+║  📕 1. "Sell It Like Serhant" - Negotiation Chapter          ★★★★★ 94/100  ║
+║  ┌────────────────────────────────────────────────────────────────────┐   ║
+║  │ "Price objections are not about price—they're about value         │   ║
+║  │  perception. The key is to reframe the conversation from cost     │   ║
+║  │  to benefit. Ask qualifying questions rather than defending      │   ║
+║  │  the price point."                                               │   ║
+║  │                                                                  │   ║
+║  │ Topics: objection_handling, negotiation                          │   ║
+║  │ [→ Read full chapter]  [📄 Save to notes]                        │   ║
+║  └────────────────────────────────────────────────────────────────────┘   ║
+║                                                                            ║
+║  📚 2. Advanced Selling Course - Lesson 4: Objection Framework ★★★★☆ 90/100 ║
+║  ┌────────────────────────────────────────────────────────────────────┐   ║
+║  │ "Use the silence strategy after presenting your value. The       │   ║
+║  │  agent who speaks first after stating price loses the            │   ║
+║  │  negotiation. Let the client respond. Their next words tell      │   ║
+║  │  you what they really care about."                               │   ║
+║  │                                                                  │   ║
+║  │ Topics: scripts, objection_handling                              │   ║
+║  │ [→ Go to lesson]  [▶️ Watch video]  [📄 Save to notes]            │   ║
+║  └────────────────────────────────────────────────────────────────────┘   ║
+║                                                                            ║
+║  🎙️ 3. Masters of Scale Podcast - Episode 12              ★★★★☆ 88/100   ║
+║  ┌────────────────────────────────────────────────────────────────────┐   ║
+║  │ "The best negotiators reframe objections as opportunities.       │   ║
+║  │  When someone says 'too expensive,' they're really saying 'I     │   ║
+║  │  don't see the value yet.' That's your cue to educate, not to   │   ║
+║  │  discount."                                                      │   ║
+║  │                                                                  │   ║
+║  │ Topics: negotiation                                              │   ║
+║  │ [→ Listen to episode]  [📄 Save to notes]                        │   ║
+║  └────────────────────────────────────────────────────────────────────┘   ║
+║                                                                            ║
+╠════════════════════════════════════════════════════════════════════════════╣
+║  AUDIO PLAYER                                                              ║
+╠════════════════════════════════════════════════════════════════════════════╣
+║                                                                            ║
+║  🎧 Listen to Ryan's Voice                                                ║
+║  ┌────────────────────────────────────────────────────────────────────┐   ║
+║  │  ▶️ ⏸  ⏹                                                           │   ║
+║  │  ╔════════════════════════════════════════════╗ 00:00 / 01:19      │   ║
+║  │  ║●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●║                      │   ║
+║  │  ╚════════════════════════════════════════════╝                     │   ║
+║  │                                                                      │   ║
+║  │  🔊 Volume: ███████████░░░░░░░                                     │   ║
+║  │  ⚡ Speed:  1.0x [0.8x] [1.2x] [1.5x]                              │   ║
+║  │                                                                      │   ║
+║  │  [📥 Download MP3]  [🔗 Share link]  [💬 Transcribe]              │   ║
+║  └────────────────────────────────────────────────────────────────────┘   ║
+║                                                                            ║
+╠════════════════════════════════════════════════════════════════════════════╣
+║  MORE OPTIONS                                                              ║
+╠════════════════════════════════════════════════════════════════════════════╣
+║                                                                            ║
+║  Response Style: [✓ Practical]  [Motivational]  [Technical]               ║
+║                                                                            ║
+║  🎯 Motivational Version                                                  ║
+║  "Price objections? That's GOOD NEWS. You know why? Because they're       ║
+║   still interested. They wouldn't object if they didn't care..."          ║
+║  [Show full motivational version]                                         ║
+║                                                                            ║
+║  🧠 Technical Version                                                     ║
+║  "Price resistance typically stems from three cognitive biases:           ║
+║   (1) Anchoring bias, (2) Loss aversion, (3) Perceived value gap..."     ║
+║  [Show full technical version]                                            ║
+║                                                                            ║
+╠════════════════════════════════════════════════════════════════════════════╣
+║  FOLLOW-UP QUESTIONS                                                       ║
+╠════════════════════════════════════════════════════════════════════════════╣
+║                                                                            ║
+║  ❓ Agents also asked:                                                     ║
+║  • What if they still won't negotiate?                                    ║
+║  • How do I know when to walk away?                                       ║
+║  • Can you teach me that silence technique?                               ║
+║                                                                            ║
+╠════════════════════════════════════════════════════════════════════════════╣
+║  FEEDBACK                                                                  ║
+╠════════════════════════════════════════════════════════════════════════════╣
+║                                                                            ║
+║  Was this helpful?  [✓ Yes] [ No]  [📧 Send feedback]                     ║
+║                                                                            ║
+║  This response has been viewed 247 times  |  Saved 89 times               ║
+║                                                                            ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║  WHAT'S HAPPENING BEHIND THE SCENES                                        ║
+╠════════════════════════════════════════════════════════════════════════════╣
+║                                                                            ║
+║  1️⃣  USER TYPES QUESTION                                                  ║
+║      "How do I overcome price objections?"                                ║
+║                                ↓                                           ║
+║  2️⃣  SYSTEM RETRIEVES CONTENT (245ms)                                      ║
+║      • Vector search (semantic similarity)                                ║
+║      • Keyword search (exact matches)                                     ║
+║      • Topic filter (objection_handling, negotiation)                     ║
+║      → Found 5 highly relevant chunks                                     ║
+║                                ↓                                           ║
+║  3️⃣  CLAUDE GENERATES RESPONSE                                             ║
+║      • System prompt: "You are Ryan Serhant..."                           ║
+║      • Sends query + chunks                                              ║
+║      • Generates practical, specific answer                              ║
+║                                ↓                                           ║
+║  4️⃣  CITATIONS EXTRACTED & RANKED                                          ║
+║      • Extracts top sources from chunks                                   ║
+║      • Scores by: quality + relevance + recency + authority               ║
+║      • Formats with URLs and excerpts                                     ║
+║                                ↓                                           ║
+║  5️⃣  DISPLAY ON FRONTEND                                                   ║
+║      • Response text in Ryan's voice                                      ║
+║      • Quality indicators (confidence score)                              ║
+║      • Clickable citations with sources                                   ║
+║      • Optional audio playback                                            ║
+║                                                                            ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║  DIFFERENT RESPONSE STYLES                                                ║
+╠════════════════════════════════════════════════════════════════════════════╣
+║                                                                            ║
+║  PRACTICAL (Shown Above)                                                  ║
+║  ├─ Action steps you can use immediately                                  ║
+║  ├─ Includes scripts and frameworks                                       ║
+║  ├─ "Here's what you do..."                                               ║
+║  └─ Best for: Step-by-step guidance                                       ║
+║                                                                            ║
+║  MOTIVATIONAL                                                              ║
+║  ├─ Energetic and confidence-building                                     ║
+║  ├─ Bigger picture perspective                                            ║
+║  ├─ "This is where your personal brand becomes EVERYTHING..."             ║
+║  └─ Best for: Mindset shifts                                              ║
+║                                                                            ║
+║  TECHNICAL                                                                 ║
+║  ├─ Deep, educational                                                     ║
+║  ├─ Backed by psychology and data                                         ║
+║  ├─ "Price resistance stems from three cognitive biases..."               ║
+║  └─ Best for: Advanced training                                           ║
+║                                                                            ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+
+KEY FEATURES YOU'LL LOVE:
+
+✅ INSTANT ANSWERS
+   Get practical advice in seconds, not hours
+
+✅ RYAN'S ACTUAL VOICE
+   Sounds like him—energetic, direct, commanding
+
+✅ REAL SCRIPTS
+   Copy-paste ready framings you can use today
+
+✅ CITED SOURCES
+   Know exactly where the advice comes from
+
+✅ MULTIPLE STYLES
+   Practical, motivational, or technical—your choice
+
+✅ AUDIO OPTION
+   Listen while driving or doing paperwork
+
+✅ CONFIDENCE SCORES
+   Trust indicators tell you how reliable it is
+
+✅ FOLLOW-UP QUESTIONS
+   Ask deeper or pivot to new topics
