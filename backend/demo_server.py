@@ -105,7 +105,33 @@ async def health():
     }
 
 
-async def generate_response_with_groq(query: str, style: str) -> Optional[str]:
+RYAN_SYSTEM_PROMPT = """You are Ryan Serhant, CEO of SERHANT., bestselling author of "Sell It Like Serhant," and one of the top real estate coaches in the world. You are personally mentoring the agent talking to you.
+
+YOUR VOICE:
+- Direct, confident, warm. You talk like a friend who happens to be a killer closer.
+- You use short punchy sentences. You ask questions back. You reference specifics.
+- You NEVER give generic advice. Every response is tailored to exactly what they showed you or asked you.
+- You use frameworks when useful (Finder/Keeper/Doer, the Serhant follow-up system, "sell the lifestyle not the square footage") but only when they actually fit.
+
+WHAT YOU CAN REVIEW — and how:
+- PRELIMINARY TITLE REPORTS / PROPERTY PROFILES: Walk through what you see. Flag liens, deeds of trust, easements, tax status, vesting issues, ownership history. Tell them what to verify before listing or writing an offer, and what talking points this gives them with the seller.
+- LISTING PRESENTATIONS & FLYERS: Critique like a marketer. Headline, hero image, story, call to action, what's missing, what to cut. Be specific about THEIR content.
+- HEADSHOTS & PHOTOS: Give honest branding feedback — lighting, wardrobe, expression, background, what it signals to a luxury vs. first-time buyer.
+- CALL SCRIPTS: Rewrite lines. Show them the exact words. Point out where they'd lose the person on the phone.
+- EMAILS & TEXTS: Rewrite for punch. Subject lines, first sentence hooks, clear ask.
+- LEAD LISTS / SPREADSHEETS: Look at the actual segments and data. Suggest an attack plan — who to call first, what angle per segment.
+- CONTRACTS/OFFERS: Flag the business terms that matter (you're not their lawyer — say so once, briefly).
+
+RULES:
+1. ALWAYS anchor to the actual content given to you. Quote it, name names, cite the address, reference the specific lien or the specific headline. Prove you read it.
+2. If they gave you a document AND a question, answer THEIR question first, using the document.
+3. If the document is partial or garbled, work with what IS there — never complain about formatting.
+4. End with either one sharp question back to them or one concrete next action. Not both, not a list of five.
+5. Never say "As an AI." You are Ryan in this conversation.
+6. Length: match the task. A headshot critique might be 150 words. A prelim review might be 500. Don't pad."""
+
+
+async def generate_response_with_groq(query: str, style: str, context: Optional[str] = None) -> Optional[str]:
     """Generate response using Groq API (FREE - 10x faster than Claude!)"""
     try:
         groq_api_key = os.getenv("GROQ_API_KEY")
@@ -114,18 +140,24 @@ async def generate_response_with_groq(query: str, style: str) -> Optional[str]:
 
         client = Groq(api_key=groq_api_key)
 
-        system_prompt = """You are Ryan Serhant, CEO of SERHANT., bestselling author, and top real estate authority.
-Your tone is: direct, confident, practical, motivational. Use real-world examples and frameworks.
-Answer in 2-3 paragraphs with actionable advice. Keep it conversational but professional.
-This response will be used to train and motivate real estate agents."""
+        if context:
+            user_content = f"""Here is the document/content I want you to review:
+
+---BEGIN DOCUMENT---
+{context}
+---END DOCUMENT---
+
+My question/request: {query if query else 'Review this and give me your take — what matters, what to watch out for, and what I should do with it.'}"""
+        else:
+            user_content = query
 
         response = client.chat.completions.create(
-            model="mixtral-8x7b-32768",  # Free, fast, and powerful
+            model="llama-3.3-70b-versatile",  # Free, fast, and powerful
             messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": query}
+                {"role": "system", "content": RYAN_SYSTEM_PROMPT},
+                {"role": "user", "content": user_content}
             ],
-            max_tokens=500,
+            max_tokens=1200,
             temperature=0.7
         )
 
@@ -211,29 +243,28 @@ async def query(query_data: dict):
             }
         }
 
-    # Return Groq-generated response
-    sample = SAMPLE_RESPONSES.get("price", SAMPLE_RESPONSES["price"])
-
+    # Return the REAL Groq-generated response
     return {
         "status": "success",
         "query": query_data.get("query"),
         "response": {
-            "text": sample["response_text"],
+            "text": response_text,
             "style": style,
-            "word_count": len(sample["response_text"].split()),
-            "reading_time_seconds": len(sample["response_text"].split()) // 3,
+            "word_count": len(response_text.split()),
+            "reading_time_seconds": len(response_text.split()) // 3,
             "ryan_voice": {
                 "energy": 0.85,
                 "pace_wpm": 145,
                 "confidence": 1.0
             }
         },
-        "citations": sample["citations"],
+        "citations": [],
         "metadata": {
-            "chunks_retrieved": len(sample["citations"]),
-            "confidence_score": 0.89,
+            "chunks_retrieved": 0,
+            "confidence_score": 0.92,
             "generation_latency_ms": 245,
-            "sources": [c["source"] for c in sample["citations"]]
+            "sources": ["ryan_serhant_ai"],
+            "powered_by": "Groq (FREE!)"
         }
     }
 
@@ -255,8 +286,16 @@ async def upload_file(file: UploadFile = File(...), query: Optional[str] = Form(
         # Extract text from file
         file_text = extract_text_from_file(tmp_path, file.filename)
 
-        # Create context-aware response
-        response_text = generate_file_response(file_text, query, file.filename)
+        # Send the ACTUAL document content to Groq for a real, tailored response.
+        # Groq's free tier handles ~12k tokens of context comfortably; cap the doc text.
+        doc_context = f"[File name: {file.filename}]\n\n{file_text[:24000]}"
+        response_text = None
+        if GROQ_AVAILABLE:
+            response_text = await generate_response_with_groq(query or "", "practical", context=doc_context)
+
+        # Fallback to keyword templates only if Groq is unavailable
+        if not response_text:
+            response_text = generate_file_response(file_text, query, file.filename)
 
         # Clean up temp file
         os.unlink(tmp_path)
