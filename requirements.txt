@@ -4,10 +4,11 @@ python-dotenv==1.0.0
 python-multipart==0.0.6
 
 # Using Groq instead of Claude (FREE!)
-groq==0.4.1
+# (0.4.1 broke against httpx>=0.28 - "unexpected keyword argument 'proxies'")
+groq>=0.13.0
 
-# Optional: Keep Claude as fallback
-anthropic==0.7.1
+# Optional: Keep Claude as fallback (disabled - not used by demo_server)
+# anthropic>=0.40.0
 
 # Optional dependencies for full features
 yt-dlp>=2026.1.0
