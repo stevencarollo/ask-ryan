@@ -440,9 +440,11 @@
                     Get Guidance
                 </button>
                 <button class="btn-secondary" onclick="clearForm()">
-                    Clear
+                    New Conversation
                 </button>
             </div>
+
+            <div id="convoBadge" style="display: none; margin-top: 16px; padding: 10px 16px; background: rgba(212, 175, 55, 0.08); border: 1px solid var(--primary); border-radius: 10px; color: #8a6d1a; font-size: 0.9em; font-weight: 500;"></div>
 
             <div class="status">
                 <span class="api-status online" id="apiStatus"></span>
@@ -474,6 +476,24 @@
 
     <script>
         const API_URL = 'https://ask-ryan-nb3w.onrender.com';
+
+        // Conversation memory: Ryan remembers the thread + any uploaded document
+        let conversationHistory = [];
+        let documentContext = null;
+        let documentName = null;
+
+        function updateConversationBadge() {
+            const badge = document.getElementById('convoBadge');
+            if (conversationHistory.length === 0) {
+                badge.style.display = 'none';
+                return;
+            }
+            const exchanges = Math.floor(conversationHistory.length / 2);
+            let text = `💬 Conversation active (${exchanges} exchange${exchanges === 1 ? '' : 's'})`;
+            if (documentName) text += ` — Ryan remembers "${documentName}"`;
+            badge.textContent = text;
+            badge.style.display = 'block';
+        }
 
         async function checkApiStatus() {
             try {
@@ -533,13 +553,30 @@
                     }
 
                     responseData = await response.json();
+
+                    // Remember the document for the rest of the conversation
+                    documentContext = responseData.extracted_text || null;
+                    documentName = file.name;
+                    conversationHistory.push({
+                        role: 'user',
+                        content: `[I uploaded a document: ${file.name}] ${question || 'Review this for me.'}`
+                    });
+                    conversationHistory.push({ role: 'assistant', content: responseData.response.text });
+
+                    // Clear the file input so replies don't re-upload the same file
+                    fileInput.value = '';
+                    document.getElementById('fileName').textContent = `✓ ${documentName} (in Ryan's memory)`;
                 } else {
                     const response = await fetch(`${API_URL}/api/query`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ query: question })
+                        body: JSON.stringify({
+                            query: question,
+                            history: conversationHistory.slice(-12),
+                            context: documentContext
+                        })
                     });
 
                     if (!response.ok) {
@@ -547,7 +584,15 @@
                     }
 
                     responseData = await response.json();
+
+                    conversationHistory.push({ role: 'user', content: question });
+                    conversationHistory.push({ role: 'assistant', content: responseData.response.text });
                 }
+
+                // Clear the question box so replying to Ryan feels natural
+                document.getElementById('question').value = '';
+                document.getElementById('question').placeholder = 'Reply to Ryan or ask a new question...';
+                updateConversationBadge();
 
                 document.getElementById('responseText').textContent = responseData.response.text;
                 document.getElementById('confidenceBadge').textContent =
@@ -587,6 +632,13 @@
 
         function clearForm() {
             document.getElementById('question').value = '';
+            document.getElementById('question').placeholder = 'Ask Ryan anything about closing deals, handling objections, building your brand...';
+            document.getElementById('fileUpload').value = '';
+            document.getElementById('fileName').textContent = '';
+            conversationHistory = [];
+            documentContext = null;
+            documentName = null;
+            updateConversationBadge();
             hideResponse();
             hideError();
         }

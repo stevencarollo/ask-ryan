@@ -131,8 +131,12 @@ RULES:
 6. Length: match the task. A headshot critique might be 150 words. A prelim review might be 500. Don't pad."""
 
 
-async def generate_response_with_groq(query: str, style: str, context: Optional[str] = None) -> Optional[str]:
-    """Generate response using Groq API (FREE - 10x faster than Claude!)"""
+async def generate_response_with_groq(query: str, style: str, context: Optional[str] = None,
+                                      history: Optional[list] = None) -> Optional[str]:
+    """Generate response using Groq API (FREE - 10x faster than Claude!)
+
+    history: prior conversation turns [{role: 'user'|'assistant', content: str}, ...]
+    so Ryan remembers the thread and any document already discussed."""
     try:
         groq_api_key = os.getenv("GROQ_API_KEY")
         if not groq_api_key:
@@ -151,12 +155,19 @@ My question/request: {query if query else 'Review this and give me your take —
         else:
             user_content = query
 
+        messages = [{"role": "system", "content": RYAN_SYSTEM_PROMPT}]
+        # Replay prior turns (validated + capped) so follow-up replies keep full context
+        if history:
+            for turn in history[-12:]:
+                role = turn.get("role")
+                content = str(turn.get("content", ""))[:8000]
+                if role in ("user", "assistant") and content:
+                    messages.append({"role": role, "content": content})
+        messages.append({"role": "user", "content": user_content})
+
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",  # Free, fast, and powerful
-            messages=[
-                {"role": "system", "content": RYAN_SYSTEM_PROMPT},
-                {"role": "user", "content": user_content}
-            ],
+            messages=messages,
             max_tokens=1200,
             temperature=0.7
         )
@@ -326,11 +337,15 @@ async def query(query_data: dict):
     """
     query_text = query_data.get("query", "")
     style = query_data.get("response_style", "practical")
+    history = query_data.get("history") or []
+    context = query_data.get("context")  # document text carried across the conversation
+    if context:
+        context = str(context)[:16000]
 
     # Try to generate response using Groq (FREE!)
     response_text = None
     if GROQ_AVAILABLE:
-        response_text = await generate_response_with_groq(query_text, style)
+        response_text = await generate_response_with_groq(query_text, style, context=context, history=history)
 
     # Fallback to sample responses if Groq unavailable
     if not response_text:
@@ -431,6 +446,7 @@ async def upload_file(file: UploadFile = File(...), query: Optional[str] = Form(
             "status": "success",
             "file_name": file.filename,
             "file_size": len(content),
+            "extracted_text": file_text[:16000],
             "response": {
                 "text": response_text,
                 "style": "practical",
