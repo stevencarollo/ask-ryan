@@ -168,6 +168,100 @@ My question/request: {query if query else 'Review this and give me your take —
         return None
 
 
+# Groq's FREE vision model - used for OCR on scanned PDFs and real photo reviews
+VISION_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"
+
+
+def _groq_client() -> Optional["Groq"]:
+    key = os.getenv("GROQ_API_KEY")
+    if not key or not GROQ_AVAILABLE:
+        return None
+    return Groq(api_key=key)
+
+
+def ocr_pdf_with_groq_vision(file_path: str, max_pages: int = 8) -> str:
+    """OCR a scanned (image-only) PDF: render pages to images with PyMuPDF,
+    transcribe each with Groq's free vision model. $0 cost."""
+    import base64
+    try:
+        import fitz  # PyMuPDF
+    except ImportError:
+        return ""
+    client = _groq_client()
+    if client is None:
+        return ""
+    try:
+        doc = fitz.open(file_path)
+    except Exception:
+        return ""
+    import time
+    total = doc.page_count
+    pages = min(total, max_pages)
+    out = []
+    for i in range(pages):
+        pix = doc[i].get_pixmap(dpi=100)
+        b64 = base64.b64encode(pix.tobytes("png")).decode()
+        # Free tier = 30k tokens/min on the vision model; retry with a pause on 429s
+        for attempt in range(3):
+            try:
+                r = client.chat.completions.create(
+                    model=VISION_MODEL,
+                    messages=[{
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": "Transcribe ALL text visible in this document page, exactly as written. Render tables as plain text rows. Output ONLY the transcription, no commentary."},
+                            {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{b64}"}},
+                        ],
+                    }],
+                    max_tokens=2000,
+                    temperature=0,
+                )
+                out.append(f"--- Page {i + 1} ---\n{r.choices[0].message.content}")
+                break
+            except Exception as e:
+                if "rate_limit" in str(e) and attempt < 2:
+                    time.sleep(8)
+                    continue
+                print(f"Vision OCR error on page {i + 1}: {e}")
+                break
+    doc.close()
+    text = "\n\n".join(out)
+    if total > pages and text:
+        text += f"\n\n[Note: this document has {total} pages; the first {pages} were read.]"
+    return text
+
+
+def analyze_image_with_groq(file_path: str, query: Optional[str], file_name: str) -> Optional[str]:
+    """Ryan actually LOOKS at an uploaded photo (headshot, flyer, listing photo)
+    and critiques it using the vision model."""
+    import base64
+    client = _groq_client()
+    if client is None:
+        return None
+    ext = os.path.splitext(file_name)[1].lower().lstrip(".")
+    mime = "jpeg" if ext in ("jpg", "jpeg") else "png"
+    try:
+        with open(file_path, "rb") as f:
+            b64 = base64.b64encode(f.read()).decode()
+        user_text = query or "Review this image and give me your honest take - what works, what doesn't, and what I should change."
+        r = client.chat.completions.create(
+            model=VISION_MODEL,
+            messages=[
+                {"role": "system", "content": RYAN_SYSTEM_PROMPT},
+                {"role": "user", "content": [
+                    {"type": "text", "text": f"(Uploaded image: {file_name})\n\n{user_text}"},
+                    {"type": "image_url", "image_url": {"url": f"data:image/{mime};base64,{b64}"}},
+                ]},
+            ],
+            max_tokens=1000,
+            temperature=0.7,
+        )
+        return r.choices[0].message.content
+    except Exception as e:
+        print(f"Vision analyze error: {e}")
+        return None
+
+
 @app.get("/api/status")
 async def status():
     """Get system status and metrics"""
@@ -283,17 +377,23 @@ async def upload_file(file: UploadFile = File(...), query: Optional[str] = Form(
             tmp.write(content)
             tmp_path = tmp.name
 
-        # Extract text from file
-        file_text = extract_text_from_file(tmp_path, file.filename)
-
-        # Send the ACTUAL document content to Groq for a real, tailored response.
-        # Groq's free tier handles ~12k tokens of context comfortably; cap the doc text.
-        doc_context = f"[File name: {file.filename}]\n\n{file_text[:24000]}"
+        ext = os.path.splitext(file.filename)[1].lower()
         response_text = None
-        if GROQ_AVAILABLE:
-            response_text = await generate_response_with_groq(query or "", "practical", context=doc_context)
+        file_text = ""
 
-        # Fallback to keyword templates only if Groq is unavailable
+        # Photos (headshots, flyers, listing shots): Ryan looks at the ACTUAL image
+        if ext in [".jpg", ".jpeg", ".png"]:
+            response_text = analyze_image_with_groq(tmp_path, query, file.filename)
+            file_text = f"[Image reviewed: {file.filename}]"
+
+        # Documents: extract text (with vision-OCR fallback for scanned PDFs)
+        if not response_text:
+            file_text = extract_text_from_file(tmp_path, file.filename)
+            doc_context = f"[File name: {file.filename}]\n\n{file_text[:24000]}"
+            if GROQ_AVAILABLE:
+                response_text = await generate_response_with_groq(query or "", "practical", context=doc_context)
+
+        # Last-resort fallback only if Groq is unavailable
         if not response_text:
             response_text = generate_file_response(file_text, query, file.filename)
 
@@ -351,16 +451,21 @@ def extract_text_from_file(file_path: str, file_name: str) -> str:
                 return f.read()
 
         elif ext == ".pdf":
+            text = ""
             try:
                 import PyPDF2
                 with open(file_path, "rb") as f:
                     reader = PyPDF2.PdfReader(f)
-                    text = ""
                     for page in reader.pages:
-                        text += page.extract_text()
-                return text if text else "[PDF content could not be extracted]"
-            except:
-                return "[PDF extraction requires PyPDF2. Showing file name: " + file_name + "]"
+                        text += page.extract_text() or ""
+            except Exception:
+                pass
+            # Scanned PDF (no text layer)? OCR it with the free Groq vision model.
+            if len(text.strip()) < 200:
+                ocr_text = ocr_pdf_with_groq_vision(file_path)
+                if ocr_text.strip():
+                    return ocr_text
+            return text if text.strip() else "[PDF content could not be extracted]"
 
         elif ext in [".docx", ".doc"]:
             try:
