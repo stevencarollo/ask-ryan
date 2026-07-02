@@ -262,6 +262,33 @@ def analyze_image_with_groq(file_path: str, query: Optional[str], file_name: str
         return None
 
 
+@app.get("/api/diag")
+async def diag():
+    """Diagnostic: is the Groq key loaded and working on this server?"""
+    key = os.getenv("GROQ_API_KEY", "")
+    info = {
+        "groq_sdk_installed": GROQ_AVAILABLE,
+        "key_present": bool(key),
+        "key_fingerprint": (key[:7] + "..." + key[-4:]) if key else None,
+        "key_length": len(key),
+        "groq_ping": None,
+    }
+    try:
+        client = _groq_client()
+        if client:
+            r = client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=[{"role": "user", "content": "say ok"}],
+                max_tokens=4,
+            )
+            info["groq_ping"] = "OK: " + (r.choices[0].message.content or "")
+        else:
+            info["groq_ping"] = "no client (missing key or sdk)"
+    except Exception as e:
+        info["groq_ping"] = f"ERROR: {str(e)[:250]}"
+    return info
+
+
 @app.get("/api/status")
 async def status():
     """Get system status and metrics"""
