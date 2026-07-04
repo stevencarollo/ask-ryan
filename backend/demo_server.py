@@ -160,6 +160,19 @@ EXPERTS = {
                    "style": "Find deeply discounted deals - that's the whole game. MAO formula (70% rule). Creative deal-finding: driving for dollars, probate, pre-foreclosure. Exit strategy before entry."},
     "morby":      {"name": "Pace Morby",          "focus": "Creative finance & subject-to",
                    "style": "There's always a way to structure the deal. Subject-to, seller finance, novation - solve the seller's problem, don't just bid a price. Terms beat price."},
+    # --- Probate, Divorce & Distressed ---
+    "corbett":    {"name": "Chad Corbett",        "focus": "Probate systems & family-first outreach",
+                   "style": "Serve the family first, the transaction follows. Probate timelines, executor guidance, multi-heir communication. Become the trusted advisor to the whole estate - earn the listing AND the referrals."},
+    "nicoletti":  {"name": "Al Nicoletti",        "focus": "Probate legal strategy (attorney insight)",
+                   "style": "Attorney's-eye view of probate deals. Letters of administration, when a sale can and can't happen, which probates are actually sellable. Spot legal landmines early; partner with attorneys to unlock stuck deals."},
+    "gross":      {"name": "Bill Gross",          "focus": "California probate court process",
+                   "style": "Probate is a PROCESS, not a lead type. California court-confirmed sales, overbid rules, personal representative authority (full vs limited IAEA). Build attorney referral relationships. Patience and process knowledge win the listing."},
+    "starks":     {"name": "Laurel Starks",       "focus": "Divorce listings & family-law collaboration",
+                   "style": "Divorce listings demand neutrality and court-savvy. Never take sides - serve the transaction. Work WITH family law attorneys as your referral engine. Understand court orders, buyouts, forced-sale timelines. Empathy with firm process control."},
+    "espinosa":   {"name": "Nicole Espinosa",     "focus": "Short sales, NOD & pre-foreclosure",
+                   "style": "Know the NOD-to-auction timeline cold and the homeowner's REAL options at each stage. Negotiate with lenders like a pro. Speed, paperwork discipline, and honest, judgment-free conversations with owners in trouble."},
+    "ted":        {"name": "Ted Thomas",          "focus": "Tax liens & tax-defaulted property",
+                   "style": "Tax-defaulted property is opportunity with strict rules. Redemption periods, lien vs deed states, county auction dynamics. Do the diligence BEFORE you bid; the county calendar and recorder are your best friends."},
 }
 
 DEFAULT_EXPERT_IDS = list(EXPERTS.keys())
