@@ -8,7 +8,7 @@ Update after EVERY advisor. Trust this file over memory.
 - [x] nicoletti (Al Nicoletti) — kb/nicoletti.md written, dossier folded
 - [x] corbett (Chad Corbett) — kb/corbett.md written, dossier folded
 - [x] starks (Laurel Starks) — kb/starks.md written, dossier folded
-- [~] ted (Ted Thomas) — next: searches
+- [x] ted (Ted Thomas) — kb/ted.md written, dossier folded — WAVE 1 RESEARCH COMPLETE
 
 ## Wave 2 — Español
 - [ ] loida (Loida Velasquez)
