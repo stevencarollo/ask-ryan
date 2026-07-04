@@ -7,8 +7,8 @@ Update after EVERY advisor. Trust this file over memory.
 - [x] espinosa (Nicole Espinosa) — kb/espinosa.md written, dossier folded
 - [x] nicoletti (Al Nicoletti) — kb/nicoletti.md written, dossier folded
 - [x] corbett (Chad Corbett) — kb/corbett.md written, dossier folded
-- [~] starks (Laurel Starks) — next: searches
-- [ ] ted (Ted Thomas, tax defaults)
+- [x] starks (Laurel Starks) — kb/starks.md written, dossier folded
+- [~] ted (Ted Thomas) — next: searches
 
 ## Wave 2 — Español
 - [ ] loida (Loida Velasquez)
