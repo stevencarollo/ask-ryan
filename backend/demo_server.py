@@ -108,83 +108,29 @@ async def health():
 # ============================================================
 # THE ROUNDTABLE - selectable expert influences
 # ============================================================
-EXPERTS = {
-    "serhant":    {"name": "Ryan Serhant",       "focus": "Luxury sales & personal branding",
-                   "style": "Bold, energetic, brand-first. Sell the lifestyle, not the square footage. Build your personal brand relentlessly. Follow-up systems win deals."},
-    "ferry":      {"name": "Tom Ferry",           "focus": "Coaching systems & business planning",
-                   "style": "Systems and accountability. Know your numbers (conversion rates, appointments set). Scripts drilled until natural. Annual business plan broken into daily disciplines."},
-    "buffini":    {"name": "Brian Buffini",       "focus": "Referrals & relationship selling",
-                   "style": "Work by referral. Serve people so well they can't stop talking about you. Pop-bys, personal notes, consistent touch systems. The relationship IS the business."},
-    "harris":     {"name": "Tim & Julie Harris",  "focus": "Listing appointments & proven scripts",
-                   "style": "Listing-agent-first mindset. Prequalify every appointment. Practiced, word-for-word scripts. Handle every stall and objection with a specific response."},
-    "mulrenin":   {"name": "Brandon Mulrenin",    "focus": "FSBO, expireds & prospecting scripts",
-                   "style": "Confident detachment - never sound needy. Ask questions that let sellers convince themselves. FSBO/expired specialist. Tonality matters more than the words."},
-    "carruthers": {"name": "Ricky Carruthers",    "focus": "Cold calling & door knocking",
-                   "style": "Volume and consistency beat talent. Make the calls every day. Real conversations from real dials. Track everything, embrace rejection as data."},
-    "loida":      {"name": "Loida Velasquez",     "focus": "Bilingual (English/Spanish) prospecting",
-                   "style": "Authentic bilingual outreach - meet Spanish-speaking clients in their language and culture. New-agent hustle. Door knocking and open houses done right."},
-    "glennda":    {"name": "Glennda Baker",       "focus": "Storytelling & social media",
-                   "style": "Every property and client is a STORY. Vulnerable, memorable, specific storytelling that makes people feel something. Social content that builds trust at scale."},
-    "lazine":     {"name": "Byron Lazine",        "focus": "Market analysis & industry trends",
-                   "style": "Data-informed takes on where the market is going. Challenge lazy industry narratives. Sharp, current, willing to be contrarian when the data says so."},
-    "burgess":    {"name": "Jimmy Burgess",       "focus": "Listing attraction & lead gen tactics",
-                   "style": "Tactical and generous - give value first. Specific repeatable lead-gen plays (unsolicited video CMAs, niche farming). Compound daily actions into a listing machine."},
-    "keller":     {"name": "Gary Keller",         "focus": "Team building & wealth models (MREA)",
-                   "style": "Think in models and leverage. Lead generation is the job; everything else is the work. Build a business that runs on systems and people, not heroics. Long-term wealth over commissions."},
-    "voss":       {"name": "Chris Voss",          "focus": "Negotiation psychology",
-                   "style": "Tactical empathy. Label emotions ('It seems like...'). Calibrated questions ('How am I supposed to do that?'). Mirror, get to 'that's right', never split the difference."},
-    "sharran":    {"name": "Sharran Srivatsaa",   "focus": "Business strategy, luxury & wealth",
-                   "style": "CEO-level thinking. Named frameworks and repeatable playbooks. Luxury positioning, deal architecture, wealth strategy. Precise, structured, high-leverage moves only."},
-    # --- Design & Staging ---
-    "gaines":     {"name": "Joanna Gaines",       "focus": "Interior design & lifestyle storytelling",
-                   "style": "Warm, story-driven design. Every home has a soul - bring it out. Mix textures, honor the home's character, design for how families actually live. Make buyers feel HOME."},
-    "mcgee":      {"name": "Shea McGee",          "focus": "Design rules & transformations",
-                   "style": "Elevated but approachable design formulas. Clear rules: scale, layering, focal points. Before/after thinking - show the transformation. Design choices that photograph beautifully."},
-    "eisen":      {"name": "Cheryl Eisen",        "focus": "Luxury staging that sells",
-                   "style": "Staging is an investment with ROI, not decoration. Create aspirational moments buyers can't forget. Every room gets a purpose. Stage to the target buyer's dream life."},
-    "pantana":    {"name": "Jason Pantana",       "focus": "Visual marketing & marketing tech",
-                   "style": "Marketing trends and tools that actually convert. Listing ads, video, SEO, AI tools. Hook-first content. Test, measure, double down on what works."},
-    "peitz":      {"name": "Chelsea Peitz",       "focus": "Visual social branding",
-                   "style": "Camera-first personal branding. Show your face, tell micro-stories, be consistently visible. Social is about connection, not perfection. Document, don't create."},
-    # --- Commercial ---
-    "knakal":     {"name": "Bob Knakal",          "focus": "Commercial investment sales",
-                   "style": "Deep market knowledge wins listings. Territory mastery - know every building, every owner, every sale. Long-game relationship cultivation with owners. Data-driven valuations."},
-    "cauble":     {"name": "Tyler Cauble",        "focus": "Commercial leasing & small CRE",
-                   "style": "Commercial demystified for regular investors. NNN leases, cap rates, value-add plays explained simply. Start small, think neighborhood retail and mixed-use."},
-    "mcelroy":    {"name": "Ken McElroy",         "focus": "Multifamily & apartment investing",
-                   "style": "Buy for cash flow, not appreciation. The deal is made at the buy. Operations and management create value. Use debt intelligently, think in decades."},
-    # --- Flipping & Investing ---
-    "tarek":      {"name": "Tarek El Moussa",     "focus": "House flipping & renovation ROI",
-                   "style": "Speed and budget discipline. Know your ARV cold before you buy. Renovate for the buyer profile, not your taste. Every day of holding costs money."},
-    "norton":     {"name": "Jerry Norton",        "focus": "Flipping & wholesaling deals",
-                   "style": "Find deeply discounted deals - that's the whole game. MAO formula (70% rule). Creative deal-finding: driving for dollars, probate, pre-foreclosure. Exit strategy before entry."},
-    "morby":      {"name": "Pace Morby",          "focus": "Creative finance & subject-to",
-                   "style": "There's always a way to structure the deal. Subject-to, seller finance, novation - solve the seller's problem, don't just bid a price. Terms beat price."},
-    # --- Probate, Divorce & Distressed ---
-    "corbett":    {"name": "Chad Corbett",        "focus": "Probate systems & family-first outreach",
-                   "style": "Serve the family first, the transaction follows. Probate timelines, executor guidance, multi-heir communication. Become the trusted advisor to the whole estate - earn the listing AND the referrals."},
-    "nicoletti":  {"name": "Al Nicoletti",        "focus": "Probate legal strategy (attorney insight)",
-                   "style": "Attorney's-eye view of probate deals. Letters of administration, when a sale can and can't happen, which probates are actually sellable. Spot legal landmines early; partner with attorneys to unlock stuck deals."},
-    "gross":      {"name": "Bill Gross",          "focus": "California probate court process",
-                   "style": "Probate is a PROCESS, not a lead type. California court-confirmed sales, overbid rules, personal representative authority (full vs limited IAEA). Build attorney referral relationships. Patience and process knowledge win the listing."},
-    "starks":     {"name": "Laurel Starks",       "focus": "Divorce listings & family-law collaboration",
-                   "style": "Divorce listings demand neutrality and court-savvy. Never take sides - serve the transaction. Work WITH family law attorneys as your referral engine. Understand court orders, buyouts, forced-sale timelines. Empathy with firm process control."},
-    "espinosa":   {"name": "Nicole Espinosa",     "focus": "Short sales, NOD & pre-foreclosure",
-                   "style": "Know the NOD-to-auction timeline cold and the homeowner's REAL options at each stage. Negotiate with lenders like a pro. Speed, paperwork discipline, and honest, judgment-free conversations with owners in trouble."},
-    "ted":        {"name": "Ted Thomas",          "focus": "Tax liens & tax-defaulted property",
-                   "style": "Tax-defaulted property is opportunity with strict rules. Redemption periods, lien vs deed states, county auction dynamics. Do the diligence BEFORE you bid; the county calendar and recorder are your best friends."},
-}
-
-DEFAULT_EXPERT_IDS = list(EXPERTS.keys())
+try:
+    from backend.experts_kb import EXPERTS, DEFAULT_EXPERT_IDS, DEEP_PANEL_MAX
+except ImportError:
+    from experts_kb import EXPERTS, DEFAULT_EXPERT_IDS, DEEP_PANEL_MAX
 
 
 def build_system_prompt(expert_ids: Optional[list] = None) -> str:
-    """Compose The Roundtable's system prompt from the client's selected advisor influences."""
+    """Focused panels (<= DEEP_PANEL_MAX advisors) get FULL knowledge dossiers
+    (frameworks, named systems, methodology). Broad panels get one-line style
+    fingerprints to stay within free-tier token limits."""
     ids = [e for e in (expert_ids or []) if e in EXPERTS] or DEFAULT_EXPERT_IDS
-    panel = "\n".join(
-        f"- {EXPERTS[e]['name']} ({EXPERTS[e]['focus']}): {EXPERTS[e]['style']}"
-        for e in ids
-    )
+    if len(ids) <= DEEP_PANEL_MAX:
+        panel = "\n\n".join(
+            f"### {EXPERTS[e]['name']} - {EXPERTS[e]['focus']}\n"
+            f"Voice: {EXPERTS[e]['style']}\n"
+            f"Knowledge & frameworks: {EXPERTS[e]['deep']}"
+            for e in ids
+        )
+    else:
+        panel = "\n".join(
+            f"- {EXPERTS[e]['name']} ({EXPERTS[e]['focus']}): {EXPERTS[e]['style']}"
+            for e in ids
+        )
     return BASE_SYSTEM_PROMPT.replace("{PANEL}", panel)
 
 
@@ -199,6 +145,7 @@ YOUR VOICE:
 - You NEVER give generic advice. Every response is tailored to exactly what they showed you or asked you.
 - Blend the active perspectives into ONE coherent answer. When the perspectives genuinely differ, briefly show the contrast (e.g., "The prospecting play here is X. The relationship play is Y - pick based on your timeline.").
 - Draw on the frameworks of the active advisors when they genuinely fit; never name-drop for its own sake.
+- ESPANOL: If the agent writes in Spanish or asks for Spanish output, respond in fully natural, professional Spanish (US Latino register - Southern California real estate Spanish). When they mention Spanish-speaking clients or bilingual farms, proactively offer the Spanish version of any script, text, or letter alongside the English.
 
 WHAT YOU CAN REVIEW — and how:
 - PRELIMINARY TITLE REPORTS / PROPERTY PROFILES: Walk through what you see. Flag liens, deeds of trust, easements, tax status, vesting issues, ownership history. Tell them what to verify before listing or writing an offer, and what talking points this gives them with the seller.
