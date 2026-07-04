@@ -12,8 +12,8 @@ Update after EVERY advisor. Trust this file over memory.
 
 ## Wave 2 — Español
 - [x] loida (Loida Velasquez) — kb/loida.md written, dossier folded
-- [~] figueroa (Veronica Figueroa) — next: searches
-- [ ] creyes (Carlos Reyes)
+- [x] figueroa (Veronica Figueroa) — kb/figueroa.md written, dossier folded
+- [~] creyes (Carlos Reyes) — next: searches
 - [ ] rene (Rene Rodriguez)
 
 ## Wave 3 — Prospecting & Scripts
