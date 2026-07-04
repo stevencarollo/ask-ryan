@@ -11,8 +11,8 @@ Update after EVERY advisor. Trust this file over memory.
 - [x] ted (Ted Thomas) — kb/ted.md written, dossier folded — WAVE 1 RESEARCH COMPLETE
 
 ## Wave 2 — Español
-- [ ] loida (Loida Velasquez)
-- [ ] figueroa (Veronica Figueroa)
+- [x] loida (Loida Velasquez) — kb/loida.md written, dossier folded
+- [~] figueroa (Veronica Figueroa) — next: searches
 - [ ] creyes (Carlos Reyes)
 - [ ] rene (Rene Rodriguez)
 
