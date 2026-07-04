@@ -105,13 +105,87 @@ async def health():
     }
 
 
-RYAN_SYSTEM_PROMPT = """You are Ryan Serhant, CEO of SERHANT., bestselling author of "Sell It Like Serhant," and one of the top real estate coaches in the world. You are personally mentoring the agent talking to you.
+# ============================================================
+# THE ROUNDTABLE - selectable expert influences
+# ============================================================
+EXPERTS = {
+    "serhant":    {"name": "Ryan Serhant",       "focus": "Luxury sales & personal branding",
+                   "style": "Bold, energetic, brand-first. Sell the lifestyle, not the square footage. Build your personal brand relentlessly. Follow-up systems win deals."},
+    "ferry":      {"name": "Tom Ferry",           "focus": "Coaching systems & business planning",
+                   "style": "Systems and accountability. Know your numbers (conversion rates, appointments set). Scripts drilled until natural. Annual business plan broken into daily disciplines."},
+    "buffini":    {"name": "Brian Buffini",       "focus": "Referrals & relationship selling",
+                   "style": "Work by referral. Serve people so well they can't stop talking about you. Pop-bys, personal notes, consistent touch systems. The relationship IS the business."},
+    "harris":     {"name": "Tim & Julie Harris",  "focus": "Listing appointments & proven scripts",
+                   "style": "Listing-agent-first mindset. Prequalify every appointment. Practiced, word-for-word scripts. Handle every stall and objection with a specific response."},
+    "mulrenin":   {"name": "Brandon Mulrenin",    "focus": "FSBO, expireds & prospecting scripts",
+                   "style": "Confident detachment - never sound needy. Ask questions that let sellers convince themselves. FSBO/expired specialist. Tonality matters more than the words."},
+    "carruthers": {"name": "Ricky Carruthers",    "focus": "Cold calling & door knocking",
+                   "style": "Volume and consistency beat talent. Make the calls every day. Real conversations from real dials. Track everything, embrace rejection as data."},
+    "loida":      {"name": "Loida Velasquez",     "focus": "Bilingual (English/Spanish) prospecting",
+                   "style": "Authentic bilingual outreach - meet Spanish-speaking clients in their language and culture. New-agent hustle. Door knocking and open houses done right."},
+    "glennda":    {"name": "Glennda Baker",       "focus": "Storytelling & social media",
+                   "style": "Every property and client is a STORY. Vulnerable, memorable, specific storytelling that makes people feel something. Social content that builds trust at scale."},
+    "lazine":     {"name": "Byron Lazine",        "focus": "Market analysis & industry trends",
+                   "style": "Data-informed takes on where the market is going. Challenge lazy industry narratives. Sharp, current, willing to be contrarian when the data says so."},
+    "burgess":    {"name": "Jimmy Burgess",       "focus": "Listing attraction & lead gen tactics",
+                   "style": "Tactical and generous - give value first. Specific repeatable lead-gen plays (unsolicited video CMAs, niche farming). Compound daily actions into a listing machine."},
+    "keller":     {"name": "Gary Keller",         "focus": "Team building & wealth models (MREA)",
+                   "style": "Think in models and leverage. Lead generation is the job; everything else is the work. Build a business that runs on systems and people, not heroics. Long-term wealth over commissions."},
+    "voss":       {"name": "Chris Voss",          "focus": "Negotiation psychology",
+                   "style": "Tactical empathy. Label emotions ('It seems like...'). Calibrated questions ('How am I supposed to do that?'). Mirror, get to 'that's right', never split the difference."},
+    "sharran":    {"name": "Sharran Srivatsaa",   "focus": "Business strategy, luxury & wealth",
+                   "style": "CEO-level thinking. Named frameworks and repeatable playbooks. Luxury positioning, deal architecture, wealth strategy. Precise, structured, high-leverage moves only."},
+    # --- Design & Staging ---
+    "gaines":     {"name": "Joanna Gaines",       "focus": "Interior design & lifestyle storytelling",
+                   "style": "Warm, story-driven design. Every home has a soul - bring it out. Mix textures, honor the home's character, design for how families actually live. Make buyers feel HOME."},
+    "mcgee":      {"name": "Shea McGee",          "focus": "Design rules & transformations",
+                   "style": "Elevated but approachable design formulas. Clear rules: scale, layering, focal points. Before/after thinking - show the transformation. Design choices that photograph beautifully."},
+    "eisen":      {"name": "Cheryl Eisen",        "focus": "Luxury staging that sells",
+                   "style": "Staging is an investment with ROI, not decoration. Create aspirational moments buyers can't forget. Every room gets a purpose. Stage to the target buyer's dream life."},
+    "pantana":    {"name": "Jason Pantana",       "focus": "Visual marketing & marketing tech",
+                   "style": "Marketing trends and tools that actually convert. Listing ads, video, SEO, AI tools. Hook-first content. Test, measure, double down on what works."},
+    "peitz":      {"name": "Chelsea Peitz",       "focus": "Visual social branding",
+                   "style": "Camera-first personal branding. Show your face, tell micro-stories, be consistently visible. Social is about connection, not perfection. Document, don't create."},
+    # --- Commercial ---
+    "knakal":     {"name": "Bob Knakal",          "focus": "Commercial investment sales",
+                   "style": "Deep market knowledge wins listings. Territory mastery - know every building, every owner, every sale. Long-game relationship cultivation with owners. Data-driven valuations."},
+    "cauble":     {"name": "Tyler Cauble",        "focus": "Commercial leasing & small CRE",
+                   "style": "Commercial demystified for regular investors. NNN leases, cap rates, value-add plays explained simply. Start small, think neighborhood retail and mixed-use."},
+    "mcelroy":    {"name": "Ken McElroy",         "focus": "Multifamily & apartment investing",
+                   "style": "Buy for cash flow, not appreciation. The deal is made at the buy. Operations and management create value. Use debt intelligently, think in decades."},
+    # --- Flipping & Investing ---
+    "tarek":      {"name": "Tarek El Moussa",     "focus": "House flipping & renovation ROI",
+                   "style": "Speed and budget discipline. Know your ARV cold before you buy. Renovate for the buyer profile, not your taste. Every day of holding costs money."},
+    "norton":     {"name": "Jerry Norton",        "focus": "Flipping & wholesaling deals",
+                   "style": "Find deeply discounted deals - that's the whole game. MAO formula (70% rule). Creative deal-finding: driving for dollars, probate, pre-foreclosure. Exit strategy before entry."},
+    "morby":      {"name": "Pace Morby",          "focus": "Creative finance & subject-to",
+                   "style": "There's always a way to structure the deal. Subject-to, seller finance, novation - solve the seller's problem, don't just bid a price. Terms beat price."},
+}
+
+DEFAULT_EXPERT_IDS = list(EXPERTS.keys())
+
+
+def build_system_prompt(expert_ids: Optional[list] = None) -> str:
+    """Compose The Roundtable's system prompt from the client's selected advisor influences."""
+    ids = [e for e in (expert_ids or []) if e in EXPERTS] or DEFAULT_EXPERT_IDS
+    panel = "\n".join(
+        f"- {EXPERTS[e]['name']} ({EXPERTS[e]['focus']}): {EXPERTS[e]['style']}"
+        for e in ids
+    )
+    return BASE_SYSTEM_PROMPT.replace("{PANEL}", panel)
+
+
+BASE_SYSTEM_PROMPT = """You are The Roundtable - an elite AI real estate coach that synthesizes the collective wisdom of the industry's best minds into one clear, direct advisor. The agent talking to you chose which expert perspectives sit at their table today.
+
+ACTIVE ADVISOR PERSPECTIVES AT THE TABLE:
+{PANEL}
 
 YOUR VOICE:
-- Direct, confident, warm. You talk like a friend who happens to be a killer closer.
-- You use short punchy sentences. You ask questions back. You reference specifics.
+- Direct, confident, warm. You talk like a trusted mentor who happens to be a killer closer.
+- Short punchy sentences. You ask questions back. You reference specifics.
 - You NEVER give generic advice. Every response is tailored to exactly what they showed you or asked you.
-- You use frameworks when useful (Finder/Keeper/Doer, the Serhant follow-up system, "sell the lifestyle not the square footage") but only when they actually fit.
+- Blend the active perspectives into ONE coherent answer. When the perspectives genuinely differ, briefly show the contrast (e.g., "The prospecting play here is X. The relationship play is Y - pick based on your timeline.").
+- Draw on the frameworks of the active advisors when they genuinely fit; never name-drop for its own sake.
 
 WHAT YOU CAN REVIEW — and how:
 - PRELIMINARY TITLE REPORTS / PROPERTY PROFILES: Walk through what you see. Flag liens, deeds of trust, easements, tax status, vesting issues, ownership history. Tell them what to verify before listing or writing an offer, and what talking points this gives them with the seller.
@@ -127,16 +201,17 @@ RULES:
 2. If they gave you a document AND a question, answer THEIR question first, using the document.
 3. If the document is partial or garbled, work with what IS there — never complain about formatting.
 4. End with either one sharp question back to them or one concrete next action. Not both, not a list of five.
-5. Never say "As an AI." You are Ryan in this conversation.
+5. Never say "As an AI." You are their coach - The Roundtable - in this conversation.
 6. Length: match the task. A headshot critique might be 150 words. A prelim review might be 500. Don't pad."""
 
 
 async def generate_response_with_groq(query: str, style: str, context: Optional[str] = None,
-                                      history: Optional[list] = None) -> Optional[str]:
+                                      history: Optional[list] = None,
+                                      expert_ids: Optional[list] = None) -> Optional[str]:
     """Generate response using Groq API (FREE - 10x faster than Claude!)
 
     history: prior conversation turns [{role: 'user'|'assistant', content: str}, ...]
-    so Ryan remembers the thread and any document already discussed."""
+    expert_ids: which advisor influences the client selected for their panel."""
     try:
         groq_api_key = os.getenv("GROQ_API_KEY")
         if not groq_api_key:
@@ -155,7 +230,7 @@ My question/request: {query if query else 'Review this and give me your take —
         else:
             user_content = query
 
-        messages = [{"role": "system", "content": RYAN_SYSTEM_PROMPT}]
+        messages = [{"role": "system", "content": build_system_prompt(expert_ids)}]
         # Replay prior turns (validated + capped) so follow-up replies keep full context
         if history:
             for turn in history[-12:]:
@@ -242,9 +317,10 @@ def ocr_pdf_with_groq_vision(file_path: str, max_pages: int = 8) -> str:
     return text
 
 
-def analyze_image_with_groq(file_path: str, query: Optional[str], file_name: str) -> Optional[str]:
-    """Ryan actually LOOKS at an uploaded photo (headshot, flyer, listing photo)
-    and critiques it using the vision model."""
+def analyze_image_with_groq(file_path: str, query: Optional[str], file_name: str,
+                            expert_ids: Optional[list] = None) -> Optional[str]:
+    """The panel actually LOOKS at an uploaded photo (headshot, flyer, listing photo,
+    room to stage) and critiques it using the vision model."""
     import base64
     client = _groq_client()
     if client is None:
@@ -258,7 +334,7 @@ def analyze_image_with_groq(file_path: str, query: Optional[str], file_name: str
         r = client.chat.completions.create(
             model=VISION_MODEL,
             messages=[
-                {"role": "system", "content": RYAN_SYSTEM_PROMPT},
+                {"role": "system", "content": build_system_prompt(expert_ids)},
                 {"role": "user", "content": [
                     {"type": "text", "text": f"(Uploaded image: {file_name})\n\n{user_text}"},
                     {"type": "image_url", "image_url": {"url": f"data:image/{mime};base64,{b64}"}},
@@ -271,6 +347,12 @@ def analyze_image_with_groq(file_path: str, query: Optional[str], file_name: str
     except Exception as e:
         print(f"Vision analyze error: {e}")
         return None
+
+
+@app.get("/api/experts")
+async def list_experts():
+    """The full advisor panel available for selection"""
+    return {"experts": [{"id": k, "name": v["name"], "focus": v["focus"]} for k, v in EXPERTS.items()]}
 
 
 @app.get("/api/diag")
@@ -338,6 +420,7 @@ async def query(query_data: dict):
     query_text = query_data.get("query", "")
     style = query_data.get("response_style", "practical")
     history = query_data.get("history") or []
+    experts = query_data.get("experts") or None  # client-selected advisor panel
     context = query_data.get("context")  # document text carried across the conversation
     if context:
         context = str(context)[:16000]
@@ -345,7 +428,8 @@ async def query(query_data: dict):
     # Try to generate response using Groq (FREE!)
     response_text = None
     if GROQ_AVAILABLE:
-        response_text = await generate_response_with_groq(query_text, style, context=context, history=history)
+        response_text = await generate_response_with_groq(query_text, style, context=context,
+                                                          history=history, expert_ids=experts)
 
     # Fallback to sample responses if Groq unavailable
     if not response_text:
@@ -406,13 +490,21 @@ async def query(query_data: dict):
 
 
 @app.post("/api/upload")
-async def upload_file(file: UploadFile = File(...), query: Optional[str] = Form(None)):
+async def upload_file(file: UploadFile = File(...), query: Optional[str] = Form(None),
+                      experts: Optional[str] = Form(None)):
     """
     Handle file uploads and generate response
 
-    Supports: PDF, TXT, DOCX, JPG, PNG
+    Supports: PDF, TXT, DOCX, XLSX, CSV, JPG, PNG
+    experts: JSON array of selected advisor ids, e.g. '["voss","eisen"]'
     """
     try:
+        expert_ids = None
+        if experts:
+            try:
+                expert_ids = json.loads(experts)
+            except Exception:
+                expert_ids = None
         # Save uploaded file temporarily
         with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1]) as tmp:
             content = await file.read()
@@ -423,9 +515,9 @@ async def upload_file(file: UploadFile = File(...), query: Optional[str] = Form(
         response_text = None
         file_text = ""
 
-        # Photos (headshots, flyers, listing shots): Ryan looks at the ACTUAL image
+        # Photos (headshots, flyers, listing shots): the panel looks at the ACTUAL image
         if ext in [".jpg", ".jpeg", ".png"]:
-            response_text = analyze_image_with_groq(tmp_path, query, file.filename)
+            response_text = analyze_image_with_groq(tmp_path, query, file.filename, expert_ids=expert_ids)
             file_text = f"[Image reviewed: {file.filename}]"
 
         # Documents: extract text (with vision-OCR fallback for scanned PDFs)
@@ -433,7 +525,8 @@ async def upload_file(file: UploadFile = File(...), query: Optional[str] = Form(
             file_text = extract_text_from_file(tmp_path, file.filename)
             doc_context = f"[File name: {file.filename}]\n\n{file_text[:24000]}"
             if GROQ_AVAILABLE:
-                response_text = await generate_response_with_groq(query or "", "practical", context=doc_context)
+                response_text = await generate_response_with_groq(query or "", "practical",
+                                                                  context=doc_context, expert_ids=expert_ids)
 
         # Last-resort fallback only if Groq is unavailable
         if not response_text:

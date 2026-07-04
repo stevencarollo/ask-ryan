@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ryan Serhant AI Coach - Real Estate Intelligence</title>
+    <title>The Roundtable - Your AI Panel of Real Estate's Best Minds</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -411,8 +411,8 @@
 <body>
     <div class="container">
         <header>
-            <h1>🎯 Ryan Serhant</h1>
-            <p>AI-Powered Real Estate Intelligence & Coaching</p>
+            <h1>⚜️ The Roundtable</h1>
+            <p>Your AI Panel of Real Estate's Best Minds — You Choose Who's at the Table</p>
         </header>
 
         <div class="query-section">
@@ -420,7 +420,7 @@
                 <label for="question">Your Real Estate Challenge:</label>
                 <textarea
                     id="question"
-                    placeholder="Ask Ryan anything about closing deals, handling objections, building your brand..."
+                    placeholder="Ask about closing deals, staging, flips, commercial, negotiation, scripts, marketing..."
                 ></textarea>
             </div>
 
@@ -433,6 +433,15 @@
                 />
                 <small>Supported: PDF, TXT, DOC, DOCX, XLSX, XLS, CSV, JPG, PNG (Max 10MB)</small>
                 <span id="fileName"></span>
+            </div>
+
+            <div class="form-group">
+                <label>🪑 Choose Your Advisors <span style="text-transform:none;font-weight:400;color:#999;">(influences blended into every answer)</span></label>
+                <div style="display:flex; gap:10px; margin-bottom:14px;">
+                    <button type="button" class="btn-secondary" style="padding:6px 14px; font-size:0.78em;" onclick="setAllExperts(true)">Select All</button>
+                    <button type="button" class="btn-secondary" style="padding:6px 14px; font-size:0.78em;" onclick="setAllExperts(false)">Clear All</button>
+                </div>
+                <div id="expertPanel"></div>
             </div>
 
             <div class="button-group">
@@ -458,12 +467,12 @@
 
         <div class="loading" id="loading">
             <div class="spinner"></div>
-            <p>Ryan is crafting your personalized response...</p>
+            <p>Your advisors are weighing in...</p>
         </div>
 
         <div class="response-section" id="responseSection">
             <div class="response-header">
-                <h2>Ryan's Response</h2>
+                <h2>The Roundtable's Take</h2>
                 <span class="confidence-badge" id="confidenceBadge">89% Confidence</span>
             </div>
             <div class="response-text" id="responseText"></div>
@@ -477,10 +486,80 @@
     <script>
         const API_URL = 'https://ask-ryan-nb3w.onrender.com';
 
-        // Conversation memory: Ryan remembers the thread + any uploaded document
+        // Conversation memory: the panel remembers the thread + any uploaded document
         let conversationHistory = [];
         let documentContext = null;
         let documentName = null;
+
+        // ===== The Advisor Panel =====
+        const EXPERT_GROUPS = [
+            { group: '📞 Sales & Prospecting', experts: [
+                ['serhant', 'Ryan Serhant', 'Luxury sales & branding'],
+                ['harris', 'Tim & Julie Harris', 'Listing appointments & scripts'],
+                ['mulrenin', 'Brandon Mulrenin', 'FSBO & expired prospecting'],
+                ['carruthers', 'Ricky Carruthers', 'Cold calling & door knocking'],
+                ['loida', 'Loida Velasquez', 'Bilingual (EN/ES) prospecting'],
+            ]},
+            { group: '📈 Coaching & Business', experts: [
+                ['ferry', 'Tom Ferry', 'Coaching systems & planning'],
+                ['buffini', 'Brian Buffini', 'Referrals & relationships'],
+                ['keller', 'Gary Keller', 'Teams & wealth models'],
+                ['sharran', 'Sharran Srivatsaa', 'Strategy, luxury & wealth'],
+            ]},
+            { group: '🎬 Marketing & Media', experts: [
+                ['glennda', 'Glennda Baker', 'Storytelling & social'],
+                ['lazine', 'Byron Lazine', 'Market analysis & trends'],
+                ['burgess', 'Jimmy Burgess', 'Listing attraction tactics'],
+                ['pantana', 'Jason Pantana', 'Visual marketing & tech'],
+                ['peitz', 'Chelsea Peitz', 'Visual social branding'],
+            ]},
+            { group: '🤝 Negotiation', experts: [
+                ['voss', 'Chris Voss', 'Negotiation psychology'],
+            ]},
+            { group: '🛋️ Design & Staging', experts: [
+                ['gaines', 'Joanna Gaines', 'Design & lifestyle storytelling'],
+                ['mcgee', 'Shea McGee', 'Design rules & transformations'],
+                ['eisen', 'Cheryl Eisen', 'Luxury staging that sells'],
+            ]},
+            { group: '🏢 Commercial', experts: [
+                ['knakal', 'Bob Knakal', 'Investment sales'],
+                ['cauble', 'Tyler Cauble', 'Leasing & small CRE'],
+                ['mcelroy', 'Ken McElroy', 'Multifamily investing'],
+            ]},
+            { group: '🔨 Flipping & Investing', experts: [
+                ['tarek', 'Tarek El Moussa', 'Flipping & renovation ROI'],
+                ['norton', 'Jerry Norton', 'Flips & wholesaling deals'],
+                ['morby', 'Pace Morby', 'Creative finance & subject-to'],
+            ]},
+        ];
+
+        function renderExpertPanel() {
+            const panel = document.getElementById('expertPanel');
+            panel.innerHTML = EXPERT_GROUPS.map(g => `
+                <div style="margin-bottom:14px;">
+                    <div style="font-size:0.78em; font-weight:700; color:#8a6d1a; letter-spacing:0.5px; margin-bottom:8px;">${g.group}</div>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(215px,1fr)); gap:8px;">
+                        ${g.experts.map(([id, name, focus]) => `
+                            <label style="display:flex; align-items:flex-start; gap:8px; padding:9px 12px; background:#fafafa; border:1.5px solid var(--border); border-radius:10px; cursor:pointer; transition:all .2s;"
+                                   onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+                                <input type="checkbox" class="expert-cb" value="${id}" checked style="margin-top:3px; accent-color:#D4AF37;">
+                                <span style="line-height:1.3;"><strong style="font-size:0.88em;">${name}</strong><br><span style="font-size:0.75em; color:#888;">${focus}</span></span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getSelectedExperts() {
+            return Array.from(document.querySelectorAll('.expert-cb:checked')).map(cb => cb.value);
+        }
+
+        function setAllExperts(checked) {
+            document.querySelectorAll('.expert-cb').forEach(cb => cb.checked = checked);
+        }
+
+        renderExpertPanel();
 
         function updateConversationBadge() {
             const badge = document.getElementById('convoBadge');
@@ -490,7 +569,7 @@
             }
             const exchanges = Math.floor(conversationHistory.length / 2);
             let text = `💬 Conversation active (${exchanges} exchange${exchanges === 1 ? '' : 's'})`;
-            if (documentName) text += ` — Ryan remembers "${documentName}"`;
+            if (documentName) text += ` — your panel remembers "${documentName}"`;
             badge.textContent = text;
             badge.style.display = 'block';
         }
@@ -542,6 +621,7 @@
                     const formData = new FormData();
                     formData.append('file', file);
                     if (question) formData.append('query', question);
+                    formData.append('experts', JSON.stringify(getSelectedExperts()));
 
                     const response = await fetch(`${API_URL}/api/upload`, {
                         method: 'POST',
@@ -565,7 +645,7 @@
 
                     // Clear the file input so replies don't re-upload the same file
                     fileInput.value = '';
-                    document.getElementById('fileName').textContent = `✓ ${documentName} (in Ryan's memory)`;
+                    document.getElementById('fileName').textContent = `✓ ${documentName} (in your panel's memory)`;
                 } else {
                     const response = await fetch(`${API_URL}/api/query`, {
                         method: 'POST',
@@ -575,7 +655,8 @@
                         body: JSON.stringify({
                             query: question,
                             history: conversationHistory.slice(-12),
-                            context: documentContext
+                            context: documentContext,
+                            experts: getSelectedExperts()
                         })
                     });
 
@@ -591,7 +672,7 @@
 
                 // Clear the question box so replying to Ryan feels natural
                 document.getElementById('question').value = '';
-                document.getElementById('question').placeholder = 'Reply to Ryan or ask a new question...';
+                document.getElementById('question').placeholder = 'Reply to your advisors or ask a new question...';
                 updateConversationBadge();
 
                 document.getElementById('responseText').textContent = responseData.response.text;
@@ -632,7 +713,7 @@
 
         function clearForm() {
             document.getElementById('question').value = '';
-            document.getElementById('question').placeholder = 'Ask Ryan anything about closing deals, handling objections, building your brand...';
+            document.getElementById('question').placeholder = 'Ask about closing deals, staging, flips, commercial, negotiation, scripts, marketing...';
             document.getElementById('fileUpload').value = '';
             document.getElementById('fileName').textContent = '';
             conversationHistory = [];
