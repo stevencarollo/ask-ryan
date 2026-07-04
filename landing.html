@@ -3,439 +3,418 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Roundtable - Your AI Panel of Real Estate's Best Minds</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>The Roundtable — Your AI Panel of Real Estate's Best Minds</title>
+    <meta name="description" content="One AI coach blending 34 selectable expert perspectives: sales, negotiation, staging, commercial, flipping, probate, divorce, pre-foreclosure — en español too. Free forever.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         :root {
-            --primary: #D4AF37;
-            --dark: #1a1a1a;
-            --light: #f5f5f5;
-            --text: #2d2d2d;
-            --border: #e0e0e0;
-            --success: #4ade80;
+            --ink: #0B0B0D;
+            --charcoal: #131316;
+            --surface: #1A1A1E;
+            --line: rgba(201, 168, 92, 0.22);
+            --gold: #C9A85C;
+            --gold-bright: #E5C87E;
+            --ivory: #F5F1E8;
+            --body: #C9C4B8;
+            --muted: #8E887B;
+            --light-bg: #F7F5F0;
+            --light-text: #17150F;
+            --light-muted: #5B564B;
         }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            *, *::before, *::after { animation: none !important; transition: none !important; }
+        }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            color: var(--text);
-            line-height: 1.6;
+            background: var(--ink);
+            color: var(--body);
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+        }
+        .display { font-family: 'Cinzel', serif; }
+        a:focus-visible, button:focus-visible {
+            outline: 2px solid var(--gold-bright);
+            outline-offset: 3px;
+            border-radius: 4px;
         }
 
+        /* ============ NAV ============ */
+        nav {
+            position: sticky; top: 0; z-index: 50;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 18px clamp(20px, 5vw, 64px);
+            background: rgba(11, 11, 13, 0.82);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-bottom: 1px solid var(--line);
+        }
+        .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; cursor: pointer; }
+        .brand svg { width: 34px; height: 34px; }
+        .brand-name {
+            font-family: 'Cinzel', serif;
+            font-size: 1.25rem; font-weight: 600; letter-spacing: 0.12em;
+            color: var(--ivory); text-transform: uppercase;
+        }
+        .nav-links { display: flex; align-items: center; gap: clamp(16px, 3vw, 36px); }
+        .nav-links a {
+            color: var(--muted); text-decoration: none; font-size: 0.9rem; font-weight: 500;
+            letter-spacing: 0.04em; transition: color 0.2s ease; padding: 10px 2px; cursor: pointer;
+        }
+        .nav-links a:hover { color: var(--gold-bright); }
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+            padding: 14px 34px; border-radius: 2px; cursor: pointer;
+            font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 600;
+            letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none;
+            transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+            border: 1px solid var(--gold); min-height: 44px;
+        }
+        .btn-solid { background: var(--gold); color: var(--ink); }
+        .btn-solid:hover { background: var(--gold-bright); box-shadow: 0 8px 40px rgba(201, 168, 92, 0.35); }
+        .btn-ghost { background: transparent; color: var(--gold); }
+        .btn-ghost:hover { color: var(--ink); background: var(--gold); }
+        .nav-cta { padding: 11px 24px; }
+
+        /* ============ HERO ============ */
         .hero {
-            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
-            color: white;
-            padding: 80px 20px;
-            text-align: center;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            position: relative; overflow: hidden;
+            min-height: calc(100vh - 71px);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; padding: 96px 24px 72px;
         }
-
+        .hero::before {
+            content: ''; position: absolute; inset: 0; pointer-events: none;
+            background:
+                radial-gradient(ellipse 60% 45% at 50% -5%, rgba(201, 168, 92, 0.16), transparent 65%),
+                radial-gradient(ellipse 45% 35% at 85% 100%, rgba(201, 168, 92, 0.05), transparent 70%);
+        }
+        .hero-kicker {
+            display: inline-flex; align-items: center; gap: 14px;
+            color: var(--gold); font-size: 0.78rem; font-weight: 600;
+            letter-spacing: 0.32em; text-transform: uppercase; margin-bottom: 34px;
+        }
+        .hero-kicker::before, .hero-kicker::after {
+            content: ''; width: 44px; height: 1px; background: var(--line);
+        }
         .hero h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 4.5em;
-            margin-bottom: 20px;
-            color: var(--primary);
-            font-weight: 800;
-            letter-spacing: -2px;
+            font-family: 'Cinzel', serif; font-weight: 600;
+            font-size: clamp(2.6rem, 7vw, 5rem); line-height: 1.12;
+            color: var(--ivory); max-width: 900px; margin-bottom: 30px;
+        }
+        .hero h1 em { font-style: normal; color: var(--gold-bright); }
+        .hero-sub {
+            font-size: clamp(1rem, 2vw, 1.2rem); font-weight: 300;
+            color: var(--body); max-width: 640px; margin-bottom: 46px;
+        }
+        .hero-ctas { display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; margin-bottom: 70px; }
+        .hero-stats {
+            display: flex; gap: clamp(28px, 6vw, 80px); flex-wrap: wrap; justify-content: center;
+            padding-top: 42px; border-top: 1px solid var(--line);
+        }
+        .stat { text-align: center; }
+        .stat-n {
+            font-family: 'Cinzel', serif; font-size: clamp(1.9rem, 4vw, 2.6rem);
+            font-weight: 600; color: var(--gold-bright); line-height: 1;
+        }
+        .stat-l {
+            font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--muted); margin-top: 10px;
         }
 
-        .hero .tagline {
-            font-size: 1.4em;
-            color: #ddd;
-            margin-bottom: 40px;
-            font-weight: 300;
-            max-width: 600px;
+        /* ============ SECTIONS ============ */
+        section { padding: clamp(72px, 10vw, 130px) clamp(20px, 5vw, 64px); }
+        .section-head { text-align: center; max-width: 720px; margin: 0 auto clamp(48px, 6vw, 80px); }
+        .kicker {
+            color: var(--gold); font-size: 0.75rem; font-weight: 600;
+            letter-spacing: 0.3em; text-transform: uppercase; display: block; margin-bottom: 18px;
+        }
+        h2 {
+            font-family: 'Cinzel', serif; font-weight: 600;
+            font-size: clamp(1.9rem, 4.5vw, 3rem); line-height: 1.2; color: var(--ivory);
+        }
+        .section-sub { margin-top: 18px; color: var(--muted); font-size: 1.02rem; font-weight: 300; }
+
+        /* Panel groups */
+        .panel-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1px; background: var(--line); border: 1px solid var(--line);
+            max-width: 1240px; margin: 0 auto;
+        }
+        .panel-card {
+            background: var(--charcoal); padding: 38px 32px;
+            transition: background-color 0.3s ease;
+        }
+        .panel-card:hover { background: var(--surface); }
+        .panel-card svg { width: 26px; height: 26px; stroke: var(--gold); margin-bottom: 20px; }
+        .panel-card h3 {
+            font-family: 'Cinzel', serif; font-size: 1.02rem; font-weight: 600;
+            letter-spacing: 0.06em; color: var(--ivory); margin-bottom: 12px;
+        }
+        .panel-card p { font-size: 0.9rem; color: var(--muted); line-height: 1.7; }
+
+        /* Light band — how it works */
+        .light { background: var(--light-bg); }
+        .light h2 { color: var(--light-text); }
+        .light .section-sub { color: var(--light-muted); }
+        .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: clamp(28px, 4vw, 56px); max-width: 1100px; margin: 0 auto; }
+        .step { text-align: left; }
+        .step-n {
+            font-family: 'Cinzel', serif; font-size: 3rem; font-weight: 400;
+            color: var(--gold); line-height: 1; margin-bottom: 18px;
+        }
+        .step h3 { color: var(--light-text); font-size: 1.15rem; font-weight: 600; margin-bottom: 10px; }
+        .step p { color: var(--light-muted); font-size: 0.95rem; }
+
+        /* Capabilities */
+        .caps { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: clamp(20px, 3vw, 36px); max-width: 1240px; margin: 0 auto; }
+        .cap {
+            border: 1px solid var(--line); padding: 36px 32px; background: rgba(26, 26, 30, 0.5);
+            transition: border-color 0.25s ease;
+        }
+        .cap:hover { border-color: rgba(201, 168, 92, 0.55); }
+        .cap svg { width: 24px; height: 24px; stroke: var(--gold); margin-bottom: 18px; }
+        .cap h3 { color: var(--ivory); font-size: 1.05rem; font-weight: 600; margin-bottom: 10px; letter-spacing: 0.02em; }
+        .cap p { font-size: 0.92rem; color: var(--muted); }
+
+        /* Skill download */
+        .skill-band { background: linear-gradient(180deg, var(--charcoal), var(--ink)); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); text-align: center; }
+        .skill-box { max-width: 680px; margin: 0 auto; }
+        .code-snippet {
+            margin: 30px auto 34px; padding: 18px 24px; max-width: 560px;
+            background: var(--ink); border: 1px solid var(--line);
+            font-family: 'Consolas', 'Monaco', monospace; font-size: 0.85rem;
+            color: var(--gold-bright); text-align: left; overflow-x: auto; white-space: nowrap;
         }
 
-        .hero p {
-            font-size: 1.1em;
-            color: #aaa;
-            max-width: 700px;
-            margin-bottom: 50px;
-            line-height: 1.8;
+        /* Pricing */
+        .price-card {
+            max-width: 460px; margin: 0 auto; text-align: center;
+            border: 1px solid var(--gold); padding: clamp(40px, 6vw, 64px) clamp(28px, 5vw, 56px);
+            background: var(--charcoal); position: relative;
         }
-
-        .cta-button {
-            display: inline-block;
-            background: linear-gradient(135deg, var(--primary) 0%, #c9a227 100%);
-            color: var(--dark);
-            padding: 18px 50px;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 1.1em;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            box-shadow: 0 10px 40px rgba(212, 175, 55, 0.3);
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
+        .price-card::before {
+            content: ''; position: absolute; inset: 8px;
+            border: 1px solid var(--line); pointer-events: none;
         }
-
-        .cta-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 50px rgba(212, 175, 55, 0.4);
+        .price-n { font-family: 'Cinzel', serif; font-size: 4.4rem; font-weight: 600; color: var(--gold-bright); line-height: 1; }
+        .price-l { color: var(--muted); font-size: 0.8rem; letter-spacing: 0.24em; text-transform: uppercase; margin: 14px 0 34px; }
+        .price-list { list-style: none; text-align: left; margin-bottom: 40px; }
+        .price-list li {
+            padding: 12px 0 12px 34px; position: relative;
+            color: var(--body); font-size: 0.95rem; border-bottom: 1px solid rgba(201, 168, 92, 0.1);
         }
-
-        .features {
-            background: white;
-            padding: 80px 20px;
-            text-align: center;
-        }
-
-        .features h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: 3em;
-            margin-bottom: 60px;
-            color: var(--primary);
-        }
-
-        .features-grid {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
-        }
-
-        .feature-card {
-            padding: 40px;
-            background: #f9f9f9;
-            border-radius: 12px;
-            border-left: 4px solid var(--primary);
-            transition: all 0.3s ease;
-        }
-
-        .feature-card:hover {
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            transform: translateY(-5px);
-        }
-
-        .feature-card h3 {
-            font-size: 1.5em;
-            margin-bottom: 15px;
-            color: var(--text);
-            font-weight: 700;
-        }
-
-        .feature-card p {
-            color: #666;
-            line-height: 1.8;
-        }
-
-        .icon {
-            font-size: 2.5em;
-            margin-bottom: 15px;
-        }
-
-        .about {
-            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
-            color: white;
-            padding: 80px 20px;
-            text-align: center;
-        }
-
-        .about h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: 3em;
-            margin-bottom: 40px;
-            color: var(--primary);
-        }
-
-        .about-content {
-            max-width: 800px;
-            margin: 0 auto;
-            line-height: 1.9;
-            font-size: 1.1em;
-            color: #ddd;
-        }
-
-        .stats {
-            background: white;
-            padding: 80px 20px;
-        }
-
-        .stats-grid {
-            max-width: 1000px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-            text-align: center;
-        }
-
-        .stat {
-            padding: 30px;
-        }
-
-        .stat-number {
-            font-family: 'Playfair Display', serif;
-            font-size: 3.5em;
-            color: var(--primary);
-            font-weight: 800;
-            margin-bottom: 10px;
-        }
-
-        .stat-label {
-            font-size: 1.1em;
-            color: #666;
-            font-weight: 600;
-        }
-
-        .pricing {
-            background: #f9f9f9;
-            padding: 80px 20px;
-            text-align: center;
-        }
-
-        .pricing h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: 3em;
-            margin-bottom: 50px;
-            color: var(--primary);
-        }
-
-        .pricing-card {
-            background: white;
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 50px 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            border: 2px solid var(--primary);
-        }
-
-        .price {
-            font-family: 'Playfair Display', serif;
-            font-size: 3.5em;
-            color: var(--primary);
-            margin-bottom: 10px;
-            font-weight: 800;
-        }
-
-        .price-label {
-            color: #666;
-            font-size: 1.1em;
-            margin-bottom: 30px;
-        }
-
-        .features-list {
-            text-align: left;
-            margin-bottom: 40px;
-            line-height: 2.2;
-        }
-
-        .features-list li {
-            list-style: none;
-            color: #666;
-            padding-left: 30px;
-            position: relative;
-        }
-
-        .features-list li:before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: var(--primary);
-            font-weight: 800;
-            font-size: 1.2em;
+        .price-list li:last-child { border-bottom: none; }
+        .price-list li::before {
+            content: ''; position: absolute; left: 4px; top: 19px;
+            width: 14px; height: 8px; border-left: 2px solid var(--gold); border-bottom: 2px solid var(--gold);
+            transform: rotate(-45deg);
         }
 
         footer {
-            background: var(--dark);
-            color: #888;
-            text-align: center;
-            padding: 40px 20px;
-            border-top: 1px solid var(--border);
+            padding: 56px clamp(20px, 5vw, 64px); text-align: center;
+            border-top: 1px solid var(--line); color: var(--muted); font-size: 0.85rem;
         }
+        footer .brand-name { font-size: 1rem; }
+        footer p { margin-top: 14px; max-width: 640px; margin-left: auto; margin-right: auto; }
 
-        footer p {
-            margin-bottom: 10px;
-        }
-
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.8em;
-            }
-
-            .hero .tagline {
-                font-size: 1.2em;
-            }
-
-            .features h2,
-            .about h2,
-            .pricing h2 {
-                font-size: 2em;
-            }
-
-            .features-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-        }
-
-        nav {
-            background: var(--dark);
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            border-bottom: 1px solid var(--primary);
-        }
-
-        nav .logo {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.8em;
-            color: var(--primary);
-            font-weight: 800;
-            text-decoration: none;
-        }
-
-        nav a {
-            color: #aaa;
-            text-decoration: none;
-            margin-left: 30px;
-            transition: color 0.3s ease;
-            font-weight: 500;
-        }
-
-        nav a:hover {
-            color: var(--primary);
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 30px;
-        }
-
-        @media (max-width: 768px) {
-            .nav-links {
-                gap: 15px;
-                font-size: 0.9em;
-            }
-
-            nav a {
-                margin-left: 0;
-            }
+        @media (max-width: 720px) {
+            .nav-links a:not(.btn) { display: none; }
+            .hero { padding-top: 64px; }
         }
     </style>
 </head>
 <body>
-    <nav>
-        <a href="/" class="logo">⚜️ The Roundtable</a>
+    <nav aria-label="Main">
+        <a href="/" class="brand" aria-label="The Roundtable home">
+            <svg viewBox="0 0 34 34" fill="none" aria-hidden="true">
+                <circle cx="17" cy="17" r="15.5" stroke="#C9A85C" stroke-width="1.4"/>
+                <circle cx="17" cy="17" r="3" fill="#C9A85C"/>
+                <circle cx="17" cy="6.5" r="1.6" fill="#C9A85C"/><circle cx="27.5" cy="17" r="1.6" fill="#C9A85C"/>
+                <circle cx="17" cy="27.5" r="1.6" fill="#C9A85C"/><circle cx="6.5" cy="17" r="1.6" fill="#C9A85C"/>
+                <circle cx="24.4" cy="9.6" r="1.6" fill="#C9A85C"/><circle cx="24.4" cy="24.4" r="1.6" fill="#C9A85C"/>
+                <circle cx="9.6" cy="24.4" r="1.6" fill="#C9A85C"/><circle cx="9.6" cy="9.6" r="1.6" fill="#C9A85C"/>
+            </svg>
+            <span class="brand-name">The Roundtable</span>
+        </a>
         <div class="nav-links">
-            <a href="#features">Features</a>
-            <a href="#about">About</a>
+            <a href="#panel">The Panel</a>
+            <a href="#capabilities">Capabilities</a>
+            <a href="#skill">Claude Skill</a>
             <a href="#pricing">Pricing</a>
-            <a href="/frontend.html" class="cta-button" style="margin: 0; padding: 10px 25px; font-size: 0.9em;">Try Now</a>
+            <a href="/frontend.html" class="btn btn-solid nav-cta">Enter</a>
         </div>
     </nav>
 
-    <section class="hero">
-        <h1>The Roundtable</h1>
-        <p class="tagline">One AI Coach. 34 of Real Estate's Best Minds. You Choose Who's at the Table.</p>
-        <p>Sales • Negotiation • Staging • Commercial • Flipping • Probate • Divorce • Pre-Foreclosure • En Español • Completely Free</p>
-        <a href="/frontend.html" class="cta-button">Start Coaching →</a>
-    </section>
+    <header class="hero">
+        <span class="hero-kicker">AI Coaching for Real Estate Professionals</span>
+        <h1>One coach.<br><em>Thirty-four</em> of the industry's best minds.</h1>
+        <p class="hero-sub">Choose the advisors at your table — prospecting scripts, negotiation psychology, luxury staging, commercial underwriting, probate process, creative finance — and get one clear answer. In English o en español.</p>
+        <div class="hero-ctas">
+            <a href="/frontend.html" class="btn btn-solid">Take a Seat</a>
+            <a href="#panel" class="btn btn-ghost">Meet the Panel</a>
+        </div>
+        <div class="hero-stats" role="list">
+            <div class="stat" role="listitem"><div class="stat-n">34</div><div class="stat-l">Advisors</div></div>
+            <div class="stat" role="listitem"><div class="stat-n">9</div><div class="stat-l">Specialties</div></div>
+            <div class="stat" role="listitem"><div class="stat-n">2</div><div class="stat-l">Languages</div></div>
+            <div class="stat" role="listitem"><div class="stat-n">$0</div><div class="stat-l">Forever</div></div>
+        </div>
+    </header>
 
-    <section class="features" id="features">
-        <h2>Why The Roundtable?</h2>
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="icon">🎯</div>
-                <h3>Pick Your Panel</h3>
-                <p>Check the boxes for the advisor perspectives you want — prospecting scripts, negotiation psychology, luxury staging, creative finance — and every answer blends them.</p>
+    <section id="panel">
+        <div class="section-head">
+            <span class="kicker">The Panel</span>
+            <h2>Nine seats. You decide who speaks.</h2>
+            <p class="section-sub">Every answer blends only the perspectives you select. Fewer seats, deeper expertise.</p>
+        </div>
+        <div class="panel-grid">
+            <div class="panel-card">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <h3>Sales &amp; Prospecting</h3>
+                <p>FSBO and expired scripts, cold-call structure, door-knocking systems, listing-appointment prequalification — tonality included.</p>
             </div>
-            <div class="feature-card">
-                <div class="icon">⚡</div>
-                <h3>Instant Answers</h3>
-                <p>No waiting. Get AI-powered responses trained on Ryan's best content in seconds, not hours.</p>
+            <div class="panel-card">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+                <h3>Coaching &amp; Business</h3>
+                <p>Business-plan math, referral systems, team models, and CEO-level deal architecture from the industry's most-quoted coaches.</p>
             </div>
-            <div class="feature-card">
-                <div class="icon">📚</div>
-                <h3>34 Expert Perspectives</h3>
-                <p>Coaching systems, FSBO scripts, referral selling, storytelling, market analysis, commercial, flipping, staging, probate, divorce, pre-foreclosure, and full Spanish-language coaching — all at one table.</p>
+            <div class="panel-card">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+                <h3>Marketing &amp; Media</h3>
+                <p>Storytelling that converts, hook-first video, listing-attraction plays, Google Business ranking, and camera-first branding.</p>
             </div>
-            <div class="feature-card">
-                <div class="icon">🎤</div>
-                <h3>Real Conversations</h3>
-                <p>Your coach asks questions back and remembers the whole thread — reply, push back, and go deeper like a real coaching session.</p>
+            <div class="panel-card">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>
+                <h3>Negotiation</h3>
+                <p>Tactical empathy, calibrated questions, accusation audits, and anchor strategy — hostage-negotiator psychology for the living room.</p>
             </div>
-            <div class="feature-card">
-                <div class="icon">📄</div>
-                <h3>Upload Documents</h3>
-                <p>Upload prelims, contracts, lead lists, flyers, even scanned PDFs and headshots — your panel reads them and gives specific guidance.</p>
+            <div class="panel-card">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3"/><path d="M2 11v5a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v2H6v-2a2 2 0 0 0-4 0Z"/><path d="M4 18v2"/><path d="M20 18v2"/></svg>
+                <h3>Design &amp; Staging</h3>
+                <p>Room-by-room staging plans, design rules that photograph beautifully, and luxury merchandising that shortens days-on-market.</p>
             </div>
-            <div class="feature-card">
-                <div class="icon">💰</div>
-                <h3>100% Free</h3>
-                <p>No subscriptions, no hidden costs, no credit card required. Forever free for all real estate agents.</p>
+            <div class="panel-card">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>
+                <h3>Commercial</h3>
+                <p>Cap-rate and NOI underwriting, NNN leasing, territory mastery, and multifamily value-add from investment-sales veterans.</p>
+            </div>
+            <div class="panel-card">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 12-8.373 8.373a1 1 0 1 1-3-3L12 9"/><path d="m18 15 4-4"/><path d="m21.5 11.5-1.914-1.914A2 2 0 0 1 19 8.172V7l-2.26-2.26a6 6 0 0 0-4.202-1.756L9 2.96l.92.82A6.18 6.18 0 0 1 12 8.4V10l2 2h1.172a2 2 0 0 1 1.414.586L18.5 14.5"/></svg>
+                <h3>Flipping &amp; Investing</h3>
+                <p>ARV discipline, MAO formulas, rehab budgets, BRRRR math, and creative-finance structures — subject-to, seller carry, novation.</p>
+            </div>
+            <div class="panel-card">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22V8"/><path d="m5 12-2 3h18l-2-3"/><path d="M5 12V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v8"/><path d="M9 22h6"/></svg>
+                <h3>Probate, Divorce &amp; Distressed</h3>
+                <p>California IAEA authority, court-confirmation math, divorce-listing neutrality, NOD timelines, short sales, and tax-default plays.</p>
+            </div>
+            <div class="panel-card">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                <h3>Español &amp; Bilingual</h3>
+                <p>Full Spanish-language coaching — scripts en español, cultural fluency, ITIN lending paths, and the Latino homeownership market.</p>
             </div>
         </div>
     </section>
 
-    <section class="about" id="about">
-        <h2>About The Roundtable</h2>
-        <div class="about-content">
-            <p>The Roundtable is an AI coaching tool for real estate professionals that blends the frameworks and philosophies of the industry's best minds — coaching systems, prospecting scripts, negotiation psychology, luxury staging, commercial investing, and house flipping — into one advisor you control.</p>
-            <p style="margin-top: 30px;">Whether you're handling objections, prepping a listing appointment, staging a property, analyzing a flip, or structuring a creative deal — choose the advisors that fit the job and get one clear answer. Completely free, forever.</p>
+    <section class="light" id="how">
+        <div class="section-head">
+            <span class="kicker">How It Works</span>
+            <h2 style="color: var(--light-text);">Three moves to better answers.</h2>
         </div>
-    </section>
-
-    <section class="stats">
-        <div class="stats-grid">
-            <div class="stat">
-                <div class="stat-number">34</div>
-                <div class="stat-label">Expert Perspectives</div>
+        <div class="steps">
+            <div class="step">
+                <div class="step-n">I</div>
+                <h3>Select your advisors</h3>
+                <p>Check the seats you want filled. A focused panel of eight or fewer unlocks each advisor's full playbook — frameworks, formulas, and scripts.</p>
             </div>
-            <div class="stat">
-                <div class="stat-number">9</div>
-                <div class="stat-label">Specialty Areas</div>
+            <div class="step">
+                <div class="step-n">II</div>
+                <h3>Ask, or hand over a file</h3>
+                <p>Type your situation — or upload a prelim, contract, lead list, flyer, headshot, even a scanned PDF. The panel reads every page.</p>
             </div>
-            <div class="stat">
-                <div class="stat-number">$0</div>
-                <div class="stat-label">Cost. Forever Free.</div>
-            </div>
-            <div class="stat">
-                <div class="stat-number">1</div>
-                <div class="stat-label">Coach, Fully Yours</div>
+            <div class="step">
+                <div class="step-n">III</div>
+                <h3>Talk it through</h3>
+                <p>Your coach answers, asks the next sharp question, and remembers the whole thread. Reply, push back, go deeper — like a real session.</p>
             </div>
         </div>
     </section>
 
-    <section class="pricing" id="pricing">
-        <h2>Simple Pricing</h2>
-        <div class="pricing-card">
-            <div class="price">$0</div>
-            <div class="price-label">Forever</div>
-            <ul class="features-list">
-                <li>Unlimited questions</li>
-                <li>Upload documents</li>
+    <section id="capabilities">
+        <div class="section-head">
+            <span class="kicker">Capabilities</span>
+            <h2>Bring anything to the table.</h2>
+        </div>
+        <div class="caps">
+            <div class="cap">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+                <h3>Title &amp; Prelim Review</h3>
+                <p>Liens, vesting, deeds of trust, tax status, ownership history — plus the talking points they give you with the seller. Scanned PDFs get read page-by-page.</p>
+            </div>
+            <div class="cap">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+                <h3>Photo &amp; Headshot Critique</h3>
+                <p>The panel actually looks at your image — lighting, wardrobe, staging, curb appeal, what buyers will object to — and tells you what to change.</p>
+            </div>
+            <div class="cap">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                <h3>Lead-List Attack Plans</h3>
+                <p>Upload a spreadsheet of owners — probate, NOD, absentee, farm — and get a segment-by-segment calling order with the right angle for each.</p>
+            </div>
+            <div class="cap">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+                <h3>Scripts &amp; Live Replies</h3>
+                <p>Word-for-word call scripts, objection responses, emails, and texts — rewritten for your exact situation, in English and Spanish.</p>
+            </div>
+            <div class="cap">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></svg>
+                <h3>Flyer &amp; Marketing Feedback</h3>
+                <p>Upload your listing flyer or presentation and get a marketer's teardown — headline, story, hierarchy, call to action, what to cut.</p>
+            </div>
+            <div class="cap">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <h3>Conversation Memory</h3>
+                <p>Your coach remembers the document, the thread, and its own questions. Answer back and the session continues — nothing resets.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="skill-band" id="skill">
+        <div class="skill-box">
+            <span class="kicker">For Claude Users</span>
+            <h2>Take the panel with you.</h2>
+            <p class="section-sub">Download The Roundtable as a Claude Skill. Any agent with Claude gets the full 34-advisor panel inside their own Claude — no website needed.</p>
+            <div class="code-snippet">roundtable-skill.zip → unzip into ~/.claude/skills/</div>
+            <a href="/roundtable-skill.zip" class="btn btn-solid" download>Download the Skill</a>
+        </div>
+    </section>
+
+    <section id="pricing">
+        <div class="section-head">
+            <span class="kicker">Membership</span>
+            <h2>The price of a seat.</h2>
+        </div>
+        <div class="price-card">
+            <div class="price-n">$0</div>
+            <div class="price-l">Forever · No Card · No Signup</div>
+            <ul class="price-list">
+                <li>Unlimited questions, both languages</li>
                 <li>34 selectable advisor perspectives</li>
-                <li>Instant responses</li>
-                <li>Conversation memory & document review</li>
-                <li>No credit card required</li>
+                <li>Document, photo &amp; scanned-PDF review</li>
+                <li>Conversation memory across the session</li>
+                <li>Downloadable Claude Skill included</li>
             </ul>
-            <a href="/frontend.html" class="cta-button">Start Free →</a>
+            <a href="/frontend.html" class="btn btn-solid" style="width: 100%;">Take Your Seat</a>
         </div>
     </section>
 
     <footer>
-        <p><strong>The Roundtable</strong> — AI Real Estate Coaching</p>
-        <p>Perspectives inspired by publicly available industry content • Not affiliated with or endorsed by any individual or brokerage</p>
-        <p>&copy; 2026. Built with ❤️ for real estate agents.</p>
+        <span class="brand-name">The Roundtable</span>
+        <p>AI coaching for real estate professionals. Perspectives inspired by publicly available industry content. Not affiliated with or endorsed by any individual, brokerage, or brand referenced. Not legal, tax, or financial advice.</p>
     </footer>
 </body>
 </html>

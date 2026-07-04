@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Roundtable - Your AI Panel of Real Estate's Best Minds</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,8 +13,8 @@
         }
 
         :root {
-            --primary: #D4AF37;
-            --dark: #1a1a1a;
+            --primary: #C9A85C;
+            --dark: #0B0B0D;
             --light: #f5f5f5;
             --text: #2d2d2d;
             --border: #e0e0e0;
@@ -23,7 +23,7 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            background: radial-gradient(ellipse 70% 50% at 50% -10%, rgba(201,168,92,0.14), transparent 60%), #0B0B0D;
             min-height: 100vh;
             padding: 40px 20px;
             color: var(--text);
@@ -42,7 +42,7 @@
         }
 
         header h1 {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Cinzel', serif;
             font-size: 3.5em;
             margin-bottom: 12px;
             color: var(--primary);
@@ -59,7 +59,7 @@
 
         .query-section {
             background: white;
-            border-radius: 16px;
+            border-radius: 4px;
             padding: 40px;
             margin-bottom: 40px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
@@ -84,7 +84,7 @@
             width: 100%;
             padding: 16px 18px;
             border: 2px solid var(--border);
-            border-radius: 12px;
+            border-radius: 3px;
             font-size: 1em;
             font-family: 'Inter', sans-serif;
             resize: vertical;
@@ -97,7 +97,7 @@
             outline: none;
             border-color: var(--primary);
             background: white;
-            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.08);
+            box-shadow: 0 0 0 4px rgba(201, 168, 92, 0.08);
         }
 
         textarea::placeholder {
@@ -107,7 +107,7 @@
         input[type="file"] {
             padding: 12px;
             border: 2px solid var(--border);
-            border-radius: 12px;
+            border-radius: 3px;
             width: 100%;
             font-size: 0.95em;
             transition: all 0.3s ease;
@@ -140,7 +140,7 @@
         button {
             padding: 14px 32px;
             border: none;
-            border-radius: 12px;
+            border-radius: 3px;
             font-size: 0.95em;
             font-weight: 600;
             cursor: pointer;
@@ -150,15 +150,15 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, #c9a227 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, #B8964A 100%);
             color: var(--dark);
             flex: 1;
-            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.25);
+            box-shadow: 0 8px 20px rgba(201, 168, 92, 0.25);
         }
 
         .btn-primary:hover:not(:disabled) {
             transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(212, 175, 55, 0.35);
+            box-shadow: 0 12px 30px rgba(201, 168, 92, 0.35);
         }
 
         .btn-primary:active:not(:disabled) {
@@ -183,7 +183,7 @@
 
         .response-section {
             background: white;
-            border-radius: 16px;
+            border-radius: 4px;
             padding: 40px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
             border: 1px solid var(--border);
@@ -218,7 +218,7 @@
         }
 
         .response-header h2 {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Cinzel', serif;
             color: var(--primary);
             font-size: 1.8em;
             margin-bottom: 0;
@@ -297,7 +297,7 @@
         }
 
         .citation-link:hover {
-            color: #c9a227;
+            color: #B8964A;
         }
 
         .loading {
@@ -411,7 +411,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>⚜️ The Roundtable</h1>
+            <h1>The Roundtable</h1>
             <p>Your AI Panel of Real Estate's Best Minds — You Choose Who's at the Table</p>
         </header>
 
@@ -425,7 +425,7 @@
             </div>
 
             <div class="form-group">
-                <label for="fileUpload">📎 Attach a document (optional):</label>
+                <label for="fileUpload">Attach a document (optional):</label>
                 <input
                     type="file"
                     id="fileUpload"
@@ -436,7 +436,7 @@
             </div>
 
             <div class="form-group">
-                <label>🪑 Choose Your Advisors <span style="text-transform:none;font-weight:400;color:#999;">(influences blended into every answer)</span></label>
+                <label>Choose Your Advisors <span style="text-transform:none;font-weight:400;color:#999;">(influences blended into every answer)</span></label>
                 <div style="display:flex; gap:10px; margin-bottom:14px;">
                     <button type="button" class="btn-secondary" style="padding:6px 14px; font-size:0.78em;" onclick="setAllExperts(true)">Select All</button>
                     <button type="button" class="btn-secondary" style="padding:6px 14px; font-size:0.78em;" onclick="setAllExperts(false)">Clear All</button>
@@ -453,7 +453,7 @@
                 </button>
             </div>
 
-            <div id="convoBadge" style="display: none; margin-top: 16px; padding: 10px 16px; background: rgba(212, 175, 55, 0.08); border: 1px solid var(--primary); border-radius: 10px; color: #8a6d1a; font-size: 0.9em; font-weight: 500;"></div>
+            <div id="convoBadge" style="display: none; margin-top: 16px; padding: 10px 16px; background: rgba(201, 168, 92, 0.08); border: 1px solid var(--primary); border-radius: 3px; color: #8a6d1a; font-size: 0.9em; font-weight: 500;"></div>
 
             <div class="status">
                 <span class="api-status online" id="apiStatus"></span>
@@ -477,7 +477,7 @@
             </div>
             <div class="response-text" id="responseText"></div>
             <div class="citations" id="citationsBox" style="display: none;">
-                <h3>📚 Sources</h3>
+                <h3>Sources</h3>
                 <ul class="citation-list" id="citationsList"></ul>
             </div>
         </div>
@@ -493,51 +493,51 @@
 
         // ===== The Advisor Panel =====
         const EXPERT_GROUPS = [
-            { group: '📞 Sales & Prospecting', experts: [
+            { group: 'Sales & Prospecting', experts: [
                 ['serhant', 'Ryan Serhant', 'Luxury sales & branding'],
                 ['harris', 'Tim & Julie Harris', 'Listing appointments & scripts'],
                 ['mulrenin', 'Brandon Mulrenin', 'FSBO & expired prospecting'],
                 ['carruthers', 'Ricky Carruthers', 'Cold calling & door knocking'],
             ]},
-            { group: '📈 Coaching & Business', experts: [
+            { group: 'Coaching & Business', experts: [
                 ['ferry', 'Tom Ferry', 'Coaching systems & planning'],
                 ['buffini', 'Brian Buffini', 'Referrals & relationships'],
                 ['keller', 'Gary Keller', 'Teams & wealth models'],
                 ['sharran', 'Sharran Srivatsaa', 'Strategy, luxury & wealth'],
             ]},
-            { group: '🎬 Marketing & Media', experts: [
+            { group: 'Marketing & Media', experts: [
                 ['glennda', 'Glennda Baker', 'Storytelling & social'],
                 ['lazine', 'Byron Lazine', 'Market analysis & trends'],
                 ['burgess', 'Jimmy Burgess', 'Listing attraction tactics'],
                 ['pantana', 'Jason Pantana', 'Visual marketing & tech'],
                 ['peitz', 'Chelsea Peitz', 'Visual social branding'],
             ]},
-            { group: '🤝 Negotiation', experts: [
+            { group: 'Negotiation', experts: [
                 ['voss', 'Chris Voss', 'Negotiation psychology'],
             ]},
-            { group: '🛋️ Design & Staging', experts: [
+            { group: 'Design & Staging', experts: [
                 ['gaines', 'Joanna Gaines', 'Design & lifestyle storytelling'],
                 ['mcgee', 'Shea McGee', 'Design rules & transformations'],
                 ['eisen', 'Cheryl Eisen', 'Luxury staging that sells'],
             ]},
-            { group: '🏢 Commercial', experts: [
+            { group: 'Commercial', experts: [
                 ['knakal', 'Bob Knakal', 'Investment sales'],
                 ['cauble', 'Tyler Cauble', 'Leasing & small CRE'],
                 ['mcelroy', 'Ken McElroy', 'Multifamily investing'],
             ]},
-            { group: '🔨 Flipping & Investing', experts: [
+            { group: 'Flipping & Investing', experts: [
                 ['tarek', 'Tarek El Moussa', 'Flipping & renovation ROI'],
                 ['norton', 'Jerry Norton', 'Flips & wholesaling deals'],
                 ['morby', 'Pace Morby', 'Creative finance & subject-to'],
                 ['greene', 'David Greene', 'BRRRR & long-distance investing'],
             ]},
-            { group: '🇪🇸 Español & Bilingual', experts: [
+            { group: 'Español & Bilingual', experts: [
                 ['loida', 'Loida Velasquez', 'Bilingual (EN/ES) prospecting'],
                 ['figueroa', 'Veronica Figueroa', 'Latino homebuyer market'],
                 ['creyes', 'Carlos Reyes', 'Investing & wholesaling en español'],
                 ['rene', 'Rene Rodriguez', 'Sales psychology & influence'],
             ]},
-            { group: '⚖️ Probate, Divorce & Distressed', experts: [
+            { group: 'Probate, Divorce & Distressed', experts: [
                 ['corbett', 'Chad Corbett', 'Probate systems & outreach'],
                 ['nicoletti', 'Al Nicoletti', 'Probate legal strategy (attorney)'],
                 ['gross', 'Bill Gross', 'CA probate court process'],
@@ -556,7 +556,7 @@
                         ${g.experts.map(([id, name, focus]) => `
                             <label style="display:flex; align-items:flex-start; gap:8px; padding:9px 12px; background:#fafafa; border:1.5px solid var(--border); border-radius:10px; cursor:pointer; transition:all .2s;"
                                    onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
-                                <input type="checkbox" class="expert-cb" value="${id}" checked style="margin-top:3px; accent-color:#D4AF37;">
+                                <input type="checkbox" class="expert-cb" value="${id}" checked style="margin-top:3px; accent-color:#C9A85C;">
                                 <span style="line-height:1.3;"><strong style="font-size:0.88em;">${name}</strong><br><span style="font-size:0.75em; color:#888;">${focus}</span></span>
                             </label>
                         `).join('')}
@@ -582,7 +582,7 @@
                 return;
             }
             const exchanges = Math.floor(conversationHistory.length / 2);
-            let text = `💬 Conversation active (${exchanges} exchange${exchanges === 1 ? '' : 's'})`;
+            let text = `Conversation active (${exchanges} exchange${exchanges === 1 ? '' : 's'})`;
             if (documentName) text += ` — your panel remembers "${documentName}"`;
             badge.textContent = text;
             badge.style.display = 'block';
