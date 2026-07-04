@@ -10,3 +10,12 @@ Verification: wave1_gate.py — 5/5 PASS (answers cite researched frameworks: PC
 short-sale package contents, elisor path, 68-day rule, tax-deed funnel).
 Tooling: scripts/fold_dossier.py (reusable fold-back, immune to heredoc backslash mangling).
 Next: Wave 2 Español (loida, figueroa, creyes, rene) then retrieval layer + bilingual script library.
+
+## 2026-07-04 — WAVE 2 COMPLETE: Espanol & Bilingual (research program)
+Built: sourced kb files for loida (PropStream/REDX verbatim expired script/Realtyna),
+figueroa (Team OS FUBCON, Sisu, eXp Life, NAHREP - #1 eXp mega team, accountability-with-consent),
+creyes (REI Mastery ep809 - marketers-first doctrine, channel rankings, $500->$97K/mo spend arc),
+rene (Amplify Your Influence breakdown + RBC ep28 - AMPLIFII frame/message/tie-down, identity story).
+Gate: wave2_gate.py 3/3 PASS incl. Spanish-language test (answered en espanol citing researched concepts).
+Skill zip REGENERATED with enriched dossiers + full research library bundled (references/research/*.md).
+Progress: 10 of 34 advisors research-backed. Next: retrieval layer + espanol_scripts.md, then Wave 3 (Mulrenin, Harris, Carruthers, Serhant).
