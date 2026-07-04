@@ -14,7 +14,7 @@ Update after EVERY advisor. Trust this file over memory.
 - [x] loida (Loida Velasquez) — kb/loida.md written, dossier folded
 - [x] figueroa (Veronica Figueroa) — kb/figueroa.md written, dossier folded
 - [x] creyes (Carlos Reyes) — kb/creyes.md written, dossier folded
-- [~] rene (Rene Rodriguez) — next: searches
+- [x] rene (Rene Rodriguez) — kb/rene.md written, dossier folded — WAVE 2 RESEARCH COMPLETE
 
 ## Wave 3 — Prospecting & Scripts
 - [ ] mulrenin (Brandon Mulrenin)
