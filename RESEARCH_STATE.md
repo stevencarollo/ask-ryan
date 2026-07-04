@@ -6,8 +6,8 @@ Update after EVERY advisor. Trust this file over memory.
 - [x] gross (Bill Gross) — kb/gross.md written, dossier folded, 2 transcripts + statute source
 - [x] espinosa (Nicole Espinosa) — kb/espinosa.md written, dossier folded
 - [x] nicoletti (Al Nicoletti) — kb/nicoletti.md written, dossier folded
-- [~] corbett (Chad Corbett) — next: searches
-- [ ] starks (Laurel Starks, divorce)
+- [x] corbett (Chad Corbett) — kb/corbett.md written, dossier folded
+- [~] starks (Laurel Starks) — next: searches
 - [ ] ted (Ted Thomas, tax defaults)
 
 ## Wave 2 — Español
