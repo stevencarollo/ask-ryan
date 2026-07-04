@@ -4,8 +4,8 @@ Update after EVERY advisor. Trust this file over memory.
 
 ## Wave 1 — Distressed & Legal
 - [x] gross (Bill Gross) — kb/gross.md written, dossier folded, 2 transcripts + statute source
-- [~] espinosa (Nicole Espinosa) — next: searches
-- [ ] nicoletti (Al Nicoletti, probate attorney)
+- [x] espinosa (Nicole Espinosa) — kb/espinosa.md written, dossier folded
+- [~] nicoletti (Al Nicoletti) — next: searches
 - [ ] corbett (Chad Corbett, probate outreach)
 - [ ] starks (Laurel Starks, divorce)
 - [ ] ted (Ted Thomas, tax defaults)
