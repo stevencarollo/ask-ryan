@@ -110,6 +110,17 @@
             transition: all 0.2s ease;
         }
         .panel-actions button:hover { background: var(--gold); color: var(--ink); }
+        .panel-actions .apply-btn {
+            margin-left: auto;
+            background: var(--gold); color: var(--ink); border-color: var(--gold);
+            font-weight: 700;
+        }
+        .panel-actions .apply-btn:hover { background: var(--gold-bright); }
+        .chat-toast {
+            position: fixed; bottom: 96px; left: 50%; transform: translateX(-50%);
+            background: var(--charcoal); border: 1px solid var(--gold); color: var(--gold-bright);
+            padding: 10px 22px; border-radius: 6px; font-size: 0.82em; display: none; z-index: 60;
+        }
         .group-label {
             font-size: 0.72em; font-weight: 700; color: var(--gold);
             letter-spacing: 0.08em; margin: 12px 0 7px; text-transform: uppercase;
@@ -277,6 +288,7 @@
                 <div class="panel-actions">
                     <button type="button" onclick="setAllExperts(true)">Select All</button>
                     <button type="button" onclick="setAllExperts(false)">Clear All</button>
+                    <button type="button" class="apply-btn" onclick="applyAdvisors()">Done — Seat My Panel</button>
                 </div>
                 <div id="expertPanel"></div>
             </div>
@@ -533,6 +545,26 @@
             const d = document.querySelector('details.advisors');
             d.open = !d.open;
             if (d.open) d.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function chatToast(msg) {
+            let t = document.getElementById('chatToast');
+            if (!t) {
+                t = document.createElement('div');
+                t.id = 'chatToast'; t.className = 'chat-toast';
+                document.body.appendChild(t);
+            }
+            t.textContent = msg; t.style.display = 'block';
+            clearTimeout(t._h);
+            t._h = setTimeout(() => t.style.display = 'none', 3000);
+        }
+
+        function applyAdvisors() {
+            const n = getSelectedExperts().length;
+            if (n === 0) { chatToast('Select at least one advisor'); return; }
+            document.querySelector('details.advisors').open = false;
+            chatToast(`Panel seated: ${n} advisor${n === 1 ? '' : 's'}${n <= 8 ? ' · deep-dossier mode' : ''} — ask away`);
+            document.getElementById('composerInput').focus();
         }
 
         // ===== Wiring =====
