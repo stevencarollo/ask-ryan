@@ -35,3 +35,11 @@ FKD, six reasons balls drop, Four W's, seven client stages, Wow Effect).
 Research correction shipped: Ricky Carruthers -> Ricky Carruth in KB + frontend UI.
 Skill zip rebuilt with 15 research files. Progress: 14 of 34 advisors research-backed.
 Next: Wave 4 (ferry, buffini, keller, sharran).
+
+## 2026-07-04 — WAVE 4 COMPLETE: Coaching & Business
+kb files: ferry (5-step business plan, appointments math verbatim; CORRECTED 8x8/33-touch misattribution),
+buffini (IOV monthly rhythm, 7x follow-up call multiplier, A+-to-D sorting), keller (MREA four models,
+verbatim 8x8 + 33-touch breakdowns - the true home of those systems), sharran (verified bio incl. role
+update to Acquisition.com CEO; 94.5% listing consultation claim; pre-launch blueprint).
+Skill zip rebuilt (19 research files). Progress: 18 of 34 advisors research-backed.
+Next: Wave 5 (voss, norton, morby, greene, tarek).

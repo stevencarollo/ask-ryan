@@ -26,7 +26,7 @@ Update after EVERY advisor. Trust this file over memory.
 - [x] ferry (Tom Ferry) — kb/ferry.md written, dossier folded (8x8/33-touch misattribution corrected)
 - [x] buffini (Brian Buffini) — kb/buffini.md written, dossier folded
 - [x] keller (Gary Keller) — kb/keller.md written, dossier folded (8x8/33-touch verified HERE)
-- [~] sharran (Sharran Srivatsaa) — next: searches
+- [x] sharran (Sharran Srivatsaa) — kb/sharran.md written, dossier folded (role updated: now Acquisition.com CEO/MP) — WAVE 4 RESEARCH COMPLETE
 
 ## Wave 5 — Negotiation & Investing
 - [ ] voss (Chris Voss)
