@@ -110,3 +110,16 @@ distinct A/B voices, play/pause/stop, progress bar, current-line highlight); tra
 NOTEBOOKLM HANDOFF: one click downloads the source doc + opens notebooklm.google.com (Google has no
 public NotebookLM API - this is the deepest legal integration: doc formatted for Audio Overview).
 Nav wired: chat topbar, flyer studio, landing. $0 - browser TTS is free, no new services.
+
+## 2026-07-04 — REAL NOTEBOOKLM INTEGRATION (notebooklm-py bridge)
+Steve provided github.com/teng-lin/notebooklm-py (unofficial client: notebooks, sources, Audio
+Overview MP3 generation+download, headless storage-state auth). Built backend/nlm_bridge.py:
+threaded job runner (create notebook -> add episode source doc -> generate audio overview ->
+poll/download MP3 -> delete notebook), auth via ~/.notebooklm storage_state.json locally or
+NLM_STORAGE_B64 env on Render. Endpoints: /api/nlm-ready, POST /api/nlm-audio (job start),
+GET /api/nlm-audio/{id} (status), GET /api/nlm-audio/{id}/file (MP3). Podcast Studio UI: when
+server has auth, a "Generate NotebookLM Audio" button appears with live progress + built-in
+player + MP3 download; manual source-doc handoff remains for unconfigured servers.
+Auth status: awaiting Steve's one-time Google login in the Playwright window (cookie imports
+from Chrome/Edge blocked by app-bound encryption; Firefox has no Google session).
+NOTE: unofficial API - can break if Google changes internals; uses Steve's own account.

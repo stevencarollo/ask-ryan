@@ -111,11 +111,27 @@ h1.page{font-family:'Cinzel',serif;font-size:1.6em;color:var(--gold);letter-spac
         </div>
         <div class="transcript" id="transcript"></div>
         <div class="nlm">
-            <h4>Send to NotebookLM</h4>
-            <p>Google's NotebookLM has no public API, so this is the fastest legal path: one click downloads this episode's <b>source document</b> and opens NotebookLM — drop the file into a new notebook and press <b>Audio Overview</b> for Google's studio-quality podcast version of this exact topic.</p>
-            <div class="row">
-                <button class="mini-btn" style="background:var(--gold);color:var(--ink);border-color:var(--gold)" onclick="sendToNotebookLM()">Download Source + Open NotebookLM</button>
-                <button class="mini-btn" onclick="downloadSource()">Just the Source Doc</button>
+            <h4>NotebookLM Studio Audio</h4>
+            <div id="nlmAuto" style="display:none">
+                <p>Generate Google's <b>studio-quality two-host Audio Overview</b> of this exact episode — right here. Takes 2-5 minutes.</p>
+                <div class="row">
+                    <button class="mini-btn" id="nlmBtn" style="background:var(--gold);color:var(--ink);border-color:var(--gold)" onclick="nlmGenerate()">Generate NotebookLM Audio</button>
+                </div>
+                <div id="nlmProgress" style="display:none;margin-top:12px">
+                    <div style="font-size:.78em;color:var(--gold-bright)" id="nlmStep">Starting...</div>
+                    <div style="height:4px;background:rgba(255,255,255,.1);border-radius:3px;margin-top:8px;overflow:hidden"><i id="nlmBar" style="display:block;height:100%;width:5%;background:var(--gold);transition:width 1s"></i></div>
+                </div>
+                <div id="nlmDone" style="display:none;margin-top:12px">
+                    <audio id="nlmPlayer" controls style="width:100%"></audio>
+                    <div class="row" style="margin-top:8px"><a class="mini-btn" id="nlmDownload" download="roundtable_episode.mp3" style="text-decoration:none;display:inline-block">Download MP3</a></div>
+                </div>
+            </div>
+            <div id="nlmManual">
+                <p>One click downloads this episode's <b>source document</b> and opens NotebookLM — drop the file into a new notebook and press <b>Audio Overview</b> for Google's studio-quality podcast version.</p>
+                <div class="row">
+                    <button class="mini-btn" style="background:var(--gold);color:var(--ink);border-color:var(--gold)" onclick="sendToNotebookLM()">Download Source + Open NotebookLM</button>
+                    <button class="mini-btn" onclick="downloadSource()">Just the Source Doc</button>
+                </div>
             </div>
         </div>
     </div>
@@ -259,7 +275,61 @@ function sendToNotebookLM(){
     toast('NotebookLM opened - create a notebook, add the downloaded file, press Audio Overview');
 }
 
+// ===== Real NotebookLM audio generation =====
+let nlmJob = null, nlmTimer = null, nlmPct = 5;
+async function checkNlmReady(){
+    try{
+        const r = await fetch(`${API_URL}/api/nlm-ready`);
+        const d = await r.json();
+        if(d.ready){ $('nlmAuto').style.display='block'; }
+    }catch(e){}
+}
+async function nlmGenerate(){
+    if(!episode) return;
+    const btn=$('nlmBtn'); btn.disabled=true; btn.textContent='Working...';
+    $('nlmProgress').style.display='block'; $('nlmDone').style.display='none';
+    nlmPct = 5; $('nlmBar').style.width='5%';
+    try{
+        const r = await fetch(`${API_URL}/api/nlm-audio`, {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ title: episode.title, source_doc: episode.source_doc, language: $('lang').value })
+        });
+        const d = await r.json();
+        if(d.status!=='started') throw new Error(d.message||'failed');
+        nlmJob = d.job_id;
+        nlmTimer = setInterval(nlmPoll, 6000);
+    }catch(e){
+        $('nlmStep').textContent = 'Could not start: ' + e.message;
+        btn.disabled=false; btn.textContent='Generate NotebookLM Audio';
+    }
+}
+async function nlmPoll(){
+    try{
+        const r = await fetch(`${API_URL}/api/nlm-audio/${nlmJob}`);
+        const d = await r.json();
+        $('nlmStep').textContent = d.step || d.status;
+        nlmPct = Math.min(nlmPct + 4, 92);
+        $('nlmBar').style.width = nlmPct + '%';
+        if(d.status==='done'){
+            clearInterval(nlmTimer);
+            $('nlmBar').style.width='100%';
+            $('nlmStep').textContent='Studio audio ready';
+            const url = `${API_URL}/api/nlm-audio/${nlmJob}/file`;
+            $('nlmPlayer').src = url;
+            $('nlmDownload').href = url;
+            $('nlmDone').style.display='block';
+            const btn=$('nlmBtn'); btn.disabled=false; btn.textContent='Generate NotebookLM Audio';
+            toast('NotebookLM studio audio ready');
+        } else if(d.status==='error'){
+            clearInterval(nlmTimer);
+            $('nlmStep').textContent = 'Error: ' + (d.error||'unknown');
+            const btn=$('nlmBtn'); btn.disabled=false; btn.textContent='Generate NotebookLM Audio';
+        }
+    }catch(e){}
+}
+
 renderTopics();
+checkNlmReady();
 </script>
 </body>
 </html>

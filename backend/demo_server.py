@@ -320,6 +320,56 @@ def analyze_image_with_groq(file_path: str, query: Optional[str], file_name: str
         return None
 
 
+def _nlm():
+    try:
+        from backend import nlm_bridge
+    except ImportError:
+        import nlm_bridge
+    return nlm_bridge
+
+
+@app.get("/api/nlm-ready")
+async def nlm_ready_endpoint():
+    """Is real NotebookLM audio generation configured on this server?"""
+    try:
+        return {"ready": _nlm().nlm_ready()}
+    except Exception:
+        return {"ready": False}
+
+
+@app.post("/api/nlm-audio")
+async def nlm_audio_start(data: dict):
+    """Start a REAL NotebookLM Audio Overview job for an episode source doc."""
+    bridge = _nlm()
+    if not bridge.nlm_ready():
+        return JSONResponse(status_code=501, content={
+            "status": "error",
+            "message": "NotebookLM auth isn't configured on this server yet."})
+    title = (data.get("title") or "Roundtable Episode")[:120]
+    source_doc = (data.get("source_doc") or "")[:200_000]
+    if len(source_doc) < 200:
+        return JSONResponse(status_code=400, content={"status": "error", "message": "source_doc required"})
+    job_id = bridge.start_audio_job(title, source_doc, data.get("language", "en"))
+    return {"status": "started", "job_id": job_id}
+
+
+@app.get("/api/nlm-audio/{job_id}")
+async def nlm_audio_status(job_id: str):
+    s = _nlm().job_status(job_id)
+    if s is None:
+        return JSONResponse(status_code=404, content={"status": "error", "message": "unknown job"})
+    return s
+
+
+@app.get("/api/nlm-audio/{job_id}/file")
+async def nlm_audio_file(job_id: str):
+    from fastapi.responses import FileResponse
+    f = _nlm().job_file(job_id)
+    if not f:
+        return JSONResponse(status_code=404, content={"status": "error", "message": "no file yet"})
+    return FileResponse(f, media_type="audio/mpeg", filename="roundtable_episode.mp3")
+
+
 @app.post("/api/podcast-script")
 async def podcast_script(data: dict):
     """Podcast Studio: pick a topic -> a two-host NotebookLM-style deep-dive episode
