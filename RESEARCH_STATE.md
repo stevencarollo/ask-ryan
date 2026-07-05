@@ -37,8 +37,8 @@ Update after EVERY advisor. Trust this file over memory.
 
 ## Wave 6 — Commercial
 - [x] knakal (Bob Knakal) — kb/knakal.md written, dossier folded
-- [~] cauble (Tyler Cauble) — next: searches
-- [ ] mcelroy (Ken McElroy)
+- [x] cauble (Tyler Cauble) — kb/cauble.md written, dossier folded
+- [~] mcelroy (Ken McElroy) — next: searches
 
 ## Wave 7 — Marketing & Media
 - [ ] glennda (Glennda Baker)
