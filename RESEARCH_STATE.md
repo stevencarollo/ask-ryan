@@ -19,8 +19,8 @@ Update after EVERY advisor. Trust this file over memory.
 ## Wave 3 — Prospecting & Scripts
 - [x] mulrenin (Brandon Mulrenin) — kb/mulrenin.md written, dossier folded
 - [x] harris (Tim & Julie Harris) — kb/harris.md written, dossier folded
-- [~] carruthers (Ricky Carruthers) — next: searches
-- [ ] serhant (Ryan Serhant)
+- [x] carruthers (Ricky CARRUTH - name corrected by research) — kb written, dossier folded
+- [~] serhant (Ryan Serhant) — next: searches
 
 ## Wave 4 — Coaching & Business
 - [ ] ferry (Tom Ferry)
