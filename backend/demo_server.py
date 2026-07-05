@@ -349,7 +349,8 @@ async def nlm_audio_start(data: dict):
     source_doc = (data.get("source_doc") or "")[:200_000]
     if len(source_doc) < 200:
         return JSONResponse(status_code=400, content={"status": "error", "message": "source_doc required"})
-    job_id = bridge.start_audio_job(title, source_doc, data.get("language", "en"))
+    job_id = bridge.start_audio_job(title, source_doc, data.get("language", "en"),
+                                    (data.get("instructions") or "")[:500] or None)
     return {"status": "started", "job_id": job_id}
 
 
@@ -370,36 +371,94 @@ async def nlm_audio_file(job_id: str):
     return FileResponse(f, media_type="audio/mpeg", filename="roundtable_episode.mp3")
 
 
+try:
+    from backend.podcast_concepts import PODCAST_ADVISORS
+    from backend.kb_retrieval import get_kb
+except ImportError:
+    from podcast_concepts import PODCAST_ADVISORS
+    from kb_retrieval import get_kb
+
+
+@app.get("/api/podcast-concepts")
+async def podcast_concepts():
+    """The advisor episode catalog: first names, voice genders, and 3 researched
+    episode concepts per advisor."""
+    out = []
+    for aid, meta in PODCAST_ADVISORS.items():
+        e = EXPERTS.get(aid, {})
+        out.append({"id": aid, "name": e.get("name", meta["first"]),
+                    "first": meta["first"], "gender": meta["gender"],
+                    "focus": e.get("focus", ""), "concepts": meta["concepts"]})
+    return {"advisors": out}
+
+
 @app.post("/api/podcast-script")
 async def podcast_script(data: dict):
-    """Podcast Studio: pick a topic -> a two-host NotebookLM-style deep-dive episode
-    script grounded in the researched advisor library, plus a source document
-    formatted for NotebookLM upload (Audio Overview handoff)."""
+    """Podcast Studio: topic or advisor-persona episodes.
+
+    advisors: [] -> default ALEX/MORGAN show grounded via retrieval.
+    advisors: [id] -> interview: ALEX interviews that advisor (their first name,
+              their researched ideology).
+    advisors: [id1, id2] -> duo show: both hosts ARE the advisors, speaking their
+              own researched philosophies, agreeing and clashing where they truly differ.
+    """
     topic = (data.get("topic") or "real estate success habits").strip()[:200]
     minutes = int(data.get("minutes") or 6)
     language = data.get("language", "en")
+    advisor_ids = [a for a in (data.get("advisors") or []) if a in PODCAST_ADVISORS][:2]
 
-    kb_extra = retrieve_kb_sections(topic, max_chars=6000, max_files=4)
     lang_rule = ("Write the dialogue in natural US-Latino professional Spanish."
                  if language == "es" else "Write the dialogue in English.")
 
+    if advisor_ids:
+        metas = [PODCAST_ADVISORS[a] for a in advisor_ids]
+        if len(advisor_ids) == 2:
+            hosts = [{"name": metas[0]["first"].upper(), "gender": metas[0]["gender"]},
+                     {"name": metas[1]["first"].upper(), "gender": metas[1]["gender"]}]
+            persona_docs = "\n\n".join(
+                f"=== {EXPERTS[a]['name']} (host '{PODCAST_ADVISORS[a]['first'].upper()}') - researched ideology ===\n"
+                f"{get_kb(a, 6500)}" for a in advisor_ids)
+            cast_rules = (
+                f"The two hosts ARE these real advisors, first names only: "
+                f"{hosts[0]['name']} and {hosts[1]['name']}. Each host speaks ONLY from their own "
+                f"researched ideology below - their frameworks, their numbers, their signature phrases. "
+                f"Where their philosophies genuinely differ, let them respectfully CLASH and push back on "
+                f"each other before finding the practical middle. No generic co-host filler.")
+        else:
+            a = advisor_ids[0]
+            hosts = [{"name": "ALEX", "gender": "m"},
+                     {"name": metas[0]["first"].upper(), "gender": metas[0]["gender"]}]
+            persona_docs = (f"=== {EXPERTS[a]['name']} (host '{hosts[1]['name']}') - researched ideology ===\n"
+                            f"{get_kb(a, 8000)}")
+            cast_rules = (
+                f"Host ALEX is the curious interviewer asking what agents are thinking. "
+                f"Host {hosts[1]['name']} IS the real advisor - speaking only from the researched ideology "
+                f"below: their frameworks, real numbers, and signature phrases, in their voice.")
+        research_block = persona_docs
+    else:
+        hosts = [{"name": "ALEX", "gender": "m"}, {"name": "MORGAN", "gender": "f"}]
+        cast_rules = ("Host ALEX (curious, asks the questions agents are thinking, summarizes takeaways). "
+                      "Host MORGAN (the expert voice - draws on the research, gives frameworks, numbers, scripts).")
+        kb_extra = retrieve_kb_sections(topic, max_chars=6000, max_files=4)
+        research_block = kb_extra if kb_extra else "(no library match - solid general coaching knowledge, no invented statistics)"
+
+    host_names = [h["name"] for h in hosts]
     prompt = f"""Create a two-host podcast episode about: {topic}
 
 The show is "The Roundtable Sessions" - a sharp, warm real estate coaching podcast for agents.
-Host ALEX (curious, asks the questions agents are thinking, summarizes takeaways).
-Host MORGAN (the expert voice - draws on the research below, gives frameworks, numbers, and word-for-word scripts).
+{cast_rules}
 
-RESEARCH LIBRARY (ground every claim here when relevant - use the real numbers, formulas, and named frameworks):
-{kb_extra if kb_extra else '(no library match - use solid general real estate coaching knowledge, no invented statistics)'}
+RESEARCH (ground every claim here - use the real numbers, formulas, named frameworks, and signature phrases):
+{research_block}
 
-Rules: ~{minutes} minutes of audio (~{minutes * 140} words). Banter like NotebookLM's audio overviews -
-natural interruptions, "right", "exactly", short reactions - but ALWAYS substantive. Open with a hook,
-close with 3 actionable takeaways. {lang_rule}
+Rules: ~{minutes} minutes of audio (~{minutes * 140} words). Natural banter like NotebookLM's audio
+overviews - short reactions, interruptions, "right", "exactly" - but ALWAYS substantive. Open with a
+hook, close with 3 actionable takeaways. Host names in turns must be exactly {host_names[0]} and {host_names[1]}. {lang_rule}
 
 Respond ONLY with JSON:
 {{"title": "punchy episode title",
 "description": "2-sentence episode description",
-"turns": [{{"host": "ALEX", "text": "..."}}, {{"host": "MORGAN", "text": "..."}}]}}"""
+"turns": [{{"host": "{host_names[0]}", "text": "..."}}, {{"host": "{host_names[1]}", "text": "..."}}]}}"""
 
     try:
         client = _groq_client()
@@ -414,6 +473,7 @@ Respond ONLY with JSON:
         )
         import json as _json
         ep = _json.loads(r.choices[0].message.content)
+        ep["hosts"] = hosts
 
         # NotebookLM source document: the deep-dive doc an agent can upload for an Audio Overview
         doc_lines = [f"# {ep.get('title', topic)}", "",
@@ -423,8 +483,8 @@ Respond ONLY with JSON:
         for t in ep.get("turns", []):
             doc_lines.append(f"**{t.get('host', 'HOST')}:** {t.get('text', '')}")
             doc_lines.append("")
-        if kb_extra:
-            doc_lines += ["## Source research (from The Roundtable advisor library)", "", kb_extra]
+        if research_block and "(no library match" not in research_block:
+            doc_lines += ["## Source research (from The Roundtable advisor library)", "", research_block]
         ep["source_doc"] = "\n".join(doc_lines)
         return {"status": "success", "episode": ep}
     except Exception as e:

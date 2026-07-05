@@ -76,6 +76,11 @@ TOPICS = {
 }
 
 
+def get_kb(kb_id: str, max_chars: int = 7000) -> str:
+    """Full researched knowledge file for one advisor ('' if none)."""
+    return (_KB.get(kb_id) or "")[:max_chars]
+
+
 def retrieve_kb_sections(query: str, max_chars: int = 4500, max_files: int = 3) -> str:
     """Return the most relevant research-library excerpts for a query ('' if none)."""
     q = (query or "").lower()

@@ -6,7 +6,7 @@
 <title>Podcast Studio — The Roundtable</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,500&display=swap" rel="stylesheet">
 <style>
-:root{--gold:#C9A85C;--gold-bright:#E5C87E;--ink:#0B0B0D;--charcoal:#131316;--line:rgba(201,168,92,.25);--ivory:#F5F1E8;--muted:#8E887B;}
+:root{--gold:#C9A85C;--gold-bright:#E5C87E;--ink:#0B0B0D;--charcoal:#131316;--line:rgba(201,168,92,.25);--ivory:#F5F1E8;--muted:#8E887B;--blue:#7FB4D9;}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Inter',sans-serif;background:radial-gradient(ellipse 70% 50% at 50% -10%,rgba(201,168,92,.14),transparent 60%),var(--ink);color:var(--ivory);min-height:100vh}
 button{cursor:pointer;font-family:'Inter',sans-serif}
@@ -21,19 +21,32 @@ nav.topbar{display:flex;justify-content:space-between;align-items:center;gap:10p
 .nav-btn:hover{background:var(--gold);color:var(--ink)}
 @media(max-width:720px){.brand-mini{display:none}}
 
-.wrap{max-width:860px;margin:0 auto;padding:28px 18px 80px}
+.wrap{max-width:880px;margin:0 auto;padding:28px 18px 80px}
 h1.page{font-family:'Cinzel',serif;font-size:1.6em;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;text-align:center}
 .sub{color:var(--muted);text-align:center;font-size:.88em;margin-top:6px;font-weight:300}
 .sec-label{font-size:.72em;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:26px 0 12px}
+.mode-tabs{display:flex;gap:8px;margin-top:24px;flex-wrap:wrap}
+.mode-tab{flex:1;min-width:150px;padding:13px 10px;border:1.5px solid var(--line);border-radius:8px;background:var(--charcoal);color:var(--muted);font-size:.8em;font-weight:600;letter-spacing:.05em;text-align:center;transition:all .2s}
+.mode-tab.active{border-color:var(--gold);color:var(--gold-bright);background:rgba(201,168,92,.08)}
+.mode-tab small{display:block;font-weight:400;font-size:.85em;margin-top:3px;letter-spacing:0}
+.mode-pane{display:none;margin-top:16px}
+.mode-pane.active{display:block}
 .topics{display:flex;flex-wrap:wrap;gap:9px}
-.chip{padding:10px 16px;border:1px solid var(--line);border-radius:22px;background:var(--charcoal);color:var(--ivory);font-size:.82em;transition:all .2s}
+.chip{padding:10px 16px;border:1px solid var(--line);border-radius:22px;background:var(--charcoal);color:var(--ivory);font-size:.82em;transition:all .2s;text-align:left}
 .chip:hover{border-color:var(--gold)}
 .chip.active{background:var(--gold);color:var(--ink);border-color:var(--gold);font-weight:700}
 .custom-row{display:flex;gap:9px;margin-top:12px}
 .custom-row input{flex:1;padding:12px 15px;background:var(--charcoal);border:1px solid var(--line);border-radius:5px;color:var(--ivory);font-size:.92rem;font-family:'Inter',sans-serif}
+select.adv{width:100%;padding:12px 13px;background:var(--charcoal);border:1px solid var(--line);border-radius:5px;color:var(--ivory);font-size:.9rem;margin-bottom:10px}
+.duo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:640px){.duo-grid{grid-template-columns:1fr}}
+.concepts{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.hint{font-size:.72em;color:var(--muted);margin-top:8px;line-height:1.55}
+.cast{margin-top:18px;padding:13px 16px;border:1px solid var(--line);border-radius:8px;background:rgba(201,168,92,.06);font-size:.84em;color:var(--gold-bright)}
+.cast b{color:var(--ivory)}
 .opts{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
 .opts select{padding:10px 13px;background:var(--charcoal);border:1px solid var(--line);border-radius:5px;color:var(--ivory);font-size:.85rem}
-.go{width:100%;margin-top:18px;padding:15px;background:linear-gradient(135deg,var(--gold) 0%,#B8964A 100%);color:var(--ink);border:none;border-radius:6px;font-weight:700;font-size:.88em;letter-spacing:.12em;text-transform:uppercase;transition:all .2s}
+.go{width:100%;margin-top:16px;padding:15px;background:linear-gradient(135deg,var(--gold) 0%,#B8964A 100%);color:var(--ink);border:none;border-radius:6px;font-weight:700;font-size:.88em;letter-spacing:.12em;text-transform:uppercase;transition:all .2s}
 .go:hover:not(:disabled){background:var(--gold-bright)}
 .go:disabled{opacity:.55;cursor:wait}
 
@@ -42,7 +55,7 @@ h1.page{font-family:'Cinzel',serif;font-size:1.6em;color:var(--gold);letter-spac
 .ep-head h2{font-family:'Playfair Display',serif;font-size:1.5em;color:var(--ivory);line-height:1.25}
 .ep-head p{color:var(--muted);font-size:.85em;margin-top:7px;line-height:1.6}
 .player{display:flex;align-items:center;gap:12px;padding:15px 24px;border-bottom:1px solid var(--line);background:rgba(201,168,92,.05);flex-wrap:wrap}
-.play-btn{width:52px;height:52px;border-radius:50%;border:none;background:var(--gold);color:var(--ink);font-size:1.1em;display:flex;align-items:center;justify-content:center;transition:all .2s;flex:0 0 auto}
+.play-btn{width:52px;height:52px;border-radius:50%;border:none;background:var(--gold);color:var(--ink);display:flex;align-items:center;justify-content:center;transition:all .2s;flex:0 0 auto}
 .play-btn:hover{background:var(--gold-bright)}
 .play-btn svg{width:20px;height:20px;fill:currentColor}
 .player .info{flex:1;min-width:140px}
@@ -55,9 +68,9 @@ h1.page{font-family:'Cinzel',serif;font-size:1.6em;color:var(--gold);letter-spac
 .turn{display:flex;gap:12px;margin-bottom:16px;opacity:.85}
 .turn.current{opacity:1}
 .turn.current .tx{border-color:var(--gold)}
-.turn .who{flex:0 0 64px;font-size:.68em;font-weight:700;letter-spacing:.1em;padding-top:4px;text-align:right}
-.turn.a .who{color:#7FB4D9}
-.turn.m .who{color:var(--gold-bright)}
+.turn .who{flex:0 0 84px;font-size:.68em;font-weight:700;letter-spacing:.1em;padding-top:4px;text-align:right}
+.turn.h0 .who{color:var(--blue)}
+.turn.h1 .who{color:var(--gold-bright)}
 .turn .tx{flex:1;font-size:.9em;line-height:1.65;color:#d8d4c8;border-left:2px solid transparent;padding-left:12px}
 .nlm{padding:18px 24px;border-top:1px solid var(--line);background:rgba(201,168,92,.04)}
 .nlm h4{font-size:.75em;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
@@ -80,13 +93,44 @@ h1.page{font-family:'Cinzel',serif;font-size:1.6em;color:var(--gold);letter-spac
 
 <div class="wrap">
     <h1 class="page">Podcast Studio</h1>
-    <p class="sub">Pick a topic. The panel produces a two-host deep-dive episode from the research library — listen right here, or send it to NotebookLM.</p>
+    <p class="sub">Advisor deep-dives, custom duo shows, or any topic — produced from the researched library, listenable instantly, and NotebookLM studio audio on demand.</p>
 
-    <div class="sec-label">Choose a Topic</div>
-    <div class="topics" id="topics"></div>
-    <div class="custom-row">
-        <input id="customTopic" placeholder="...or type any topic: 'winning probate listings in LA County'">
+    <div class="mode-tabs">
+        <button class="mode-tab active" id="tabAdvisor" onclick="setMode('advisor')">Advisor Deep-Dive<small>ALEX interviews one advisor</small></button>
+        <button class="mode-tab" id="tabDuo" onclick="setMode('duo')">Duo Show<small>Two advisors, their ideologies</small></button>
+        <button class="mode-tab" id="tabTopic" onclick="setMode('topic')">Quick Topic<small>Classic two-host episode</small></button>
     </div>
+
+    <!-- Advisor deep-dive -->
+    <div class="mode-pane active" id="paneAdvisor">
+        <div class="sec-label">Pick an Advisor</div>
+        <select class="adv" id="advSelect" onchange="renderConcepts()"></select>
+        <div class="sec-label" style="margin-top:14px">Their Episode Concepts</div>
+        <div class="concepts" id="conceptList"></div>
+        <div class="custom-row"><input id="advCustom" placeholder="...or your own question for this advisor"></div>
+    </div>
+
+    <!-- Duo show -->
+    <div class="mode-pane" id="paneDuo">
+        <div class="sec-label">Choose Two Advisors</div>
+        <div class="duo-grid">
+            <select class="adv" id="duoA"></select>
+            <select class="adv" id="duoB"></select>
+        </div>
+        <div class="sec-label" style="margin-top:12px">What Should They Talk About?</div>
+        <div class="custom-row"><input id="duoTopic" placeholder="e.g. cold calling vs referrals: which builds the better business?"></div>
+        <div class="hint">The hosts ARE the two advisors — first names, their researched frameworks and philosophies, clashing where they genuinely disagree.</div>
+    </div>
+
+    <!-- Quick topic -->
+    <div class="mode-pane" id="paneTopic">
+        <div class="sec-label">Choose a Topic</div>
+        <div class="topics" id="topics"></div>
+        <div class="custom-row"><input id="customTopic" placeholder="...or type any topic"></div>
+    </div>
+
+    <div class="cast" id="castLine">Hosts: <b>ALEX</b> &amp; <b>MORGAN</b></div>
+
     <div class="opts">
         <select id="length"><option value="4">~4 minute episode</option><option value="6" selected>~6 minute episode</option><option value="10">~10 minute episode</option></select>
         <select id="lang"><option value="en">English</option><option value="es">Español</option></select>
@@ -113,7 +157,7 @@ h1.page{font-family:'Cinzel',serif;font-size:1.6em;color:var(--gold);letter-spac
         <div class="nlm">
             <h4>NotebookLM Studio Audio</h4>
             <div id="nlmAuto" style="display:none">
-                <p>Generate Google's <b>studio-quality two-host Audio Overview</b> of this exact episode — right here. Takes 2-5 minutes.</p>
+                <p>Generate Google's <b>studio-quality Audio Overview</b> of this exact episode — right here. Takes 2-8 minutes.</p>
                 <div class="row">
                     <button class="mini-btn" id="nlmBtn" style="background:var(--gold);color:var(--ink);border-color:var(--gold)" onclick="nlmGenerate()">Generate NotebookLM Audio</button>
                 </div>
@@ -127,7 +171,7 @@ h1.page{font-family:'Cinzel',serif;font-size:1.6em;color:var(--gold);letter-spac
                 </div>
             </div>
             <div id="nlmManual">
-                <p>One click downloads this episode's <b>source document</b> and opens NotebookLM — drop the file into a new notebook and press <b>Audio Overview</b> for Google's studio-quality podcast version.</p>
+                <p>One click downloads this episode's <b>source document</b> and opens NotebookLM — drop the file into a new notebook and press <b>Audio Overview</b>.</p>
                 <div class="row">
                     <button class="mini-btn" style="background:var(--gold);color:var(--ink);border-color:var(--gold)" onclick="sendToNotebookLM()">Download Source + Open NotebookLM</button>
                     <button class="mini-btn" onclick="downloadSource()">Just the Source Doc</button>
@@ -149,14 +193,17 @@ const TOPICS = [
     'BRRRR & building a rental portfolio',
     'Staging that sells: room-by-room ROI',
     'Video & social media for listings',
-    'Referral systems: the Buffini way',
+    'Referral systems that compound',
     'Commercial 101: cap rates & NNN leases',
     'Prospección bilingüe: ganando el mercado latino',
     'Tax liens & tax-deed auctions',
     'Divorce listings: the neutral expert',
     'Building your first real estate team',
 ];
+let CATALOG = [];              // advisor podcast catalog from API
+let mode = 'advisor';
 let selectedTopic = TOPICS[0];
+let selectedConcept = null;
 let episode = null;
 let playing = false, turnIdx = 0, utter = null;
 
@@ -164,38 +211,112 @@ function $(id){ return document.getElementById(id); }
 function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function toast(m){ const t=$('toast'); t.textContent=m; t.style.display='block'; setTimeout(()=>t.style.display='none',3000); }
 
+// ===== Modes =====
+function setMode(m){
+    mode = m;
+    ['advisor','duo','topic'].forEach(x=>{
+        $('pane'+x[0].toUpperCase()+x.slice(1)).classList.toggle('active', x===m);
+        $('tab'+x[0].toUpperCase()+x.slice(1)).classList.toggle('active', x===m);
+    });
+    updateCast();
+}
+
+// ===== Catalog =====
+async function loadCatalog(){
+    try{
+        const r = await fetch(`${API_URL}/api/podcast-concepts`);
+        const d = await r.json();
+        CATALOG = d.advisors || [];
+    }catch(e){ CATALOG = []; }
+    const opts = CATALOG.map(a=>`<option value="${a.id}">${esc(a.name)} — ${esc(a.focus)}</option>`).join('');
+    $('advSelect').innerHTML = opts;
+    $('duoA').innerHTML = opts;
+    $('duoB').innerHTML = opts;
+    if(CATALOG.length>1) $('duoB').selectedIndex = 1;
+    renderConcepts();
+    ['advSelect','duoA','duoB','duoTopic','advCustom'].forEach(id=>{
+        $(id).addEventListener('change', updateCast);
+        $(id).addEventListener('input', updateCast);
+    });
+    updateCast();
+}
+function adv(id){ return CATALOG.find(a=>a.id===id); }
+
+function renderConcepts(){
+    const a = adv($('advSelect').value);
+    if(!a){ $('conceptList').innerHTML=''; return; }
+    selectedConcept = a.concepts[0];
+    $('conceptList').innerHTML = a.concepts.map((c,i)=>
+        `<button class="chip ${i===0?'active':''}" onclick="pickConcept(${i})">${esc(c)}</button>`).join('');
+    updateCast();
+}
+function pickConcept(i){
+    const a = adv($('advSelect').value);
+    selectedConcept = a.concepts[i];
+    $('advCustom').value = '';
+    document.querySelectorAll('#conceptList .chip').forEach((c,j)=>c.classList.toggle('active', j===i));
+    updateCast();
+}
+
+// ===== Quick topics =====
 function renderTopics(){
     $('topics').innerHTML = TOPICS.map((t,i)=>
         `<button class="chip ${t===selectedTopic?'active':''}" onclick="pickTopic(${i})">${esc(t)}</button>`).join('');
 }
-function pickTopic(i){ selectedTopic = TOPICS[i]; $('customTopic').value=''; renderTopics(); }
-$('customTopic').addEventListener('input', function(){
-    if(this.value.trim()){ selectedTopic = this.value.trim(); document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); }
+function pickTopic(i){ selectedTopic = TOPICS[i]; $('customTopic').value=''; renderTopics(); updateCast(); }
+document.addEventListener('DOMContentLoaded', ()=>{
+    $('customTopic').addEventListener('input', function(){
+        if(this.value.trim()){ selectedTopic = this.value.trim(); document.querySelectorAll('#topics .chip').forEach(c=>c.classList.remove('active')); }
+        updateCast();
+    });
 });
 
+// ===== Current request =====
+function currentRequest(){
+    if(mode==='advisor'){
+        const a = adv($('advSelect').value);
+        const topic = $('advCustom').value.trim() || selectedConcept || (a? a.concepts[0] : 'success habits');
+        return { topic, advisors: a? [a.id] : [] };
+    }
+    if(mode==='duo'){
+        const a = adv($('duoA').value), b = adv($('duoB').value);
+        const ids = (a&&b&&a.id!==b.id) ? [a.id,b.id] : (a? [a.id]:[]);
+        const topic = $('duoTopic').value.trim() ||
+            (a&&b? `${a.focus} meets ${b.focus}: how their philosophies build a business together` : 'winning listings');
+        return { topic, advisors: ids };
+    }
+    return { topic: selectedTopic, advisors: [] };
+}
+function updateCast(){
+    const req = currentRequest();
+    let hosts;
+    if(req.advisors.length===2){
+        const a=adv(req.advisors[0]), b=adv(req.advisors[1]);
+        hosts = `<b>${esc(a.first.toUpperCase())}</b> &amp; <b>${esc(b.first.toUpperCase())}</b>`;
+    } else if(req.advisors.length===1){
+        const a=adv(req.advisors[0]);
+        hosts = `<b>ALEX</b> interviews <b>${esc(a.first.toUpperCase())}</b>`;
+    } else {
+        hosts = `<b>ALEX</b> &amp; <b>MORGAN</b>`;
+    }
+    $('castLine').innerHTML = `Hosts: ${hosts} &nbsp;·&nbsp; <span style="color:var(--muted)">${esc(req.topic).slice(0,90)}</span>`;
+}
+
+// ===== Produce =====
 async function makeEpisode(){
     stopPlay();
+    const req = currentRequest();
     const btn=$('goBtn'); btn.disabled=true; btn.textContent='The panel is producing your episode...';
     try{
         const res = await fetch(`${API_URL}/api/podcast-script`, {
             method:'POST', headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({ topic: selectedTopic, minutes: Number($('length').value), language: $('lang').value })
+            body: JSON.stringify({ topic: req.topic, advisors: req.advisors,
+                minutes: Number($('length').value), language: $('lang').value })
         });
         if(!res.ok) throw new Error('server');
         const data = await res.json();
         episode = data.episode;
-        $('epTitle').textContent = episode.title || selectedTopic;
-        $('epDesc').textContent = episode.description || '';
-        $('transcript').innerHTML = (episode.turns||[]).map((t,i)=>
-            `<div class="turn ${t.host==='ALEX'?'a':'m'}" id="turn${i}">
-                <div class="who">${esc(t.host)}</div>
-                <div class="tx">${esc(t.text)}</div>
-            </div>`).join('');
-        $('episode').style.display='block';
-        $('nowPlaying').textContent = 'Ready — press play to listen';
-        $('progress').style.width = '0';
-        turnIdx = 0;
-        $('episode').scrollIntoView({behavior:'smooth', block:'start'});
+        renderEpisode();
         toast('Episode produced');
     }catch(e){
         toast('Server waking up (free hosting) — try again in ~1 minute');
@@ -203,18 +324,51 @@ async function makeEpisode(){
         btn.disabled=false; btn.textContent='Produce This Episode';
     }
 }
+function hostIndex(name){
+    if(!episode || !episode.hosts) return 0;
+    return episode.hosts.findIndex(h=>h.name===name) === 1 ? 1 : 0;
+}
+function renderEpisode(){
+    $('epTitle').textContent = episode.title || '';
+    $('epDesc').textContent = episode.description || '';
+    $('transcript').innerHTML = (episode.turns||[]).map((t,i)=>
+        `<div class="turn h${hostIndex(t.host)}" id="turn${i}">
+            <div class="who">${esc(t.host)}</div>
+            <div class="tx">${esc(t.text)}</div>
+        </div>`).join('');
+    $('episode').style.display='block';
+    $('nowPlaying').textContent = 'Ready — press play to listen';
+    $('progress').style.width = '0';
+    turnIdx = 0;
+    $('nlmProgress').style.display='none'; $('nlmDone').style.display='none';
+    $('episode').scrollIntoView({behavior:'smooth', block:'start'});
+}
 
-// ===== Playback: two distinct browser voices (free, instant) =====
-let voiceA=null, voiceM=null;
+// ===== Playback: gender-cast browser voices =====
+let voicePools = { m: [], f: [] };
 function pickVoices(){
-    const vs = speechSynthesis.getVoices().filter(v=>v.lang.startsWith($('lang').value==='es'?'es':'en'));
+    const lang = $('lang').value==='es' ? 'es' : 'en';
+    const vs = speechSynthesis.getVoices().filter(v=>v.lang.toLowerCase().startsWith(lang));
     if(!vs.length) return;
-    voiceA = vs.find(v=>/male|david|guy|daniel|diego|jorge/i.test(v.name)) || vs[0];
-    voiceM = vs.find(v=>v!==voiceA && /female|zira|jenny|samantha|aria|paulina|sabina/i.test(v.name)) || vs.find(v=>v!==voiceA) || vs[0];
+    const male = vs.filter(v=>/david|mark|guy|george|eric|ryan|male|diego|jorge|raul|andrew|brian|christopher|roger/i.test(v.name) && !/female/i.test(v.name));
+    const female = vs.filter(v=>/zira|jenny|aria|susan|linda|heather|michelle|emma|ana|paulina|sabina|female|natasha|sonia|libby/i.test(v.name));
+    voicePools.m = male.length? male : vs;
+    voicePools.f = female.length? female : vs;
 }
 speechSynthesis.onvoiceschanged = pickVoices;
 pickVoices();
-
+function voiceFor(turnHost){
+    const idx = hostIndex(turnHost);
+    const h = (episode.hosts||[{gender:'m'},{gender:'f'}])[idx] || {gender: idx? 'f':'m'};
+    const pool = voicePools[h.gender==='f'?'f':'m'];
+    if(!pool || !pool.length) return { voice:null, pitch: idx? 1.05:0.95 };
+    // Two same-gender hosts: give each a DIFFERENT voice from the pool (or pitch-split)
+    const other = (episode.hosts||[])[1-idx] || {};
+    let vIdx = 0;
+    if(other.gender === h.gender){ vIdx = Math.min(idx, pool.length-1); }
+    const pitchSplit = (other.gender===h.gender && pool.length<2) ? (idx? 1.12 : 0.9) : 1.0;
+    return { voice: pool[vIdx], pitch: pitchSplit };
+}
 function speakTurn(i){
     if(!episode || i >= episode.turns.length){ stopPlay(); $('nowPlaying').textContent='Episode complete'; $('progress').style.width='100%'; return; }
     turnIdx = i;
@@ -225,8 +379,9 @@ function speakTurn(i){
     $('nowPlaying').textContent = `Now speaking: ${t.host}`;
     $('progress').style.width = Math.round(i/episode.turns.length*100)+'%';
     utter = new SpeechSynthesisUtterance(t.text);
-    utter.voice = t.host==='ALEX' ? voiceA : voiceM;
-    utter.rate = 1.04; utter.pitch = t.host==='ALEX' ? 0.95 : 1.05;
+    const cast = voiceFor(t.host);
+    if(cast.voice) utter.voice = cast.voice;
+    utter.rate = 1.04; utter.pitch = cast.pitch;
     utter.onend = ()=>{ if(playing) speakTurn(i+1); };
     speechSynthesis.speak(utter);
 }
@@ -250,7 +405,7 @@ function stopPlay(){
     document.querySelectorAll('.turn').forEach(el=>el.classList.remove('current'));
 }
 
-// ===== Downloads + NotebookLM handoff =====
+// ===== Downloads + NotebookLM =====
 function dl(name, text){
     const a=document.createElement('a');
     a.href=URL.createObjectURL(new Blob([text],{type:'text/markdown'}));
@@ -272,10 +427,10 @@ function sendToNotebookLM(){
     if(!episode) return;
     downloadSource();
     window.open('https://notebooklm.google.com/', '_blank');
-    toast('NotebookLM opened - create a notebook, add the downloaded file, press Audio Overview');
+    toast('NotebookLM opened — add the file, press Audio Overview');
 }
 
-// ===== Real NotebookLM audio generation =====
+// ===== Real NotebookLM audio =====
 let nlmJob = null, nlmTimer = null, nlmPct = 5;
 async function checkNlmReady(){
     try{
@@ -283,6 +438,11 @@ async function checkNlmReady(){
         const d = await r.json();
         if(d.ready){ $('nlmAuto').style.display='block'; }
     }catch(e){}
+}
+function nlmInstructions(){
+    if(!episode || !episode.hosts) return null;
+    const names = episode.hosts.map(h=>h.name).join(' and ');
+    return `The two hosts should be named ${names} and should embody the philosophies of the transcript speakers with those names, staying faithful to their frameworks and advice.`;
 }
 async function nlmGenerate(){
     if(!episode) return;
@@ -292,7 +452,8 @@ async function nlmGenerate(){
     try{
         const r = await fetch(`${API_URL}/api/nlm-audio`, {
             method:'POST', headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({ title: episode.title, source_doc: episode.source_doc, language: $('lang').value })
+            body: JSON.stringify({ title: episode.title, source_doc: episode.source_doc,
+                language: $('lang').value, instructions: nlmInstructions() })
         });
         const d = await r.json();
         if(d.status!=='started') throw new Error(d.message||'failed');
@@ -308,7 +469,7 @@ async function nlmPoll(){
         const r = await fetch(`${API_URL}/api/nlm-audio/${nlmJob}`);
         const d = await r.json();
         $('nlmStep').textContent = d.step || d.status;
-        nlmPct = Math.min(nlmPct + 4, 92);
+        nlmPct = Math.min(nlmPct + 3, 92);
         $('nlmBar').style.width = nlmPct + '%';
         if(d.status==='done'){
             clearInterval(nlmTimer);
@@ -329,6 +490,7 @@ async function nlmPoll(){
 }
 
 renderTopics();
+loadCatalog();
 checkNlmReady();
 </script>
 </body>

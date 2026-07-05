@@ -56,11 +56,11 @@ def nlm_ready():
         return False
 
 
-def start_audio_job(title, source_doc, language="en"):
+def start_audio_job(title, source_doc, language="en", instructions=None):
     job_id = uuid.uuid4().hex[:12]
     JOBS[job_id] = {"status": "queued", "step": "Starting...", "created": time.time(),
                     "title": title, "file": None, "error": None}
-    t = threading.Thread(target=_run_job, args=(job_id, title, source_doc, language), daemon=True)
+    t = threading.Thread(target=_run_job, args=(job_id, title, source_doc, language, instructions), daemon=True)
     t.start()
     _gc_jobs()
     return job_id
@@ -84,14 +84,14 @@ def _set(job_id, **kw):
         JOBS[job_id].update(kw)
 
 
-def _run_job(job_id, title, source_doc, language):
+def _run_job(job_id, title, source_doc, language, instructions=None):
     try:
-        asyncio.run(_run_async(job_id, title, source_doc, language))
+        asyncio.run(_run_async(job_id, title, source_doc, language, instructions))
     except Exception as e:
         _set(job_id, status="error", error=str(e)[:300])
 
 
-async def _run_async(job_id, title, source_doc, language):
+async def _run_async(job_id, title, source_doc, language, instructions=None):
     from notebooklm import NotebookLMClient
 
     storage = _storage_path()
@@ -112,7 +112,7 @@ async def _run_async(job_id, title, source_doc, language):
 
             _set(job_id, step="Generating the Audio Overview (Google usually takes 2-5 minutes)...")
             # verified signature: generate_audio(notebook_id, source_ids=None, language='en', instructions=None, ...)
-            await client.artifacts.generate_audio(nb_id, language=(language or "en"))
+            await client.artifacts.generate_audio(nb_id, language=(language or "en"), instructions=(instructions or None))
 
             # Poll for completion + download
             out = os.path.join(tempfile.gettempdir(), f"nlm_audio_{job_id}.mp3")

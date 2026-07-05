@@ -123,3 +123,14 @@ player + MP3 download; manual source-doc handoff remains for unconfigured server
 Auth status: awaiting Steve's one-time Google login in the Playwright window (cookie imports
 from Chrome/Edge blocked by app-bound encryption; Firefox has no Google session).
 NOTE: unofficial API - can break if Google changes internals; uses Steve's own account.
+
+## 2026-07-05 — PODCAST STUDIO v2: ADVISOR EPISODES + DUO SHOWS
+Built: backend/podcast_concepts.py - 102 episode concepts (3 per advisor, grounded in the researched
+dossiers) + first names + voice genders. /api/podcast-concepts catalog endpoint. /api/podcast-script
+upgraded: advisors[] param - single advisor = ALEX interviews them (host named by FIRST NAME, speaking
+only from their full researched kb file); two advisors = DUO SHOW (both hosts ARE the advisors, first
+names, clashing where philosophies differ). Gender-matched voice casting: two men = two male voices
+(pitch-split fallback). NLM instructions passthrough so studio audio embodies the chosen hosts.
+UI: three-mode tabs (Advisor Deep-Dive / Duo Show / Quick Topic), concept chips per advisor, live cast
+line, host-colored transcript. VERIFIED: Voss+Mulrenin duo (CHRIS/BRANDON hosts, both ideologies
+present - ASP method taught in Brandon's voice); Gross interview grounded in overbid/IAEA research.
