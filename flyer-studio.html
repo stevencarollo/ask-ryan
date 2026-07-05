@@ -706,10 +706,18 @@ function fitSheet(){
 window.addEventListener('resize', fitSheet);
 
 function fullDoc(){
+    // The flyer is designed at 850x1100px. A letter page prints at 816x1056px (96dpi),
+    // so scale by exactly 0.96 (same 8.5:11 aspect) to guarantee ONE page, no clipping.
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${esc(val('addr','Flyer'))} - Flyer</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
-<style>@page{size:letter;margin:0}body{margin:0}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style>
-</head><body>${flyerHTML()}</body></html>`;
+<style>
+@page{size:letter;margin:0}
+html,body{margin:0;padding:0}
+.page{width:8.5in;height:11in;overflow:hidden;page-break-after:avoid;page-break-inside:avoid}
+.fit{width:850px;height:1100px;transform:scale(0.96);transform-origin:top left}
+@media print{html,body{width:8.5in;height:11in;overflow:hidden}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head><body><div class="page"><div class="fit">${flyerHTML()}</div></div></body></html>`;
 }
 function printFlyer(){
     const w=window.open('','_blank');
