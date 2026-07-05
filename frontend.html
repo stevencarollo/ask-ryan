@@ -6,479 +6,259 @@
     <title>The Roundtable - Your AI Panel of Real Estate's Best Minds</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         :root {
-            --primary: #C9A85C;
-            --dark: #0B0B0D;
-            --light: #f5f5f5;
-            --text: #2d2d2d;
-            --border: #e0e0e0;
-            --success: #4ade80;
+            --gold: #C9A85C;
+            --gold-bright: #E5C87E;
+            --ink: #0B0B0D;
+            --charcoal: #131316;
+            --line: rgba(201, 168, 92, 0.25);
+            --ivory: #F5F1E8;
+            --muted: #8E887B;
+            --paper: #FFFFFF;
+            --paper-soft: #F7F5F0;
+            --text: #17150F;
+            --text-soft: #5B564B;
         }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: radial-gradient(ellipse 70% 50% at 50% -10%, rgba(201,168,92,0.14), transparent 60%), #0B0B0D;
-            min-height: 100vh;
-            padding: 40px 20px;
+            background: radial-gradient(ellipse 70% 50% at 50% -10%, rgba(201,168,92,0.14), transparent 60%), var(--ink);
             color: var(--text);
+            display: flex;
+            flex-direction: column;
+        }
+        button { cursor: pointer; font-family: 'Inter', sans-serif; }
+        button:focus-visible, textarea:focus-visible, a:focus-visible {
+            outline: 2px solid var(--gold-bright);
+            outline-offset: 2px;
         }
 
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
+        /* ===== Header ===== */
         header {
             text-align: center;
-            margin-bottom: 50px;
-            padding-bottom: 40px;
-            border-bottom: 2px solid var(--primary);
+            padding: 22px 16px 16px;
+            border-bottom: 1px solid var(--line);
+            background: rgba(11,11,13,0.6);
         }
-
         header h1 {
             font-family: 'Cinzel', serif;
-            font-size: 3.5em;
-            margin-bottom: 12px;
-            color: var(--primary);
-            font-weight: 800;
-            letter-spacing: -1px;
-        }
-
-        header p {
-            font-size: 1.1em;
-            color: #888;
-            font-weight: 300;
-            letter-spacing: 0.5px;
-        }
-
-        .query-section {
-            background: white;
-            border-radius: 4px;
-            padding: 40px;
-            margin-bottom: 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-            border: 1px solid var(--border);
-        }
-
-        .form-group {
-            margin-bottom: 28px;
-        }
-
-        label {
-            display: block;
+            font-size: 1.7em;
             font-weight: 600;
-            margin-bottom: 12px;
-            color: var(--text);
-            font-size: 0.95em;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.1em;
+            color: var(--gold);
             text-transform: uppercase;
         }
-
-        textarea {
-            width: 100%;
-            padding: 16px 18px;
-            border: 2px solid var(--border);
-            border-radius: 3px;
-            font-size: 1em;
-            font-family: 'Inter', sans-serif;
-            resize: vertical;
-            min-height: 120px;
-            transition: all 0.3s ease;
-            background: #fafafa;
+        header p { color: var(--muted); font-size: 0.82em; font-weight: 300; margin-top: 4px; }
+        .status-line {
+            display: inline-flex; align-items: center; gap: 7px;
+            margin-top: 8px; font-size: 0.75em; color: var(--muted);
         }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: #666; }
+        .dot.online { background: #4ade80; }
+        .dot.offline { background: #ef4444; }
 
-        textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: white;
-            box-shadow: 0 0 0 4px rgba(201, 168, 92, 0.08);
+        /* ===== Advisor panel (collapsible) ===== */
+        .setup {
+            max-width: 900px; margin: 14px auto 0; width: calc(100% - 28px);
         }
-
-        textarea::placeholder {
-            color: #999;
+        details.advisors {
+            background: var(--charcoal);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            color: var(--ivory);
         }
-
-        input[type="file"] {
-            padding: 12px;
-            border: 2px solid var(--border);
-            border-radius: 3px;
-            width: 100%;
-            font-size: 0.95em;
-            transition: all 0.3s ease;
+        details.advisors summary {
+            cursor: pointer; list-style: none;
+            padding: 13px 18px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 0.86em; font-weight: 600; letter-spacing: 0.06em;
+            color: var(--gold-bright); text-transform: uppercase;
         }
-
-        input[type="file"]:focus {
-            outline: none;
-            border-color: var(--primary);
+        details.advisors summary::-webkit-details-marker { display: none; }
+        details.advisors summary .count { color: var(--muted); text-transform: none; font-weight: 400; letter-spacing: 0; }
+        .advisor-body { padding: 4px 18px 18px; }
+        .panel-actions { display: flex; gap: 10px; margin-bottom: 12px; }
+        .panel-actions button {
+            padding: 6px 14px; font-size: 0.75em; border-radius: 3px;
+            background: transparent; color: var(--gold); border: 1px solid var(--line);
+            transition: all 0.2s ease;
         }
-
-        small {
-            color: #888;
-            font-size: 0.85em;
-            margin-top: 8px;
-            display: block;
+        .panel-actions button:hover { background: var(--gold); color: var(--ink); }
+        .group-label {
+            font-size: 0.72em; font-weight: 700; color: var(--gold);
+            letter-spacing: 0.08em; margin: 12px 0 7px; text-transform: uppercase;
         }
-
-        #fileName {
-            color: var(--primary);
-            font-weight: 600;
-            margin-top: 10px;
+        .chip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 7px; }
+        .chip-grid label {
+            display: flex; align-items: flex-start; gap: 8px;
+            padding: 8px 10px; border: 1px solid rgba(201,168,92,0.18); border-radius: 4px;
+            cursor: pointer; transition: border-color 0.2s ease; background: rgba(255,255,255,0.02);
         }
+        .chip-grid label:hover { border-color: var(--gold); }
+        .chip-grid input { margin-top: 3px; accent-color: #C9A85C; }
+        .chip-grid strong { font-size: 0.82em; color: var(--ivory); display: block; }
+        .chip-grid small { font-size: 0.7em; color: var(--muted); }
 
-        .button-group {
-            display: flex;
-            gap: 14px;
-            margin-top: 28px;
+        /* ===== Chat thread ===== */
+        .thread-wrap {
+            flex: 1; overflow-y: auto;
+            padding: 20px 14px 10px;
         }
-
-        button {
-            padding: 14px 32px;
-            border: none;
-            border-radius: 3px;
-            font-size: 0.95em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            letter-spacing: 0.3px;
-            text-transform: uppercase;
+        .thread { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+        .msg { display: flex; flex-direction: column; max-width: 85%; animation: rise 0.25s ease-out; }
+        @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+        @media (prefers-reduced-motion: reduce) { .msg { animation: none; } }
+        .msg.user { align-self: flex-end; align-items: flex-end; }
+        .msg.coach { align-self: flex-start; align-items: flex-start; }
+        .bubble {
+            padding: 13px 17px; border-radius: 10px;
+            font-size: 0.95em; line-height: 1.7;
+            white-space: pre-wrap; word-wrap: break-word;
         }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, #B8964A 100%);
-            color: var(--dark);
-            flex: 1;
-            box-shadow: 0 8px 20px rgba(201, 168, 92, 0.25);
+        .msg.user .bubble {
+            background: linear-gradient(135deg, var(--gold) 0%, #B8964A 100%);
+            color: var(--ink); border-bottom-right-radius: 3px; font-weight: 500;
         }
-
-        .btn-primary:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(201, 168, 92, 0.35);
+        .msg.coach .bubble {
+            background: var(--paper); color: var(--text);
+            border: 1px solid var(--line); border-bottom-left-radius: 3px;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.25);
         }
-
-        .btn-primary:active:not(:disabled) {
-            transform: translateY(-1px);
+        .msg .who {
+            font-size: 0.68em; font-weight: 600; letter-spacing: 0.14em;
+            text-transform: uppercase; color: var(--muted); margin-bottom: 5px;
         }
-
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
+        .bubble b { font-weight: 700; }
+        .bubble .file-tag {
+            display: inline-block; font-size: 0.8em; padding: 2px 10px; margin-bottom: 6px;
+            background: rgba(11,11,13,0.14); border-radius: 20px; font-weight: 600;
         }
-
-        .btn-secondary {
-            background: var(--light);
-            color: var(--text);
-            border: 2px solid var(--border);
+        .msg .actions { margin-top: 5px; }
+        .msg .actions button {
+            font-size: 0.68em; color: var(--muted); background: none; border: none;
+            letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 6px;
         }
+        .msg .actions button:hover { color: var(--gold-bright); }
 
-        .btn-secondary:hover:not(:disabled) {
-            background: #efefef;
-            border-color: var(--primary);
+        /* typing indicator */
+        .typing .bubble { display: inline-flex; gap: 5px; align-items: center; padding: 16px 20px; }
+        .typing .d { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); opacity: 0.4; animation: blink 1.2s infinite; }
+        .typing .d:nth-child(2) { animation-delay: 0.2s; }
+        .typing .d:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes blink { 0%, 80%, 100% { opacity: 0.3; } 40% { opacity: 1; } }
+
+        /* ===== Composer ===== */
+        .composer-wrap {
+            border-top: 1px solid var(--line);
+            background: rgba(11,11,13,0.85);
+            backdrop-filter: blur(14px);
+            padding: 12px 14px calc(14px + env(safe-area-inset-bottom));
         }
-
-        .response-section {
-            background: white;
-            border-radius: 4px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-            border: 1px solid var(--border);
-            display: none;
+        .composer { max-width: 900px; margin: 0 auto; }
+        .doc-chip {
+            display: none; align-items: center; gap: 8px;
+            margin-bottom: 8px; padding: 6px 12px;
+            background: rgba(201,168,92,0.1); border: 1px solid var(--line); border-radius: 20px;
+            color: var(--gold-bright); font-size: 0.78em; width: fit-content;
         }
-
-        .response-section.active {
-            display: block;
-            animation: slideIn 0.4s ease-out;
+        .doc-chip button { background: none; border: none; color: var(--muted); font-size: 1.1em; line-height: 1; }
+        .doc-chip button:hover { color: #ef4444; }
+        .composer-row { display: flex; gap: 9px; align-items: flex-end; }
+        .icon-btn {
+            flex: 0 0 auto; width: 46px; height: 46px;
+            border-radius: 6px; border: 1px solid var(--line);
+            background: var(--charcoal); color: var(--gold);
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s ease;
         }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .icon-btn:hover { border-color: var(--gold); background: rgba(201,168,92,0.12); }
+        .icon-btn svg { width: 20px; height: 20px; stroke: currentColor; }
+        textarea#composerInput {
+            flex: 1; resize: none;
+            min-height: 46px; max-height: 150px;
+            padding: 12px 15px;
+            background: var(--charcoal); color: var(--ivory);
+            border: 1px solid var(--line); border-radius: 6px;
+            font-family: 'Inter', sans-serif; font-size: 0.95em; line-height: 1.5;
         }
-
-        .response-header {
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid var(--primary);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
+        textarea#composerInput:focus { outline: none; border-color: var(--gold); }
+        textarea#composerInput::placeholder { color: var(--muted); }
+        #sendBtn {
+            flex: 0 0 auto; height: 46px; padding: 0 26px;
+            background: linear-gradient(135deg, var(--gold) 0%, #B8964A 100%);
+            color: var(--ink); border: none; border-radius: 6px;
+            font-weight: 700; font-size: 0.82em; letter-spacing: 0.12em; text-transform: uppercase;
+            transition: all 0.2s ease;
         }
-
-        .response-header h2 {
-            font-family: 'Cinzel', serif;
-            color: var(--primary);
-            font-size: 1.8em;
-            margin-bottom: 0;
-            font-weight: 700;
+        #sendBtn:hover:not(:disabled) { background: var(--gold-bright); }
+        #sendBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .composer-foot {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 7px; font-size: 0.7em; color: var(--muted);
         }
-
-        .confidence-badge {
-            background: var(--success);
-            color: white;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 600;
+        .composer-foot button {
+            background: none; border: none; color: var(--muted);
+            font-size: 1em; letter-spacing: 0.06em; text-transform: uppercase;
         }
-
-        .response-text {
-            font-size: 1.05em;
-            line-height: 1.85;
-            color: var(--text);
-            margin-bottom: 30px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
+        .composer-foot button:hover { color: var(--gold-bright); }
+        .error-bar {
+            display: none; max-width: 900px; margin: 0 auto 8px;
+            padding: 9px 14px; border-radius: 6px;
+            background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.4);
+            color: #fca5a5; font-size: 0.82em;
         }
-
-        .citations {
-            margin-top: 40px;
-            padding-top: 30px;
-            border-top: 2px solid var(--border);
-        }
-
-        .citations h3 {
-            font-size: 0.9em;
-            color: #888;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-
-        .citation-list {
-            list-style: none;
-        }
-
-        .citation-item {
-            padding: 16px 18px;
-            margin-bottom: 14px;
-            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
-            border-left: 4px solid var(--primary);
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .citation-item:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            transform: translateX(4px);
-        }
-
-        .citation-source {
-            display: inline-block;
-            background: var(--primary);
-            color: var(--dark);
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 0.75em;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-right: 8px;
-        }
-
-        .citation-link {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-
-        .citation-link:hover {
-            color: #B8964A;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px 20px;
-            display: none;
-        }
-
-        .loading.active {
-            display: block;
-        }
-
-        .spinner {
-            border: 3px solid #f0f0f0;
-            border-top: 3px solid var(--primary);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .loading p {
-            color: #666;
-            font-size: 1em;
-            font-weight: 500;
-        }
-
-        .error {
-            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
-            border-left: 4px solid #f44336;
-            padding: 16px 20px;
-            margin-bottom: 24px;
-            border-radius: 8px;
-            color: #c62828;
-            display: none;
-            font-weight: 500;
-        }
-
-        .error.active {
-            display: block;
-        }
-
-        .error strong {
-            display: block;
-            margin-bottom: 4px;
-            font-weight: 700;
-        }
-
-        .status {
-            text-align: center;
-            padding: 14px 12px;
-            font-size: 0.9em;
-            color: #999;
-            margin-top: 24px;
-            font-weight: 500;
-        }
-
-        .api-status {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-right: 6px;
-            animation: pulse 2s infinite;
-        }
-
-        .api-status.online {
-            background: #4caf50;
-        }
-
-        .api-status.offline {
-            background: #f44336;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        @media (max-width: 768px) {
-            header h1 {
-                font-size: 2.5em;
-            }
-
-            .query-section, .response-section {
-                padding: 24px;
-            }
-
-            .button-group {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .response-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .confidence-badge {
-                margin-top: 12px;
-            }
+        @media (max-width: 640px) {
+            .msg { max-width: 94%; }
+            header h1 { font-size: 1.35em; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>The Roundtable</h1>
-            <p>Your AI Panel of Real Estate's Best Minds — You Choose Who's at the Table</p>
-        </header>
+    <header>
+        <h1>The Roundtable</h1>
+        <p>Your AI Panel of Real Estate's Best Minds</p>
+        <span class="status-line"><span class="dot" id="apiDot"></span><span id="statusText">Connecting...</span></span>
+    </header>
 
-        <div class="query-section">
-            <div class="form-group">
-                <label for="question">Your Real Estate Challenge:</label>
-                <textarea
-                    id="question"
-                    placeholder="Ask about closing deals, staging, flips, commercial, negotiation, scripts, marketing..."
-                ></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="fileUpload">Attach a document (optional):</label>
-                <input
-                    type="file"
-                    id="fileUpload"
-                    accept=".pdf,.txt,.doc,.docx,.jpg,.png,.jpeg,.xlsx,.xls,.csv"
-                />
-                <small>Supported: PDF, TXT, DOC, DOCX, XLSX, XLS, CSV, JPG, PNG (Max 10MB)</small>
-                <span id="fileName"></span>
-            </div>
-
-            <div class="form-group">
-                <label>Choose Your Advisors <span style="text-transform:none;font-weight:400;color:#999;">(influences blended into every answer)</span></label>
-                <div style="display:flex; gap:10px; margin-bottom:14px;">
-                    <button type="button" class="btn-secondary" style="padding:6px 14px; font-size:0.78em;" onclick="setAllExperts(true)">Select All</button>
-                    <button type="button" class="btn-secondary" style="padding:6px 14px; font-size:0.78em;" onclick="setAllExperts(false)">Clear All</button>
+    <div class="setup">
+        <details class="advisors">
+            <summary>
+                <span>Choose Your Advisors</span>
+                <span class="count" id="advisorCount"></span>
+            </summary>
+            <div class="advisor-body">
+                <div class="panel-actions">
+                    <button type="button" onclick="setAllExperts(true)">Select All</button>
+                    <button type="button" onclick="setAllExperts(false)">Clear All</button>
                 </div>
                 <div id="expertPanel"></div>
             </div>
+        </details>
+    </div>
 
-            <div class="button-group">
-                <button class="btn-primary" id="submitBtn" onclick="submitQuery()">
-                    Get Guidance
+    <div class="thread-wrap" id="threadWrap">
+        <div class="thread" id="thread"></div>
+    </div>
+
+    <div class="composer-wrap">
+        <div class="error-bar" id="errorBar"></div>
+        <div class="composer">
+            <div class="doc-chip" id="docChip">
+                <span id="docChipName"></span>
+                <button type="button" onclick="clearFile()" aria-label="Remove file">&times;</button>
+            </div>
+            <div class="composer-row">
+                <input type="file" id="fileUpload" accept=".pdf,.txt,.doc,.docx,.jpg,.png,.jpeg,.xlsx,.xls,.csv" style="display:none;">
+                <button class="icon-btn" type="button" onclick="document.getElementById('fileUpload').click()" aria-label="Attach a document">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
                 </button>
-                <button class="btn-secondary" onclick="clearForm()">
-                    New Conversation
-                </button>
+                <textarea id="composerInput" rows="1" placeholder="Ask your panel anything - or attach a prelim, flyer, lead list, headshot..."></textarea>
+                <button id="sendBtn" onclick="send()">Send</button>
             </div>
-
-            <div id="convoBadge" style="display: none; margin-top: 16px; padding: 10px 16px; background: rgba(201, 168, 92, 0.08); border: 1px solid var(--primary); border-radius: 3px; color: #8a6d1a; font-size: 0.9em; font-weight: 500;"></div>
-
-            <div class="status">
-                <span class="api-status online" id="apiStatus"></span>
-                <span id="statusText">Ready</span>
-            </div>
-        </div>
-
-        <div class="error" id="errorBox">
-            <strong>Error:</strong> <span id="errorText"></span>
-        </div>
-
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p>Your advisors are weighing in...</p>
-        </div>
-
-        <div class="response-section" id="responseSection">
-            <div class="response-header">
-                <h2>The Roundtable's Take</h2>
-                <span class="confidence-badge" id="confidenceBadge">89% Confidence</span>
-            </div>
-            <div class="response-text" id="responseText"></div>
-            <div class="citations" id="citationsBox" style="display: none;">
-                <h3>Sources</h3>
-                <ul class="citation-list" id="citationsList"></ul>
+            <div class="composer-foot">
+                <span>Enter to send &middot; Shift+Enter for a new line &middot; PDF, DOCX, XLSX, CSV, images</span>
+                <button type="button" onclick="newConversation()">New Conversation</button>
             </div>
         </div>
     </div>
@@ -486,10 +266,11 @@
     <script>
         const API_URL = 'https://ask-ryan-nb3w.onrender.com';
 
-        // Conversation memory: the panel remembers the thread + any uploaded document
         let conversationHistory = [];
         let documentContext = null;
         let documentName = null;
+        let pendingFile = null;
+        let busy = false;
 
         // ===== The Advisor Panel =====
         const EXPERT_GROUPS = [
@@ -531,12 +312,6 @@
                 ['morby', 'Pace Morby', 'Creative finance & subject-to'],
                 ['greene', 'David Greene', 'BRRRR & long-distance investing'],
             ]},
-            { group: 'Español & Bilingual', experts: [
-                ['loida', 'Loida Velasquez', 'Bilingual (EN/ES) prospecting'],
-                ['figueroa', 'Veronica Figueroa', 'Latino homebuyer market'],
-                ['creyes', 'Carlos Reyes', 'Investing & wholesaling en español'],
-                ['rene', 'Rene Rodriguez', 'Sales psychology & influence'],
-            ]},
             { group: 'Probate, Divorce & Distressed', experts: [
                 ['corbett', 'Chad Corbett', 'Probate systems & outreach'],
                 ['nicoletti', 'Al Nicoletti', 'Probate legal strategy (attorney)'],
@@ -545,127 +320,127 @@
                 ['espinosa', 'Nicole Espinosa', 'Short sales, NOD & pre-foreclosure'],
                 ['ted', 'Ted Thomas', 'Tax liens & tax defaults'],
             ]},
+            { group: 'Español & Bilingual', experts: [
+                ['loida', 'Loida Velasquez', 'Bilingual (EN/ES) prospecting'],
+                ['figueroa', 'Veronica Figueroa', 'Latino homebuyer market'],
+                ['creyes', 'Carlos Reyes', 'Investing & wholesaling en español'],
+                ['rene', 'Rene Rodriguez', 'Sales psychology & influence'],
+            ]},
         ];
 
         function renderExpertPanel() {
             const panel = document.getElementById('expertPanel');
             panel.innerHTML = EXPERT_GROUPS.map(g => `
-                <div style="margin-bottom:14px;">
-                    <div style="font-size:0.78em; font-weight:700; color:#8a6d1a; letter-spacing:0.5px; margin-bottom:8px;">${g.group}</div>
-                    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(215px,1fr)); gap:8px;">
-                        ${g.experts.map(([id, name, focus]) => `
-                            <label style="display:flex; align-items:flex-start; gap:8px; padding:9px 12px; background:#fafafa; border:1.5px solid var(--border); border-radius:10px; cursor:pointer; transition:all .2s;"
-                                   onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
-                                <input type="checkbox" class="expert-cb" value="${id}" checked style="margin-top:3px; accent-color:#C9A85C;">
-                                <span style="line-height:1.3;"><strong style="font-size:0.88em;">${name}</strong><br><span style="font-size:0.75em; color:#888;">${focus}</span></span>
-                            </label>
-                        `).join('')}
-                    </div>
+                <div class="group-label">${g.group}</div>
+                <div class="chip-grid">
+                    ${g.experts.map(([id, name, focus]) => `
+                        <label>
+                            <input type="checkbox" class="expert-cb" value="${id}" checked onchange="updateAdvisorCount()">
+                            <span><strong>${name}</strong><small>${focus}</small></span>
+                        </label>
+                    `).join('')}
                 </div>
             `).join('');
+            updateAdvisorCount();
         }
-
         function getSelectedExperts() {
             return Array.from(document.querySelectorAll('.expert-cb:checked')).map(cb => cb.value);
         }
-
         function setAllExperts(checked) {
             document.querySelectorAll('.expert-cb').forEach(cb => cb.checked = checked);
+            updateAdvisorCount();
+        }
+        function updateAdvisorCount() {
+            const n = getSelectedExperts().length;
+            document.getElementById('advisorCount').textContent =
+                n + ' of 34 seated' + (n > 0 && n <= 8 ? ' · deep-dossier mode' : '');
         }
 
-        renderExpertPanel();
-
-        function updateConversationBadge() {
-            const badge = document.getElementById('convoBadge');
-            if (conversationHistory.length === 0) {
-                badge.style.display = 'none';
-                return;
+        // ===== Thread rendering =====
+        function esc(s) {
+            return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+        function formatCoach(text) {
+            return esc(text).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+        }
+        function addMsg(role, text, opts = {}) {
+            const div = document.createElement('div');
+            div.className = 'msg ' + role;
+            const who = role === 'user' ? 'You' : 'The Roundtable';
+            let inner = '';
+            if (opts.fileTag) inner += `<span class="file-tag">&#128206; ${esc(opts.fileTag)}</span><br>`;
+            inner += role === 'coach' ? formatCoach(text) : esc(text);
+            div.innerHTML = `<span class="who">${who}</span><div class="bubble">${inner}</div>`;
+            if (role === 'coach') {
+                const act = document.createElement('div');
+                act.className = 'actions';
+                const btn = document.createElement('button');
+                btn.textContent = 'Copy';
+                btn.onclick = () => { navigator.clipboard.writeText(text); btn.textContent = 'Copied'; setTimeout(() => btn.textContent = 'Copy', 1500); };
+                act.appendChild(btn);
+                div.appendChild(act);
             }
-            const exchanges = Math.floor(conversationHistory.length / 2);
-            let text = `Conversation active (${exchanges} exchange${exchanges === 1 ? '' : 's'})`;
-            if (documentName) text += ` — your panel remembers "${documentName}"`;
-            badge.textContent = text;
-            badge.style.display = 'block';
+            document.getElementById('thread').appendChild(div);
+            scrollDown();
+            return div;
+        }
+        function addTyping() {
+            const div = document.createElement('div');
+            div.className = 'msg coach typing';
+            div.id = 'typing';
+            div.innerHTML = `<span class="who">The Roundtable</span><div class="bubble"><span class="d"></span><span class="d"></span><span class="d"></span></div>`;
+            document.getElementById('thread').appendChild(div);
+            scrollDown();
+        }
+        function removeTyping() {
+            const t = document.getElementById('typing');
+            if (t) t.remove();
+        }
+        function scrollDown() {
+            const w = document.getElementById('threadWrap');
+            w.scrollTop = w.scrollHeight;
+        }
+        function showError(msg) {
+            const bar = document.getElementById('errorBar');
+            bar.textContent = msg;
+            bar.style.display = 'block';
+            setTimeout(() => bar.style.display = 'none', 8000);
         }
 
-        async function checkApiStatus() {
+        // ===== Send flow =====
+        async function send() {
+            if (busy) return;
+            const input = document.getElementById('composerInput');
+            const question = input.value.trim();
+            if (!question && !pendingFile) return;
+
+            busy = true;
+            document.getElementById('sendBtn').disabled = true;
+
+            const fileTag = pendingFile ? pendingFile.name : null;
+            addMsg('user', question || 'Review this for me.', { fileTag });
+            input.value = '';
+            autoGrow(input);
+            addTyping();
+
             try {
-                const response = await fetch(`${API_URL}/api/health`);
-                const statusElement = document.getElementById('apiStatus');
-                const statusText = document.getElementById('statusText');
-
-                if (response.ok) {
-                    statusElement.classList.add('online');
-                    statusElement.classList.remove('offline');
-                    statusText.textContent = 'Connected';
-                    return true;
+                let data;
+                if (pendingFile) {
+                    const fd = new FormData();
+                    fd.append('file', pendingFile);
+                    if (question) fd.append('query', question);
+                    fd.append('experts', JSON.stringify(getSelectedExperts()));
+                    const res = await fetch(`${API_URL}/api/upload`, { method: 'POST', body: fd });
+                    if (!res.ok) throw new Error(`API error ${res.status}`);
+                    data = await res.json();
+                    documentContext = data.extracted_text || null;
+                    documentName = pendingFile.name;
+                    conversationHistory.push({ role: 'user', content: `[I uploaded a document: ${documentName}] ${question || 'Review this for me.'}` });
+                    clearFile();
                 } else {
-                    statusElement.classList.add('offline');
-                    statusElement.classList.remove('online');
-                    statusText.textContent = 'API Error';
-                    return false;
-                }
-            } catch (e) {
-                document.getElementById('apiStatus').classList.add('offline');
-                document.getElementById('statusText').textContent = 'Offline';
-                return false;
-            }
-        }
-
-        async function submitQuery() {
-            const question = document.getElementById('question').value.trim();
-            const fileInput = document.getElementById('fileUpload');
-            const file = fileInput.files[0];
-
-            if (!question && !file) {
-                showError('Please ask a question or upload a document');
-                return;
-            }
-
-            hideError();
-            hideResponse();
-
-            document.getElementById('loading').classList.add('active');
-            document.getElementById('submitBtn').disabled = true;
-
-            try {
-                let responseData;
-
-                if (file) {
-                    const formData = new FormData();
-                    formData.append('file', file);
-                    if (question) formData.append('query', question);
-                    formData.append('experts', JSON.stringify(getSelectedExperts()));
-
-                    const response = await fetch(`${API_URL}/api/upload`, {
+                    const res = await fetch(`${API_URL}/api/query`, {
                         method: 'POST',
-                        body: formData
-                    });
-
-                    if (!response.ok) {
-                        throw new Error(`API error: ${response.status}`);
-                    }
-
-                    responseData = await response.json();
-
-                    // Remember the document for the rest of the conversation
-                    documentContext = responseData.extracted_text || null;
-                    documentName = file.name;
-                    conversationHistory.push({
-                        role: 'user',
-                        content: `[I uploaded a document: ${file.name}] ${question || 'Review this for me.'}`
-                    });
-                    conversationHistory.push({ role: 'assistant', content: responseData.response.text });
-
-                    // Clear the file input so replies don't re-upload the same file
-                    fileInput.value = '';
-                    document.getElementById('fileName').textContent = `✓ ${documentName} (in your panel's memory)`;
-                } else {
-                    const response = await fetch(`${API_URL}/api/query`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             query: question,
                             history: conversationHistory.slice(-12),
@@ -673,103 +448,82 @@
                             experts: getSelectedExperts()
                         })
                     });
-
-                    if (!response.ok) {
-                        throw new Error(`API error: ${response.status}`);
-                    }
-
-                    responseData = await response.json();
-
+                    if (!res.ok) throw new Error(`API error ${res.status}`);
+                    data = await res.json();
                     conversationHistory.push({ role: 'user', content: question });
-                    conversationHistory.push({ role: 'assistant', content: responseData.response.text });
                 }
-
-                // Clear the question box so replying to Ryan feels natural
-                document.getElementById('question').value = '';
-                document.getElementById('question').placeholder = 'Reply to your advisors or ask a new question...';
-                updateConversationBadge();
-
-                document.getElementById('responseText').textContent = responseData.response.text;
-                document.getElementById('confidenceBadge').textContent =
-                    `${Math.round(responseData.metadata.confidence_score * 100)}% Confidence`;
-
-                if (responseData.citations && responseData.citations.length > 0) {
-                    const citationsList = document.getElementById('citationsList');
-                    citationsList.innerHTML = '';
-
-                    responseData.citations.forEach(citation => {
-                        const li = document.createElement('li');
-                        li.className = 'citation-item';
-
-                        let html = `<span class="citation-source">${citation.source}</span>`;
-
-                        if (citation.url) {
-                            html += `<a href="${citation.url}" target="_blank" class="citation-link">${citation.title}</a>`;
-                        } else {
-                            html += `<span>${citation.title}</span>`;
-                        }
-
-                        li.innerHTML = html;
-                        citationsList.appendChild(li);
-                    });
-
-                    document.getElementById('citationsBox').style.display = 'block';
-                }
-
-                showResponse();
-            } catch (error) {
-                showError(`Failed to get response: ${error.message}`);
+                const reply = data.response.text;
+                conversationHistory.push({ role: 'assistant', content: reply });
+                removeTyping();
+                addMsg('coach', reply);
+                document.getElementById('composerInput').placeholder = 'Reply to your panel...';
+            } catch (e) {
+                removeTyping();
+                showError('The panel is waking up (free hosting sleeps after 15 idle minutes - the first message can take ~1 minute). Your message was not lost: try sending it again.');
+                console.error(e);
             } finally {
-                document.getElementById('loading').classList.remove('active');
-                document.getElementById('submitBtn').disabled = false;
+                busy = false;
+                document.getElementById('sendBtn').disabled = false;
+                input.focus();
             }
         }
 
-        function clearForm() {
-            document.getElementById('question').value = '';
-            document.getElementById('question').placeholder = 'Ask about closing deals, staging, flips, commercial, negotiation, scripts, marketing...';
-            document.getElementById('fileUpload').value = '';
-            document.getElementById('fileName').textContent = '';
+        function newConversation() {
             conversationHistory = [];
             documentContext = null;
             documentName = null;
-            updateConversationBadge();
-            hideResponse();
-            hideError();
+            clearFile();
+            document.getElementById('thread').innerHTML = '';
+            document.getElementById('composerInput').placeholder = 'Ask your panel anything - or attach a prelim, flyer, lead list, headshot...';
+            welcome();
         }
 
-        function showError(message) {
-            const errorBox = document.getElementById('errorBox');
-            document.getElementById('errorText').textContent = message;
-            errorBox.classList.add('active');
+        function clearFile() {
+            pendingFile = null;
+            document.getElementById('fileUpload').value = '';
+            document.getElementById('docChip').style.display = 'none';
         }
 
-        function hideError() {
-            document.getElementById('errorBox').classList.remove('active');
-        }
-
-        function showResponse() {
-            const section = document.getElementById('responseSection');
-            section.classList.add('active');
-            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-
-        function hideResponse() {
-            document.getElementById('responseSection').classList.remove('active');
-        }
-
-        document.getElementById('fileUpload').addEventListener('change', function(e) {
-            const fileName = e.target.files[0]?.name || '';
-            document.getElementById('fileName').textContent = fileName ? `✓ ${fileName}` : '';
+        // ===== Wiring =====
+        document.getElementById('fileUpload').addEventListener('change', function (e) {
+            const f = e.target.files[0];
+            if (!f) return;
+            if (f.size > 10 * 1024 * 1024) { showError('File is over 10MB.'); this.value = ''; return; }
+            pendingFile = f;
+            document.getElementById('docChipName').textContent = f.name;
+            document.getElementById('docChip').style.display = 'flex';
+            document.getElementById('composerInput').focus();
         });
 
-        document.getElementById('question').addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.key === 'Enter') {
-                submitQuery();
+        const composer = document.getElementById('composerInput');
+        composer.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+        });
+        function autoGrow(el) {
+            el.style.height = 'auto';
+            el.style.height = Math.min(el.scrollHeight, 150) + 'px';
+        }
+        composer.addEventListener('input', () => autoGrow(composer));
+
+        async function checkApiStatus() {
+            const dot = document.getElementById('apiDot');
+            const txt = document.getElementById('statusText');
+            try {
+                const r = await fetch(`${API_URL}/api/health`);
+                if (r.ok) { dot.className = 'dot online'; txt.textContent = 'Panel connected'; return; }
+                throw 0;
+            } catch {
+                dot.className = 'dot offline'; txt.textContent = 'Waking the panel (~1 min on first visit)';
             }
-        });
+        }
 
-        window.addEventListener('load', checkApiStatus);
+        function welcome() {
+            addMsg('coach', 'Welcome to The Roundtable. Seat your advisors above (fewer seats = deeper expertise), then ask anything - scripts, deal math, staging, probate, negotiation - o pregunta en español. You can also attach a prelim, lead list, flyer, or headshot with the paperclip.');
+        }
+
+        renderExpertPanel();
+        welcome();
+        checkApiStatus();
         setInterval(checkApiStatus, 30000);
     </script>
 </body>

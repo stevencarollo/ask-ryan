@@ -68,3 +68,12 @@ all dossiers research-backed; retrieval layer serving deep sections to any panel
 bundles the full library. Gates passed: W1 5/5, W2 3/3, retrieval 4/4+full-panel, final 5/5.
 Sources consulted: ~70 searches + ~45 page fetches across podcasts transcripts, book breakdowns,
 publisher pages, industry press (NAR, Forbes, Inman-adjacent), and the advisors' own sites.
+
+## 2026-07-04 — TRUE CHAT THREAD UI (fixes "can't reply back")
+Rebuilt frontend.html as a real conversation: alternating user/coach bubbles with full visible
+history, composer FIXED AT THE BOTTOM under the coach's latest question, Enter-to-send
+(Shift+Enter newline), typing indicator, auto-scroll, per-response Copy button, paperclip attach
+with removable file chip, collapsible advisor panel with live seat count ("N of 34 seated -
+deep-dossier mode" at <=8), friendly cold-start error message, welcome message, luxury
+Cinzel/gold design preserved. All logic preserved: history+context+experts on /api/query,
+experts JSON on /api/upload, extracted_text -> conversation document memory.
