@@ -25,8 +25,8 @@ Update after EVERY advisor. Trust this file over memory.
 ## Wave 4 — Coaching & Business
 - [x] ferry (Tom Ferry) — kb/ferry.md written, dossier folded (8x8/33-touch misattribution corrected)
 - [x] buffini (Brian Buffini) — kb/buffini.md written, dossier folded
-- [~] keller (Gary Keller) — next: searches
-- [ ] sharran (Sharran Srivatsaa)
+- [x] keller (Gary Keller) — kb/keller.md written, dossier folded (8x8/33-touch verified HERE)
+- [~] sharran (Sharran Srivatsaa) — next: searches
 
 ## Wave 5 — Negotiation & Investing
 - [ ] voss (Chris Voss)
