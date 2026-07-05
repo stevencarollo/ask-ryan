@@ -45,10 +45,10 @@ Update after EVERY advisor. Trust this file over memory.
 - [x] lazine (Byron Lazine) — kb/lazine.md written, dossier folded
 - [x] burgess (Jimmy Burgess) — kb/burgess.md written, dossier folded
 - [x] pantana (Jason Pantana) — kb/pantana.md written, dossier folded
-- [~] peitz (Chelsea Peitz) — next: searches
+- [x] peitz (Chelsea Peitz) — kb/peitz.md written, dossier folded — WAVE 7 RESEARCH COMPLETE
 
 ## Wave 8 — Design & Staging
-- [ ] eisen (Cheryl Eisen)
+- [~] eisen (Cheryl Eisen) — next: searches
 - [ ] gaines (Joanna Gaines)
 - [ ] mcgee (Shea McGee)
 
