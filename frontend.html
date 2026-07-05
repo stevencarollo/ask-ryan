@@ -34,29 +34,54 @@
             outline-offset: 2px;
         }
 
-        /* ===== Header ===== */
-        header {
-            text-align: center;
-            padding: 22px 16px 16px;
+        /* ===== Top Nav ===== */
+        nav.topbar {
+            display: flex; justify-content: space-between; align-items: center; gap: 10px;
+            padding: 12px clamp(14px, 3vw, 28px);
             border-bottom: 1px solid var(--line);
-            background: rgba(11,11,13,0.6);
+            background: rgba(11,11,13,0.85);
+            backdrop-filter: blur(14px);
+            position: sticky; top: 0; z-index: 40;
         }
-        header h1 {
-            font-family: 'Cinzel', serif;
-            font-size: 1.7em;
-            font-weight: 600;
-            letter-spacing: 0.1em;
-            color: var(--gold);
-            text-transform: uppercase;
+        .nav-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
+        .back-link {
+            display: inline-flex; align-items: center; gap: 7px;
+            color: var(--muted); text-decoration: none; font-size: 0.8em; font-weight: 600;
+            letter-spacing: 0.08em; text-transform: uppercase;
+            padding: 8px 12px; border: 1px solid var(--line); border-radius: 4px;
+            transition: all 0.2s ease; white-space: nowrap;
         }
-        header p { color: var(--muted); font-size: 0.82em; font-weight: 300; margin-top: 4px; }
+        .back-link:hover { color: var(--ink); background: var(--gold); border-color: var(--gold); }
+        .back-link svg { width: 15px; height: 15px; stroke: currentColor; }
+        .brand-mini {
+            display: flex; align-items: center; gap: 9px; min-width: 0;
+            text-decoration: none;
+        }
+        .brand-mini svg { width: 26px; height: 26px; flex: 0 0 auto; }
+        .brand-mini span {
+            font-family: 'Cinzel', serif; font-size: 1.02em; font-weight: 600;
+            letter-spacing: 0.1em; color: var(--gold); text-transform: uppercase;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .nav-right { display: flex; align-items: center; gap: 9px; }
+        .nav-btn {
+            padding: 8px 14px; font-size: 0.76em; font-weight: 600;
+            letter-spacing: 0.08em; text-transform: uppercase;
+            background: transparent; color: var(--gold); border: 1px solid var(--line);
+            border-radius: 4px; transition: all 0.2s ease; white-space: nowrap;
+        }
+        .nav-btn:hover { background: var(--gold); color: var(--ink); border-color: var(--gold); }
         .status-line {
             display: inline-flex; align-items: center; gap: 7px;
-            margin-top: 8px; font-size: 0.75em; color: var(--muted);
+            font-size: 0.72em; color: var(--muted); white-space: nowrap;
         }
         .dot { width: 8px; height: 8px; border-radius: 50%; background: #666; }
         .dot.online { background: #4ade80; }
         .dot.offline { background: #ef4444; }
+        @media (max-width: 720px) {
+            .status-line span:last-child { display: none; }
+            .brand-mini span { display: none; }
+        }
 
         /* ===== Advisor panel (collapsible) ===== */
         .setup {
@@ -215,11 +240,30 @@
     </style>
 </head>
 <body>
-    <header>
-        <h1>The Roundtable</h1>
-        <p>Your AI Panel of Real Estate's Best Minds</p>
-        <span class="status-line"><span class="dot" id="apiDot"></span><span id="statusText">Connecting...</span></span>
-    </header>
+    <nav class="topbar">
+        <div class="nav-left">
+            <a href="/" class="back-link" aria-label="Back to dashboard">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                Dashboard
+            </a>
+            <a href="/" class="brand-mini" aria-label="The Roundtable home">
+                <svg viewBox="0 0 34 34" fill="none" aria-hidden="true">
+                    <circle cx="17" cy="17" r="15.5" stroke="#C9A85C" stroke-width="1.4"/>
+                    <circle cx="17" cy="17" r="3" fill="#C9A85C"/>
+                    <circle cx="17" cy="6.5" r="1.6" fill="#C9A85C"/><circle cx="27.5" cy="17" r="1.6" fill="#C9A85C"/>
+                    <circle cx="17" cy="27.5" r="1.6" fill="#C9A85C"/><circle cx="6.5" cy="17" r="1.6" fill="#C9A85C"/>
+                    <circle cx="24.4" cy="9.6" r="1.6" fill="#C9A85C"/><circle cx="24.4" cy="24.4" r="1.6" fill="#C9A85C"/>
+                    <circle cx="9.6" cy="24.4" r="1.6" fill="#C9A85C"/><circle cx="9.6" cy="9.6" r="1.6" fill="#C9A85C"/>
+                </svg>
+                <span>The Roundtable</span>
+            </a>
+        </div>
+        <div class="nav-right">
+            <span class="status-line"><span class="dot" id="apiDot"></span><span id="statusText">Connecting...</span></span>
+            <button class="nav-btn" type="button" onclick="toggleAdvisors()">Advisors</button>
+            <button class="nav-btn" type="button" onclick="newConversation()">New Chat</button>
+        </div>
+    </nav>
 
     <div class="setup">
         <details class="advisors">
@@ -258,7 +302,6 @@
             </div>
             <div class="composer-foot">
                 <span>Enter to send &middot; Shift+Enter for a new line &middot; PDF, DOCX, XLSX, CSV, images</span>
-                <button type="button" onclick="newConversation()">New Conversation</button>
             </div>
         </div>
     </div>
@@ -482,6 +525,12 @@
             pendingFile = null;
             document.getElementById('fileUpload').value = '';
             document.getElementById('docChip').style.display = 'none';
+        }
+
+        function toggleAdvisors() {
+            const d = document.querySelector('details.advisors');
+            d.open = !d.open;
+            if (d.open) d.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         // ===== Wiring =====
