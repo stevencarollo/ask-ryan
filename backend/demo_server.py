@@ -600,6 +600,24 @@ async def diag():
             info["groq_ping"] = "no client (missing key or sdk)"
     except Exception as e:
         info["groq_ping"] = f"ERROR: {str(e)[:250]}"
+
+    # NotebookLM bridge diagnostics
+    nlm_b64 = os.getenv("NLM_STORAGE_B64", "")
+    info["nlm_env_present"] = bool(nlm_b64)
+    info["nlm_env_length"] = len(nlm_b64)
+    if nlm_b64:
+        try:
+            import base64 as _b64
+            import json as _json
+            decoded = _b64.b64decode(nlm_b64)
+            _json.loads(decoded)
+            info["nlm_env_decodes"] = True
+        except Exception as e:
+            info["nlm_env_decodes"] = f"ERROR: {str(e)[:120]}"
+    try:
+        info["nlm_ready"] = _nlm().nlm_ready()
+    except Exception as e:
+        info["nlm_ready"] = f"ERROR: {str(e)[:120]}"
     return info
 
 
