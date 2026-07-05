@@ -30,8 +30,8 @@ Update after EVERY advisor. Trust this file over memory.
 
 ## Wave 5 — Negotiation & Investing
 - [x] voss (Chris Voss) — kb/voss.md written, dossier folded (Ackerman percentages added)
-- [~] norton (Jerry Norton) — next: searches
-- [ ] morby (Pace Morby)
+- [x] norton (Jerry Norton) — kb/norton.md written, dossier folded (65% formula corrected)
+- [~] morby (Pace Morby) — next: searches
 - [ ] greene (David Greene)
 - [ ] tarek (Tarek El Moussa)
 
