@@ -77,3 +77,15 @@ with removable file chip, collapsible advisor panel with live seat count ("N of 
 deep-dossier mode" at <=8), friendly cold-start error message, welcome message, luxury
 Cinzel/gold design preserved. All logic preserved: history+context+experts on /api/query,
 experts JSON on /api/upload, extracted_text -> conversation document memory.
+
+## 2026-07-04 — LISTING LINK IMPORT (the FlipAI dots, connected)
+Built: backend/listing_parser.py - Python port of the FlipAI parse-zillow.ts fallback chain,
+free strategies only: pasted Redfin/Realtor URL -> direct fetch + extraction (JSON-LD /
+__NEXT_DATA__ / CDN-regex fallbacks); Zillow URL -> slug parse (street-suffix boundary bug
+FIXED: '24923-Island-Ave-Carson' now parses correctly) -> constructed Realtor URL -> DDG->Redfin
+-> DDG->Compass; any other URL (MLS/IDX portals) -> generic extractor (JSON-LD/og:image/jpg
+harvest); final skeleton fallback prompts manual upload. Endpoint: POST /api/parse-listing.
+Studio UI: "Import From a Link" bar - fills address/city/price/beds/baths/sqft/description,
+auto-places first 4 photos, full tap-to-place photo gallery of up to 20 imported photos.
+VERIFIED LOCALLY on a live Redfin listing (23045 Delford Ave, Carson): 11 photos, $700,000,
+3/2/1316sqft + full description extracted via redfin-direct strategy.

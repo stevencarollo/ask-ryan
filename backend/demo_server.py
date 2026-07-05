@@ -320,6 +320,23 @@ def analyze_image_with_groq(file_path: str, query: Optional[str], file_name: str
         return None
 
 
+@app.post("/api/parse-listing")
+async def parse_listing_endpoint(data: dict):
+    """Flyer Studio importer: paste a Zillow / Redfin / Realtor / MLS link ->
+    photos + property facts. Ported from the FlipAI multi-source fallback chain
+    (free strategies only)."""
+    url = (data.get("url") or "").strip()
+    if not url.startswith("http"):
+        return JSONResponse(status_code=400, content={"status": "error", "message": "Paste a full listing URL."})
+    try:
+        from backend.listing_parser import parse_listing
+    except ImportError:
+        from listing_parser import parse_listing
+    import asyncio
+    result = await asyncio.to_thread(parse_listing, url)
+    return {"status": "success", "listing": result}
+
+
 @app.post("/api/flyer-copy")
 async def flyer_copy(data: dict):
     """Flyer Studio copy engine: property facts in -> polished marketing copy out.

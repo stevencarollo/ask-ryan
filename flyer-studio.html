@@ -80,6 +80,19 @@ label.f textarea{resize:vertical;min-height:64px}
     <!-- ============ CONTROLS ============ -->
     <div class="controls">
         <div class="sec">
+            <h3>Import From a Link</h3>
+            <label class="f">Paste a Zillow, Redfin, Realtor.com, or MLS listing link
+                <input id="importUrl" placeholder="https://www.redfin.com/CA/Carson/...">
+            </label>
+            <button class="ai-btn" id="importBtn" onclick="importListing()">Import Photos &amp; Details</button>
+            <div class="hint" id="importStatus">Photos, price, beds/baths, and the listing description auto-fill. Then let the panel rewrite the copy.</div>
+            <div id="gallery" style="display:none;margin-top:10px">
+                <div class="hint" style="margin-bottom:6px">Imported photos — tap to place into the flyer:</div>
+                <div id="galleryGrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;max-height:150px;overflow-y:auto"></div>
+            </div>
+        </div>
+
+        <div class="sec">
             <h3>Template</h3>
             <div class="tpl-grid" id="tplGrid"></div>
         </div>
@@ -236,6 +249,65 @@ function downscale(dataUrl, maxW, cb){
         c.getContext('2d').drawImage(img,0,0,c.width,c.height);
         cb(c.toDataURL('image/jpeg',0.82)); };
     img.src=dataUrl;
+}
+
+// ===== Listing import =====
+state.gallery = [];
+async function importListing(){
+    const url = $('importUrl').value.trim();
+    if(!url.startsWith('http')){ toast('Paste a full listing link first'); return; }
+    const btn = $('importBtn'), st = $('importStatus');
+    btn.disabled = true; btn.textContent = 'Importing listing...';
+    st.textContent = 'Fetching photos and details (10-30 seconds)...';
+    try{
+        const res = await fetch(`${API_URL}/api/parse-listing`, {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ url })
+        });
+        const data = await res.json();
+        const L = data.listing || {};
+        if(L.address) $('addr').value = L.address;
+        if(L.city) $('city').value = (L.city + (L.state? ', '+L.state : '') + (L.zip? ' '+L.zip : '')).trim();
+        if(L.listPrice) $('price').value = '$' + Number(L.listPrice).toLocaleString();
+        if(L.beds) $('beds').value = L.beds;
+        if(L.baths) $('baths').value = L.baths;
+        if(L.sqft) $('sqft').value = Number(String(L.sqft).replace(/[^0-9.]/g,'')) ? Number(String(L.sqft).replace(/[^0-9.]/g,'')).toLocaleString() : L.sqft;
+        if(L.description) $('notes').value = L.description.slice(0, 900);
+
+        state.gallery = (L.photos || []).slice(0, 20);
+        if(state.gallery.length){
+            // auto-place first 4
+            for(let i=0;i<4;i++) state.photos[i] = state.gallery[i] || null;
+            renderPhotos(); renderGallery(); render();
+            st.textContent = `Imported ${state.gallery.length} photos from ${L._source||'source'}. Details filled - now hit "Write My Copy".`;
+            toast(`${state.gallery.length} photos imported`);
+        } else {
+            renderGallery();
+            st.textContent = (L.note || 'No photos found from the free sources - details filled where possible. Add photos manually below.');
+            toast('Details imported - add photos manually');
+        }
+        render();
+    }catch(e){
+        st.textContent = 'Server may be waking up (free hosting). Wait ~1 minute and try again.';
+        toast('Import failed - try again shortly');
+    }finally{
+        btn.disabled = false; btn.textContent = 'Import Photos & Details';
+    }
+}
+function renderGallery(){
+    const g = $('gallery'), grid = $('galleryGrid');
+    if(!state.gallery.length){ g.style.display='none'; return; }
+    g.style.display = 'block';
+    grid.innerHTML = state.gallery.map((u,i)=>
+        `<div onclick="placePhoto(${i})" style="aspect-ratio:1;border-radius:4px;cursor:pointer;border:1.5px solid var(--line);background-image:url('${u.replace(/'/g,"%27")}');background-size:cover;background-position:center" title="Tap to place"></div>`).join('');
+}
+function placePhoto(i){
+    const url = state.gallery[i];
+    let slot = state.photos.findIndex(p=>!p);
+    if(slot === -1) slot = 0;
+    state.photos[slot] = url;
+    renderPhotos(); render();
+    toast(`Placed into photo slot ${slot+1}`);
 }
 
 // ===== AI copy =====
