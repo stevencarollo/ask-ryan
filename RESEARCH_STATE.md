@@ -32,8 +32,8 @@ Update after EVERY advisor. Trust this file over memory.
 - [x] voss (Chris Voss) — kb/voss.md written, dossier folded (Ackerman percentages added)
 - [x] norton (Jerry Norton) — kb/norton.md written, dossier folded (65% formula corrected)
 - [x] morby (Pace Morby) — kb/morby.md written, dossier folded
-- [~] greene (David Greene) — next: searches
-- [ ] tarek (Tarek El Moussa)
+- [x] greene (David Greene) — kb/greene.md written, dossier folded
+- [~] tarek (Tarek El Moussa) — next: searches
 
 ## Wave 6 — Commercial
 - [ ] knakal (Bob Knakal)
