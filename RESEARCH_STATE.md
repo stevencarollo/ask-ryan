@@ -43,8 +43,8 @@ Update after EVERY advisor. Trust this file over memory.
 ## Wave 7 — Marketing & Media
 - [x] glennda (Glennda Baker) — kb/glennda.md written, dossier folded
 - [x] lazine (Byron Lazine) — kb/lazine.md written, dossier folded
-- [~] burgess (Jimmy Burgess) — next: searches
-- [ ] pantana (Jason Pantana)
+- [x] burgess (Jimmy Burgess) — kb/burgess.md written, dossier folded
+- [~] pantana (Jason Pantana) — next: searches
 - [ ] peitz (Chelsea Peitz)
 
 ## Wave 8 — Design & Staging
