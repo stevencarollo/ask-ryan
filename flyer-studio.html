@@ -168,8 +168,16 @@ label.f textarea{resize:vertical;min-height:64px}
                 <label class="f">Email <input id="aEmail" placeholder="you@brokerage.com"></label>
                 <label class="f">Brokerage / DRE <input id="aBrok" placeholder="Brokerage · DRE #01234567"></label>
             </div>
-            <label class="f">Headshot / logo (optional)
-                <input type="file" id="aPhoto" accept=".jpg,.jpeg,.png,.webp">
+            <div class="row">
+                <label class="f">Headshot (optional)
+                    <input type="file" id="aPhoto" accept=".jpg,.jpeg,.png,.webp">
+                </label>
+                <label class="f">Brokerage logo (optional)
+                    <input type="file" id="bLogo" accept=".jpg,.jpeg,.png,.webp">
+                </label>
+            </div>
+            <label class="f">Listing link for QR code (optional — prints "scan for full listing")
+                <input id="qrUrl" placeholder="https://www.zillow.com/homedetails/...">
             </label>
         </div>
     </div>
@@ -195,7 +203,7 @@ const API_URL = 'https://ask-ryan-nb3w.onrender.com';
 
 // ===== State =====
 const state = {
-    template: 'luxury',
+    template: 'editorial',
     photos: [null, null, null, null],
     agentPhoto: null,
     ig: '', email_subject: '', email_body: ''
@@ -203,10 +211,14 @@ const state = {
 let photoSlot = 0;
 
 const TEMPLATES = [
-    { id: 'luxury',  name: 'Luxury Gold',  sw: 'linear-gradient(135deg,#0B0B0D 60%,#C9A85C)' },
-    { id: 'onyx',    name: 'Onyx Mono',    sw: 'linear-gradient(135deg,#111 60%,#444)' },
-    { id: 'bold',    name: 'Bold Banner',  sw: 'linear-gradient(135deg,#fff 55%,#C0392B)' },
-    { id: 'coastal', name: 'Fresh Modern', sw: 'linear-gradient(135deg,#F7F5F0 55%,#2E6E8E)' },
+    { id: 'editorial', name: 'Editorial Estate', sw: 'linear-gradient(135deg,#FDFBF7 55%,#C9A85C)' },
+    { id: 'magazine',  name: 'Magazine Cover',  sw: 'linear-gradient(135deg,#F7F4EE 50%,#3a3a40)' },
+    { id: 'luxury',    name: 'Luxury Gold',     sw: 'linear-gradient(135deg,#0B0B0D 60%,#C9A85C)' },
+    { id: 'onyx',      name: 'Onyx Cinematic',  sw: 'linear-gradient(135deg,#111 60%,#444)' },
+    { id: 'linear',    name: 'Architectural',   sw: 'linear-gradient(135deg,#fff 60%,#9a958a)' },
+    { id: 'gallery',   name: 'Gallery Wall',    sw: 'linear-gradient(135deg,#151517 55%,#C9A85C)' },
+    { id: 'bold',      name: 'Bold Banner',     sw: 'linear-gradient(135deg,#fff 55%,#B3261E)' },
+    { id: 'coastal',   name: 'Fresh Modern',    sw: 'linear-gradient(135deg,#F7F5F0 55%,#2E6E8E)' },
 ];
 
 // ===== Helpers =====
@@ -240,6 +252,12 @@ $('aPhoto').addEventListener('change', function(){
     const f=this.files[0]; if(!f){state.agentPhoto=null;render();return;}
     const r=new FileReader();
     r.onload=e=>{ downscale(e.target.result, 400, d=>{ state.agentPhoto=d; render(); }); };
+    r.readAsDataURL(f);
+});
+$('bLogo').addEventListener('change', function(){
+    const f=this.files[0]; if(!f){state.brandLogo=null;render();return;}
+    const r=new FileReader();
+    r.onload=e=>{ downscale(e.target.result, 400, d=>{ state.brandLogo=d; render(); }); };
     r.readAsDataURL(f);
 });
 function downscale(dataUrl, maxW, cb){
@@ -351,125 +369,306 @@ function flyerData(){
         feats: $('feats').value.split('\n').map(s=>s.trim()).filter(Boolean).slice(0,6),
         aName: val('aName','Your Name'), aPhone: val('aPhone',''), aEmail: val('aEmail',''), aBrok: val('aBrok',''),
         photos: state.photos.filter(Boolean),
-        agentPhoto: state.agentPhoto
+        agentPhoto: state.agentPhoto,
+        brandLogo: state.brandLogo,
+        qrUrl: val('qrUrl','')
     };
 }
 
 // ===== Templates (850x1100 = 8.5x11) =====
 function ph(url, css){ return url ? `background-image:url(${url});background-size:cover;background-position:center;${css||''}` : `background:linear-gradient(135deg,#2a2a2e,#3a3a40);${css||''}`; }
 
-function agentBar(d, dark){
+function bannerText(d){ return d.banner + (d.banner==='OPEN HOUSE' && d.ohWhen ? ' · '+esc(d.ohWhen) : ''); }
+function qrBlock(d, dark){
+    if(!d.qrUrl) return '';
+    const fg = dark ? 'rgba(245,241,232,.65)' : '#8a857a';
+    return `<div style="text-align:center;flex:0 0 auto;margin-left:18px">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=6&data=${encodeURIComponent(d.qrUrl)}" style="width:72px;height:72px;display:block;background:#fff;padding:3px;border-radius:3px">
+        <div style="font-size:8px;letter-spacing:.18em;color:${fg};margin-top:4px">SCAN FOR<br>FULL LISTING</div></div>`;
+}
+function agentBar(d, dark, accent){
+    accent = accent || '#C9A85C';
     const fg = dark ? '#F5F1E8' : '#17150F';
-    const sub = dark ? 'rgba(245,241,232,.7)' : '#5B564B';
-    return `<div style="display:flex;align-items:center;gap:16px;">
-        ${d.agentPhoto?`<div style="width:64px;height:64px;border-radius:50%;flex:0 0 auto;border:2px solid #C9A85C;${ph(d.agentPhoto)}"></div>`:''}
-        <div style="flex:1">
-            <div style="font-weight:700;font-size:19px;color:${fg};letter-spacing:.02em">${esc(d.aName)}</div>
-            <div style="font-size:14px;color:${sub};margin-top:2px">${esc([d.aPhone,d.aEmail].filter(Boolean).join(' · '))}</div>
-            <div style="font-size:12px;color:${sub}">${esc(d.aBrok)}</div>
+    const sub = dark ? 'rgba(245,241,232,.68)' : '#5B564B';
+    return `<div style="display:flex;align-items:center;gap:16px">
+        ${d.agentPhoto?`<div style="width:62px;height:62px;border-radius:50%;flex:0 0 auto;border:2px solid ${accent};${ph(d.agentPhoto)}"></div>`:''}
+        <div style="flex:1;min-width:0">
+            <div style="font-family:'Playfair Display',serif;font-weight:700;font-size:21px;color:${fg}">${esc(d.aName)}</div>
+            <div style="font-size:12.5px;color:${sub};margin-top:3px;letter-spacing:.04em">${esc([d.aPhone,d.aEmail].filter(Boolean).join('  ·  '))}</div>
+            <div style="font-size:10.5px;color:${sub};letter-spacing:.1em;text-transform:uppercase;margin-top:2px">${esc(d.aBrok)}</div>
         </div>
-        <div style="text-align:right;font-family:Cinzel,serif;color:#C9A85C;font-size:13px;letter-spacing:.18em">SCHEDULE A<br>PRIVATE TOUR</div>
+        ${d.brandLogo?`<div style="width:76px;height:44px;flex:0 0 auto;background-image:url(${d.brandLogo});background-size:contain;background-repeat:no-repeat;background-position:center"></div>`:''}
+        ${qrBlock(d, dark)}
+    </div>`;
+}
+function hairStats(d, color, line, extra){
+    const items = [[d.beds,'BEDROOMS'],[d.baths,'BATHROOMS'],[d.sqft,'LIVING SQ FT']];
+    if(extra) items.push(extra);
+    return `<div style="display:flex;border-top:1px solid ${line};border-bottom:1px solid ${line}">
+        ${items.map((it,i)=>`<div style="flex:1;text-align:center;padding:15px 4px;${i<items.length-1?'border-right:1px solid '+line:''}">
+            <div style="font-family:'Playfair Display',serif;font-size:27px;color:${color}">${esc(String(it[0]))}</div>
+            <div style="font-size:9.5px;letter-spacing:.24em;color:${color};opacity:.55;margin-top:3px">${it[1]}</div></div>`).join('')}
     </div>`;
 }
 function statRow(d, color, border){
-    const s = (n,l)=>`<div style="text-align:center;padding:0 26px;${border?'border-right:1px solid '+border:''}"><div style="font-size:30px;font-weight:700;color:${color}">${esc(n)}</div><div style="font-size:11px;letter-spacing:.2em;color:${color};opacity:.65">${l}</div></div>`;
-    return `<div style="display:flex;justify-content:center">${s(d.beds,'BEDS')}${s(d.baths,'BATHS')}<div style="text-align:center;padding:0 26px"><div style="font-size:30px;font-weight:700;color:${color}">${esc(d.sqft)}</div><div style="font-size:11px;letter-spacing:.2em;color:${color};opacity:.65">SQ FT</div></div></div>`;
+    return hairStats(d, color, border || 'transparent');
 }
-function thumbs(d, h){
+function thumbs(d, h, gap, radius){
     if(d.photos.length<2) return '';
     const t=d.photos.slice(1,4);
-    return `<div style="display:grid;grid-template-columns:repeat(${t.length},1fr);gap:10px;height:${h}px">${t.map(p=>`<div style="${ph(p)};border-radius:2px"></div>`).join('')}</div>`;
+    return `<div style="display:grid;grid-template-columns:repeat(${t.length},1fr);gap:${gap==null?10:gap}px;height:${h}px">${t.map(p=>`<div style="${ph(p)};border-radius:${radius==null?2:radius}px"></div>`).join('')}</div>`;
 }
-function bannerText(d){ return d.banner + (d.banner==='OPEN HOUSE' && d.ohWhen ? ' · '+esc(d.ohWhen) : ''); }
+function tick(pos){
+    const m = {tl:'top:14px;left:14px;border-right:none;border-bottom:none',tr:'top:14px;right:14px;border-left:none;border-bottom:none',bl:'bottom:14px;left:14px;border-right:none;border-top:none',br:'bottom:14px;right:14px;border-left:none;border-top:none'};
+    return `<div style="position:absolute;width:26px;height:26px;border:1.5px solid rgba(255,255,255,.85);${m[pos]}"></div>`;
+}
 
 const RENDER = {
+
+/* 1 — EDITORIAL ESTATE: the house style from the Wakefield/Chessington flyers */
+editorial(d){ const line='rgba(23,21,15,.14)'; return `
+<div style="width:850px;height:1100px;background:#FDFBF7;font-family:Inter,sans-serif;padding:26px;overflow:hidden">
+ <div style="border:1px solid rgba(23,21,15,.28);height:100%;padding:5px">
+ <div style="border:1px solid rgba(23,21,15,.16);height:100%;display:flex;flex-direction:column;padding:30px 36px 24px">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start">
+    <div>${d.brandLogo?`<div style="width:110px;height:52px;background-image:url(${d.brandLogo});background-size:contain;background-repeat:no-repeat;background-position:left center"></div>`:`<div style="font-family:'Playfair Display',serif;font-size:20px;color:#17150F;letter-spacing:.06em">${esc(d.aBrok||'PRESENTED BY')}</div>`}</div>
+    <div style="text-align:right">
+      <div style="font-family:'Playfair Display',serif;font-style:italic;font-size:24px;color:#17150F;text-transform:capitalize">${esc(d.banner.toLowerCase())}</div>
+      <div style="font-size:10px;letter-spacing:.3em;color:#8a857a;margin-top:3px">${esc(d.city).toUpperCase()}${d.banner==='OPEN HOUSE'&&d.ohWhen?' · '+esc(d.ohWhen).toUpperCase():''}</div>
+    </div>
+  </div>
+  <div style="height:1px;background:linear-gradient(90deg,#C9A85C,rgba(201,168,92,.15));margin:16px 0 18px"></div>
+  <div style="height:388px;position:relative;${ph(d.photos[0])}">${tick('tl')}${tick('tr')}${tick('bl')}${tick('br')}</div>
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:24px">
+    <div>
+      <div style="font-family:'Playfair Display',serif;font-size:40px;color:#17150F;line-height:1.05">${esc(d.addr)}</div>
+      <div style="font-size:12px;letter-spacing:.24em;color:#8a857a;margin-top:7px">${esc(d.city).toUpperCase()}</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:10px;letter-spacing:.3em;color:#8a857a">OFFERED AT</div>
+      <div style="font-family:'Playfair Display',serif;font-size:37px;color:#9E2B25;margin-top:2px">${esc(d.price)}</div>
+    </div>
+  </div>
+  <div style="margin-top:16px">${hairStats(d,'#17150F',line)}</div>
+  <div style="display:flex;gap:30px;margin-top:18px">
+    <div style="flex:0 0 250px">
+      <div style="font-family:'Playfair Display',serif;font-style:italic;font-size:26px;line-height:1.3;color:#17150F">${esc(d.headline)}</div>
+      ${d.subhead?`<div style="font-family:'Playfair Display',serif;font-style:italic;font-size:22px;line-height:1.3;color:#C9A85C;margin-top:2px">${esc(d.subhead)}</div>`:''}
+    </div>
+    <div style="flex:1;font-size:13.5px;line-height:1.75;color:#4a463d">${esc(d.desc)}</div>
+  </div>
+  <div style="margin-top:16px">${thumbs(d,128,12,0)}</div>
+  <div style="margin-top:auto;background:#F2EDE2;margin-left:-36px;margin-right:-36px;margin-bottom:-24px;padding:18px 36px 20px">${agentBar(d,false)}</div>
+ </div></div>
+</div>`; },
+
+/* 2 — MAGAZINE COVER: FlipAI EditorialMagazine grid */
+magazine(d){ return `
+<div style="width:850px;height:1100px;background:#F7F4EE;font-family:Inter,sans-serif;display:flex;flex-direction:column;overflow:hidden">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 36px;border-bottom:1px solid rgba(23,21,15,.12)">
+    <div style="font-size:10px;letter-spacing:.4em;color:#8a857a">${esc(d.city).toUpperCase()}</div>
+    <div style="font-size:11px;letter-spacing:.3em;color:#17150F;font-weight:700">${bannerText(d)}</div>
+  </div>
+  <div style="flex:1;display:grid;grid-template-columns:2fr 1fr;gap:8px;padding:18px 36px 0;min-height:0">
+    <div style="position:relative;${ph(d.photos[0])}">
+      <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(10,10,10,.72))"></div>
+      <div style="position:absolute;left:22px;right:22px;bottom:20px;color:#fff">
+        <div style="font-size:9.5px;letter-spacing:.34em;opacity:.85">THE COVER STORY</div>
+        <div style="font-family:'Playfair Display',serif;font-size:34px;line-height:1.15;margin-top:6px">${esc(d.headline)}</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-rows:repeat(3,1fr);gap:8px">
+      <div style="${ph(d.photos[1])}"></div>
+      <div style="${ph(d.photos[2])}"></div>
+      <div style="${ph(d.photos[3])}"></div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:26px;padding:20px 36px 8px">
+    <div>
+      <div style="font-family:'Playfair Display',serif;font-size:26px;color:#17150F">${esc(d.addr)}</div>
+      <div style="font-size:11px;letter-spacing:.2em;color:#8a857a;margin-top:3px">${esc(d.city).toUpperCase()}</div>
+      <div style="font-size:13px;line-height:1.7;color:#4a463d;margin-top:10px">${esc(d.desc)}</div>
+    </div>
+    <div style="border-left:1px solid rgba(23,21,15,.15);padding-left:24px">
+      <div style="display:flex;gap:20px">
+        ${[[d.beds,'BEDS'],[d.baths,'BATHS'],[d.sqft,'SQFT']].map(x=>`<div><div style="font-family:'Playfair Display',serif;font-size:24px;color:#17150F">${esc(String(x[0]))}</div><div style="font-size:9px;letter-spacing:.22em;color:#8a857a">${x[1]}</div></div>`).join('')}
+      </div>
+      <div style="margin-top:14px"><div style="font-size:9.5px;letter-spacing:.3em;color:#8a857a">OFFERED AT</div>
+      <div style="font-family:'Playfair Display',serif;font-size:31px;color:#9E2B25">${esc(d.price)}</div></div>
+      ${d.feats.length?`<div style="margin-top:10px">${d.feats.slice(0,3).map(f=>`<div style="font-size:11.5px;color:#4a463d;padding:3px 0">— ${esc(f)}</div>`).join('')}</div>`:''}
+    </div>
+  </div>
+  <div style="margin-top:auto;border-top:1px solid rgba(23,21,15,.12);padding:16px 36px 20px;background:#fff">${agentBar(d,false)}</div>
+</div>`; },
+
+/* 3 — LUXURY GOLD: Roundtable brand */
 luxury(d){ return `
 <div style="width:850px;height:1100px;background:#0B0B0D;font-family:Inter,sans-serif;display:flex;flex-direction:column;overflow:hidden">
-  <div style="height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 44px;border-bottom:1px solid rgba(201,168,92,.35)">
-    <span style="font-family:Cinzel,serif;color:#C9A85C;letter-spacing:.24em;font-size:14px">${bannerText(d)}</span>
-    <span style="color:#8E887B;font-size:12px;letter-spacing:.14em">${esc(d.city).toUpperCase()}</span>
+  <div style="height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 44px;border-bottom:1px solid rgba(201,168,92,.35)">
+    <span style="font-family:Cinzel,serif;color:#C9A85C;letter-spacing:.24em;font-size:13px">${bannerText(d)}</span>
+    <span style="color:#8E887B;font-size:11px;letter-spacing:.16em">${esc(d.city).toUpperCase()}</span>
   </div>
-  <div style="height:472px;margin:22px 44px 0;${ph(d.photos[0])};border:1px solid rgba(201,168,92,.35)"></div>
-  <div style="padding:26px 44px 0;text-align:center">
-    <div style="font-family:'Playfair Display',serif;font-size:40px;color:#F5F1E8;line-height:1.15">${esc(d.headline)}</div>
-    ${d.subhead?`<div style="color:#C9A85C;font-size:16px;margin-top:8px;font-style:italic;font-family:'Playfair Display',serif">${esc(d.subhead)}</div>`:''}
-    <div style="width:70px;height:1px;background:#C9A85C;margin:16px auto"></div>
-    <div style="font-family:Cinzel,serif;color:#E5C87E;font-size:30px;letter-spacing:.04em">${esc(d.price)} <span style="font-size:16px;color:#8E887B">· ${esc(d.addr)}</span></div>
+  <div style="height:440px;margin:22px 44px 0;position:relative;${ph(d.photos[0])};border:1px solid rgba(201,168,92,.4)">${tick('tl')}${tick('tr')}${tick('bl')}${tick('br')}</div>
+  <div style="padding:24px 44px 0;text-align:center">
+    <div style="font-family:'Playfair Display',serif;font-size:37px;color:#F5F1E8;line-height:1.15">${esc(d.headline)}</div>
+    ${d.subhead?`<div style="color:#C9A85C;font-size:16px;margin-top:7px;font-style:italic;font-family:'Playfair Display',serif">${esc(d.subhead)}</div>`:''}
+    <div style="width:64px;height:1px;background:#C9A85C;margin:14px auto"></div>
+    <div style="font-family:Cinzel,serif;color:#E5C87E;font-size:28px;letter-spacing:.04em">${esc(d.price)}</div>
+    <div style="color:#8E887B;font-size:13px;margin-top:4px;letter-spacing:.1em">${esc(d.addr).toUpperCase()} · ${esc(d.city).toUpperCase()}</div>
   </div>
-  <div style="margin:18px 0 0">${statRow(d,'#F5F1E8','rgba(201,168,92,.3)')}</div>
-  <div style="padding:16px 70px 0;color:#C9C4B8;font-size:15px;line-height:1.75;text-align:center">${esc(d.desc)}</div>
-  <div style="padding:16px 44px 0">${thumbs(d,120)}</div>
-  <div style="margin-top:auto;padding:18px 44px 26px;border-top:1px solid rgba(201,168,92,.35)">${agentBar(d,true)}</div>
+  <div style="margin:16px 44px 0">${hairStats(d,'#F5F1E8','rgba(201,168,92,.28)')}</div>
+  <div style="padding:15px 84px 0;color:#C9C4B8;font-size:13.5px;line-height:1.75;text-align:center">${esc(d.desc)}</div>
+  <div style="padding:15px 44px 0">${thumbs(d,112,10,0)}</div>
+  <div style="margin-top:auto;padding:17px 44px 24px;border-top:1px solid rgba(201,168,92,.35)">${agentBar(d,true)}</div>
 </div>`; },
 
+/* 4 — ONYX CINEMATIC */
 onyx(d){ return `
-<div style="width:850px;height:1100px;background:#101012;font-family:Inter,sans-serif;display:flex;flex-direction:column;overflow:hidden">
-  <div style="height:600px;position:relative;${ph(d.photos[0])}">
-    <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(16,16,18,.15) 40%,rgba(16,16,18,.96) 96%)"></div>
-    <div style="position:absolute;top:34px;left:44px;font-size:12px;letter-spacing:.3em;color:#fff;background:rgba(0,0,0,.45);padding:9px 18px;border:1px solid rgba(255,255,255,.4)">${bannerText(d)}</div>
-    <div style="position:absolute;left:44px;right:44px;bottom:28px">
-      <div style="font-family:'Playfair Display',serif;font-size:46px;color:#fff;line-height:1.12">${esc(d.headline)}</div>
-      <div style="color:rgba(255,255,255,.75);font-size:17px;margin-top:8px">${esc(d.addr)} · ${esc(d.city)}</div>
+<div style="width:850px;height:1100px;background:#0e0e10;font-family:Inter,sans-serif;display:flex;flex-direction:column;overflow:hidden">
+  <div style="height:565px;position:relative;${ph(d.photos[0])}">
+    <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,14,16,.1) 35%,rgba(14,14,16,.97) 97%)"></div>
+    <div style="position:absolute;top:30px;left:44px;font-size:11px;letter-spacing:.32em;color:#fff;background:rgba(0,0,0,.4);padding:9px 18px;border:1px solid rgba(255,255,255,.45)">${bannerText(d)}</div>
+    <div style="position:absolute;left:44px;right:44px;bottom:24px">
+      <div style="font-family:'Playfair Display',serif;font-size:44px;color:#fff;line-height:1.1">${esc(d.headline)}</div>
+      <div style="color:rgba(255,255,255,.72);font-size:16px;margin-top:8px;letter-spacing:.04em">${esc(d.addr)} · ${esc(d.city)}</div>
     </div>
   </div>
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:22px 44px;border-bottom:1px solid #2b2b30">
-    <div style="font-size:36px;font-weight:800;color:#fff">${esc(d.price)}</div>${statRow(d,'#fff','#2b2b30')}
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 44px;border-bottom:1px solid #232327">
+    <div style="font-size:35px;font-weight:800;color:#fff;letter-spacing:-.01em">${esc(d.price)}</div>
+    <div style="display:flex;gap:34px">${[[d.beds,'BEDS'],[d.baths,'BATHS'],[d.sqft,'SQ FT']].map(x=>`<div style="text-align:center"><div style="font-size:23px;font-weight:700;color:#fff">${esc(String(x[0]))}</div><div style="font-size:9px;letter-spacing:.26em;color:#77777d">${x[1]}</div></div>`).join('')}</div>
   </div>
-  <div style="display:flex;gap:34px;padding:24px 44px 0">
-    <div style="flex:1.3;color:#b9b9bd;font-size:15px;line-height:1.8">${esc(d.desc)}</div>
-    <div style="flex:1">${d.feats.map(f=>`<div style="color:#e8e8ea;font-size:14px;padding:7px 0;border-bottom:1px solid #232327">— ${esc(f)}</div>`).join('')}</div>
+  <div style="display:flex;gap:32px;padding:20px 44px 0">
+    <div style="flex:1.25;color:#b9b9bd;font-size:13.5px;line-height:1.8">${esc(d.desc)}</div>
+    <div style="flex:1">${d.feats.map(f=>`<div style="color:#e8e8ea;font-size:13px;padding:6px 0;border-bottom:1px solid #1e1e22">— ${esc(f)}</div>`).join('')}</div>
   </div>
-  <div style="padding:16px 44px 0">${thumbs(d,110)}</div>
-  <div style="margin-top:auto;padding:18px 44px 26px;background:#0a0a0c">${agentBar(d,true)}</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:16px;height:118px">
+    ${[1,2,3].map(i=>`<div style="${ph(d.photos[i])}"></div>`).join('')}
+  </div>
+  <div style="margin-top:auto;padding:16px 44px 24px;background:#0a0a0c">${agentBar(d,true)}</div>
 </div>`; },
 
+/* 5 — ARCHITECTURAL: swiss-minimal lines */
+linear(d){ const line='rgba(23,21,15,.16)'; return `
+<div style="width:850px;height:1100px;background:#FFFFFF;font-family:Inter,sans-serif;display:flex;flex-direction:column;overflow:hidden">
+  <div style="display:grid;grid-template-columns:1fr auto;border-bottom:1px solid ${line}">
+    <div style="padding:22px 36px;border-right:1px solid ${line}">
+      <div style="font-size:10px;letter-spacing:.42em;color:#9a958a">${bannerText(d)}</div>
+      <div style="font-size:32px;font-weight:300;color:#17150F;letter-spacing:-.01em;margin-top:6px">${esc(d.addr)}</div>
+      <div style="font-size:11px;letter-spacing:.22em;color:#9a958a;margin-top:3px">${esc(d.city).toUpperCase()}</div>
+    </div>
+    <div style="padding:22px 36px;display:flex;flex-direction:column;justify-content:center;text-align:right">
+      <div style="font-size:10px;letter-spacing:.32em;color:#9a958a">PRICE</div>
+      <div style="font-size:30px;font-weight:600;color:#17150F;margin-top:2px">${esc(d.price)}</div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:2fr 1fr;min-height:0;flex:1;border-bottom:1px solid ${line}">
+    <div style="border-right:1px solid ${line};${ph(d.photos[0])}"></div>
+    <div style="display:flex;flex-direction:column">
+      <div style="flex:1;${ph(d.photos[1])};border-bottom:1px solid ${line}"></div>
+      <div style="flex:1;${ph(d.photos[2])}"></div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid ${line}">
+    ${[[d.beds,'BEDROOMS'],[d.baths,'BATHROOMS'],[d.sqft,'SQUARE FEET']].map((x,i)=>`<div style="padding:16px;text-align:center;${i<2?'border-right:1px solid '+line:''}"><div style="font-size:26px;font-weight:300;color:#17150F">${esc(String(x[0]))}</div><div style="font-size:9px;letter-spacing:.3em;color:#9a958a;margin-top:3px">${x[1]}</div></div>`).join('')}
+  </div>
+  <div style="display:grid;grid-template-columns:1.5fr 1fr;flex:0 0 auto">
+    <div style="padding:22px 36px;border-right:1px solid ${line}">
+      <div style="font-size:18px;font-weight:600;color:#17150F;letter-spacing:-.01em">${esc(d.headline)}</div>
+      <div style="font-size:13px;line-height:1.75;color:#5B564B;margin-top:9px">${esc(d.desc)}</div>
+    </div>
+    <div style="padding:22px 30px">
+      ${d.feats.map((f,i)=>`<div style="font-size:12px;color:#17150F;padding:6px 0;${i<d.feats.length-1?'border-bottom:1px solid rgba(23,21,15,.08)':''}"><span style="color:#9a958a;font-size:10px;margin-right:8px">${String(i+1).padStart(2,'0')}</span>${esc(f)}</div>`).join('')}
+    </div>
+  </div>
+  <div style="margin-top:auto;border-top:1px solid ${line};padding:16px 36px 20px">${agentBar(d,false,'#17150F')}</div>
+</div>`; },
+
+/* 6 — GALLERY WALL: photo-forward mosaic */
+gallery(d){ return `
+<div style="width:850px;height:1100px;background:#151517;font-family:Inter,sans-serif;display:flex;flex-direction:column;overflow:hidden">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 36px">
+    <div style="font-size:10.5px;letter-spacing:.36em;color:#C9A85C">${bannerText(d)}</div>
+    <div style="font-size:10.5px;letter-spacing:.2em;color:#77777d">${esc(d.city).toUpperCase()}</div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(3,1fr);gap:6px;padding:0 36px;height:520px">
+    <div style="grid-column:1/4;grid-row:1/3;${ph(d.photos[0])}"></div>
+    <div style="grid-column:4;grid-row:1;${ph(d.photos[1])}"></div>
+    <div style="grid-column:4;grid-row:2;${ph(d.photos[2])}"></div>
+    <div style="grid-column:1/3;grid-row:3;${ph(d.photos[3])}"></div>
+    <div style="grid-column:3/5;grid-row:3;display:flex;align-items:center;justify-content:center;background:#C9A85C">
+      <div style="text-align:center;color:#151517;padding:10px">
+        <div style="font-size:9.5px;letter-spacing:.3em;font-weight:700">OFFERED AT</div>
+        <div style="font-family:'Playfair Display',serif;font-size:34px;margin-top:2px">${esc(d.price)}</div>
+      </div>
+    </div>
+  </div>
+  <div style="padding:24px 36px 0;text-align:center">
+    <div style="font-family:'Playfair Display',serif;font-size:33px;color:#F5F1E8;line-height:1.15">${esc(d.headline)}</div>
+    <div style="font-size:13px;letter-spacing:.14em;color:#8E887B;margin-top:7px">${esc(d.addr).toUpperCase()} · ${esc(d.city).toUpperCase()}</div>
+    <div style="display:flex;justify-content:center;gap:38px;margin-top:15px">
+      ${[[d.beds,'BEDS'],[d.baths,'BATHS'],[d.sqft,'SQ FT']].map(x=>`<div><span style="font-size:21px;font-weight:700;color:#F5F1E8">${esc(String(x[0]))}</span> <span style="font-size:10px;letter-spacing:.2em;color:#77777d">${x[1]}</span></div>`).join('')}
+    </div>
+    <div style="max-width:620px;margin:13px auto 0;color:#a8a8ad;font-size:12.5px;line-height:1.7">${esc(d.desc)}</div>
+  </div>
+  <div style="margin-top:auto;padding:16px 36px 22px;border-top:1px solid rgba(201,168,92,.28)">${agentBar(d,true)}</div>
+</div>`; },
+
+/* 7 — BOLD BANNER */
 bold(d){ return `
 <div style="width:850px;height:1100px;background:#fff;font-family:Inter,sans-serif;display:flex;flex-direction:column;overflow:hidden">
-  <div style="background:#C0392B;color:#fff;text-align:center;padding:20px;font-weight:800;font-size:34px;letter-spacing:.14em">${bannerText(d)}</div>
-  <div style="height:450px;${ph(d.photos[0])}"></div>
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:22px 44px;background:#17150F">
-    <div><div style="color:#fff;font-size:26px;font-weight:800">${esc(d.addr)}</div><div style="color:rgba(255,255,255,.65);font-size:15px">${esc(d.city)}</div></div>
-    <div style="color:#fff;font-size:40px;font-weight:800">${esc(d.price)}</div>
+  <div style="background:#B3261E;color:#fff;text-align:center;padding:19px;font-weight:800;font-size:31px;letter-spacing:.16em">${bannerText(d)}</div>
+  <div style="height:452px;position:relative;${ph(d.photos[0])}">
+    <div style="position:absolute;right:26px;bottom:-34px;background:#17150F;color:#fff;padding:16px 30px;border-radius:2px;box-shadow:0 14px 40px rgba(0,0,0,.35)">
+      <div style="font-size:9.5px;letter-spacing:.3em;color:rgba(255,255,255,.6)">OFFERED AT</div>
+      <div style="font-size:34px;font-weight:800">${esc(d.price)}</div>
+    </div>
   </div>
-  <div style="padding:20px 44px 0">
-    <div style="font-size:26px;font-weight:800;color:#17150F">${esc(d.headline)}</div>
-    <div style="color:#5B564B;font-size:15px;line-height:1.7;margin-top:8px">${esc(d.desc)}</div>
+  <div style="padding:30px 44px 0">
+    <div style="font-size:27px;font-weight:800;color:#17150F;max-width:520px;line-height:1.2">${esc(d.headline)}</div>
+    <div style="font-size:14px;color:#B3261E;font-weight:700;letter-spacing:.06em;margin-top:5px">${esc(d.addr).toUpperCase()} · ${esc(d.city).toUpperCase()}</div>
+    <div style="color:#5B564B;font-size:13.5px;line-height:1.7;margin-top:10px;max-width:730px">${esc(d.desc)}</div>
   </div>
   <div style="display:flex;gap:26px;padding:16px 44px 0;align-items:flex-start">
-    <div style="flex:1">${d.feats.map(f=>`<div style="font-size:14px;color:#17150F;padding:6px 0;font-weight:600">&#9642; ${esc(f)}</div>`).join('')}</div>
-    <div style="flex:1.1">${thumbs(d,150)}</div>
+    <div style="flex:1">${d.feats.map(f=>`<div style="font-size:13px;color:#17150F;padding:5px 0;font-weight:600">&#9642;&nbsp; ${esc(f)}</div>`).join('')}</div>
+    <div style="flex:1.15">${thumbs(d,148,8,3)}</div>
   </div>
-  <div style="margin:14px 0 0">${statRow(d,'#17150F','#e5e0d5')}</div>
-  <div style="margin-top:auto;padding:16px 44px 24px;border-top:4px solid #C0392B">${agentBar(d,false)}</div>
+  <div style="margin:14px 44px 0;background:#F6F3EC;border-radius:4px">${hairStats(d,'#17150F','rgba(23,21,15,.1)')}</div>
+  <div style="margin-top:auto;padding:15px 44px 22px;border-top:4px solid #B3261E">${agentBar(d,false,'#B3261E')}</div>
 </div>`; },
 
+/* 8 — FRESH MODERN: coastal-clean */
 coastal(d){ return `
 <div style="width:850px;height:1100px;background:#F7F5F0;font-family:Inter,sans-serif;display:flex;flex-direction:column;overflow:hidden">
-  <div style="display:flex;justify-content:space-between;align-items:center;padding:26px 44px 14px">
-    <span style="font-size:12px;letter-spacing:.3em;color:#2E6E8E;font-weight:700">${bannerText(d)}</span>
-    <span style="font-size:13px;color:#8a857a">${esc(d.city)}</span>
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:24px 44px 13px">
+    <span style="font-size:11px;letter-spacing:.32em;color:#2E6E8E;font-weight:700">${bannerText(d)}</span>
+    <span style="font-size:12px;color:#8a857a;letter-spacing:.08em">${esc(d.city)}</span>
   </div>
-  <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:12px;padding:0 44px;height:430px">
-    <div style="${ph(d.photos[0])};border-radius:8px"></div>
-    <div style="display:grid;grid-template-rows:1fr 1fr;gap:12px">
-      <div style="${ph(d.photos[1])};border-radius:8px"></div>
-      <div style="${ph(d.photos[2])};border-radius:8px"></div>
+  <div style="display:grid;grid-template-columns:1.65fr 1fr;gap:10px;padding:0 44px;height:415px">
+    <div style="${ph(d.photos[0])};border-radius:10px"></div>
+    <div style="display:grid;grid-template-rows:1fr 1fr;gap:10px">
+      <div style="${ph(d.photos[1])};border-radius:10px"></div>
+      <div style="${ph(d.photos[2])};border-radius:10px"></div>
     </div>
   </div>
-  <div style="padding:26px 44px 0">
-    <div style="font-family:'Playfair Display',serif;font-size:38px;color:#1e293b;line-height:1.15">${esc(d.headline)}</div>
-    ${d.subhead?`<div style="color:#2E6E8E;font-size:16px;margin-top:6px">${esc(d.subhead)}</div>`:''}
-    <div style="display:flex;align-items:baseline;gap:18px;margin-top:12px">
-      <span style="font-size:34px;font-weight:800;color:#2E6E8E">${esc(d.price)}</span>
-      <span style="font-size:16px;color:#5B564B">${esc(d.addr)}</span>
+  <div style="padding:24px 44px 0">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px">
+      <div>
+        <div style="font-family:'Playfair Display',serif;font-size:34px;color:#1e293b;line-height:1.15;max-width:520px">${esc(d.headline)}</div>
+        ${d.subhead?`<div style="color:#2E6E8E;font-size:15px;margin-top:5px">${esc(d.subhead)}</div>`:''}
+      </div>
+      <div style="text-align:right;flex:0 0 auto">
+        <div style="font-size:9.5px;letter-spacing:.3em;color:#8a857a">OFFERED AT</div>
+        <div style="font-size:33px;font-weight:800;color:#2E6E8E">${esc(d.price)}</div>
+      </div>
     </div>
-    <div style="color:#5B564B;font-size:15px;line-height:1.75;margin-top:12px">${esc(d.desc)}</div>
-    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px">
-      ${d.feats.map(f=>`<span style="background:#fff;border:1px solid #d8d2c4;color:#374151;font-size:13px;padding:7px 14px;border-radius:20px">${esc(f)}</span>`).join('')}
+    <div style="font-size:14px;color:#475569;margin-top:8px;letter-spacing:.02em">${esc(d.addr)} · ${esc(d.city)}</div>
+    <div style="color:#5B564B;font-size:13.5px;line-height:1.75;margin-top:10px">${esc(d.desc)}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:13px">
+      ${d.feats.map(f=>`<span style="background:#fff;border:1px solid #ddd6c6;color:#374151;font-size:12px;padding:7px 15px;border-radius:20px">${esc(f)}</span>`).join('')}
     </div>
   </div>
-  <div style="margin:16px 0 0">${statRow(d,'#1e293b','#d8d2c4')}</div>
-  <div style="margin-top:auto;padding:16px 44px 24px;background:#fff;border-top:1px solid #e2ddd0">${agentBar(d,false)}</div>
+  <div style="margin:15px 44px 0">${hairStats(d,'#1e293b','#ddd6c6')}</div>
+  <div style="margin-top:auto;padding:15px 44px 22px;background:#fff;border-top:1px solid #e6e0d2">${agentBar(d,false,'#2E6E8E')}</div>
 </div>`; }
 };
 
@@ -511,7 +710,7 @@ function downloadFlyer(){
 }
 
 // live updates
-['banner','ohWhen','addr','city','price','beds','baths','sqft','headline','subhead','desc','feats','aName','aPhone','aEmail','aBrok'].forEach(id=>{
+['banner','ohWhen','addr','city','price','beds','baths','sqft','headline','subhead','desc','feats','aName','aPhone','aEmail','aBrok','qrUrl'].forEach(id=>{
     $(id).addEventListener('input', render);
     $(id).addEventListener('change', render);
 });

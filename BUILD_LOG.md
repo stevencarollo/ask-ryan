@@ -89,3 +89,13 @@ Studio UI: "Import From a Link" bar - fills address/city/price/beds/baths/sqft/d
 auto-places first 4 photos, full tap-to-place photo gallery of up to 20 imported photos.
 VERIFIED LOCALLY on a live Redfin listing (23045 Delford Ave, Carson): 11 photos, $700,000,
 3/2/1316sqft + full description extracted via redfin-direct strategy.
+
+## 2026-07-04 — FLYER STUDIO v2: 8 PREMIUM TEMPLATES
+Studied Steve's real flyers (Wakefield/Chessington PDFs - the editorial estate house style: double-rule
+frame, corner ticks, serif address + colored price, hairline stat rows, italic two-line tagline, cream
+agent band with QR) and the FlipAI templates.tsx (27 modern React templates). Rebuilt the studio engine:
+8 templates - Editorial Estate (faithful house style), Magazine Cover (FlipAI EditorialMagazine grid),
+Luxury Gold (refined w/ corner ticks), Onyx Cinematic (hero overlay + strip), Architectural (swiss
+hairline grid, numbered features), Gallery Wall (mosaic + gold price block), Bold Banner (floating price
+card), Fresh Modern (rounded coastal). New: brokerage-logo upload, QR code from listing link (qrserver,
+free) with 'SCAN FOR FULL LISTING' caption, Playfair Display type system, print-safe inline styles.
