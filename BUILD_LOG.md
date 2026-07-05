@@ -99,3 +99,14 @@ Luxury Gold (refined w/ corner ticks), Onyx Cinematic (hero overlay + strip), Ar
 hairline grid, numbered features), Gallery Wall (mosaic + gold price block), Bold Banner (floating price
 card), Fresh Modern (rounded coastal). New: brokerage-logo upload, QR code from listing link (qrserver,
 free) with 'SCAN FOR FULL LISTING' caption, Playfair Display type system, print-safe inline styles.
+
+## 2026-07-04 — PODCAST STUDIO + NOTEBOOKLM CONNECTION
+Built: /api/podcast-script - two-host ("The Roundtable Sessions": ALEX + MORGAN) NotebookLM-style
+episode generator grounded in the researched kb via retrieval (verified: probate episode cites
+overbid/IAEA material); returns title/description/turns + a formatted NotebookLM SOURCE DOCUMENT.
+podcast-studio.html: 14 topic chips from the research library + custom topic + EN/ES + 4/6/10-min;
+transcript view with host-colored turns; BUILT-IN two-voice playback (browser speech synthesis,
+distinct A/B voices, play/pause/stop, progress bar, current-line highlight); transcript download;
+NOTEBOOKLM HANDOFF: one click downloads the source doc + opens notebooklm.google.com (Google has no
+public NotebookLM API - this is the deepest legal integration: doc formatted for Audio Overview).
+Nav wired: chat topbar, flyer studio, landing. $0 - browser TTS is free, no new services.

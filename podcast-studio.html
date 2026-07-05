@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Podcast Studio — The Roundtable</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#C9A85C;--gold-bright:#E5C87E;--ink:#0B0B0D;--charcoal:#131316;--line:rgba(201,168,92,.25);--ivory:#F5F1E8;--muted:#8E887B;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:radial-gradient(ellipse 70% 50% at 50% -10%,rgba(201,168,92,.14),transparent 60%),var(--ink);color:var(--ivory);min-height:100vh}
+button{cursor:pointer;font-family:'Inter',sans-serif}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--gold-bright);outline-offset:2px}
+nav.topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px clamp(14px,3vw,28px);border-bottom:1px solid var(--line);background:rgba(11,11,13,.85);backdrop-filter:blur(14px);position:sticky;top:0;z-index:40}
+.nav-left{display:flex;align-items:center;gap:14px}
+.back-link{display:inline-flex;align-items:center;gap:7px;color:var(--muted);text-decoration:none;font-size:.8em;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:8px 12px;border:1px solid var(--line);border-radius:4px;transition:all .2s}
+.back-link:hover{color:var(--ink);background:var(--gold)}
+.back-link svg{width:15px;height:15px;stroke:currentColor}
+.brand-mini span{font-family:'Cinzel',serif;font-size:1.02em;font-weight:600;letter-spacing:.1em;color:var(--gold);text-transform:uppercase}
+.nav-btn{padding:8px 14px;font-size:.76em;font-weight:600;letter-spacing:.08em;text-transform:uppercase;background:transparent;color:var(--gold);border:1px solid var(--line);border-radius:4px;transition:all .2s;text-decoration:none;display:inline-block}
+.nav-btn:hover{background:var(--gold);color:var(--ink)}
+@media(max-width:720px){.brand-mini{display:none}}
+
+.wrap{max-width:860px;margin:0 auto;padding:28px 18px 80px}
+h1.page{font-family:'Cinzel',serif;font-size:1.6em;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;text-align:center}
+.sub{color:var(--muted);text-align:center;font-size:.88em;margin-top:6px;font-weight:300}
+.sec-label{font-size:.72em;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:26px 0 12px}
+.topics{display:flex;flex-wrap:wrap;gap:9px}
+.chip{padding:10px 16px;border:1px solid var(--line);border-radius:22px;background:var(--charcoal);color:var(--ivory);font-size:.82em;transition:all .2s}
+.chip:hover{border-color:var(--gold)}
+.chip.active{background:var(--gold);color:var(--ink);border-color:var(--gold);font-weight:700}
+.custom-row{display:flex;gap:9px;margin-top:12px}
+.custom-row input{flex:1;padding:12px 15px;background:var(--charcoal);border:1px solid var(--line);border-radius:5px;color:var(--ivory);font-size:.92rem;font-family:'Inter',sans-serif}
+.opts{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.opts select{padding:10px 13px;background:var(--charcoal);border:1px solid var(--line);border-radius:5px;color:var(--ivory);font-size:.85rem}
+.go{width:100%;margin-top:18px;padding:15px;background:linear-gradient(135deg,var(--gold) 0%,#B8964A 100%);color:var(--ink);border:none;border-radius:6px;font-weight:700;font-size:.88em;letter-spacing:.12em;text-transform:uppercase;transition:all .2s}
+.go:hover:not(:disabled){background:var(--gold-bright)}
+.go:disabled{opacity:.55;cursor:wait}
+
+.episode{display:none;margin-top:30px;border:1px solid var(--line);border-radius:8px;background:var(--charcoal);overflow:hidden}
+.ep-head{padding:22px 24px;border-bottom:1px solid var(--line)}
+.ep-head h2{font-family:'Playfair Display',serif;font-size:1.5em;color:var(--ivory);line-height:1.25}
+.ep-head p{color:var(--muted);font-size:.85em;margin-top:7px;line-height:1.6}
+.player{display:flex;align-items:center;gap:12px;padding:15px 24px;border-bottom:1px solid var(--line);background:rgba(201,168,92,.05);flex-wrap:wrap}
+.play-btn{width:52px;height:52px;border-radius:50%;border:none;background:var(--gold);color:var(--ink);font-size:1.1em;display:flex;align-items:center;justify-content:center;transition:all .2s;flex:0 0 auto}
+.play-btn:hover{background:var(--gold-bright)}
+.play-btn svg{width:20px;height:20px;fill:currentColor}
+.player .info{flex:1;min-width:140px}
+.player .info .now{font-size:.78em;color:var(--gold-bright);letter-spacing:.08em}
+.player .info .bar{height:4px;background:rgba(255,255,255,.1);border-radius:3px;margin-top:8px;overflow:hidden}
+.player .info .bar i{display:block;height:100%;width:0;background:var(--gold);transition:width .3s}
+.mini-btn{padding:9px 14px;font-size:.72em;font-weight:600;letter-spacing:.08em;text-transform:uppercase;background:transparent;color:var(--gold);border:1px solid var(--line);border-radius:4px;transition:all .2s}
+.mini-btn:hover{background:rgba(201,168,92,.14)}
+.transcript{max-height:430px;overflow-y:auto;padding:20px 24px}
+.turn{display:flex;gap:12px;margin-bottom:16px;opacity:.85}
+.turn.current{opacity:1}
+.turn.current .tx{border-color:var(--gold)}
+.turn .who{flex:0 0 64px;font-size:.68em;font-weight:700;letter-spacing:.1em;padding-top:4px;text-align:right}
+.turn.a .who{color:#7FB4D9}
+.turn.m .who{color:var(--gold-bright)}
+.turn .tx{flex:1;font-size:.9em;line-height:1.65;color:#d8d4c8;border-left:2px solid transparent;padding-left:12px}
+.nlm{padding:18px 24px;border-top:1px solid var(--line);background:rgba(201,168,92,.04)}
+.nlm h4{font-size:.75em;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.nlm p{font-size:.8em;color:var(--muted);line-height:1.65;margin-bottom:12px}
+.nlm .row{display:flex;gap:9px;flex-wrap:wrap}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--charcoal);border:1px solid var(--gold);color:var(--gold-bright);padding:10px 22px;border-radius:6px;font-size:.82em;display:none;z-index:60}
+</style>
+</head>
+<body>
+<nav class="topbar">
+    <div class="nav-left">
+        <a href="/" class="back-link"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>Dashboard</a>
+        <a href="/" class="brand-mini"><span>The Roundtable</span></a>
+    </div>
+    <div style="display:flex;gap:9px">
+        <a class="nav-btn" href="/frontend.html">Coaching Chat</a>
+        <a class="nav-btn" href="/flyer-studio.html">Flyer Studio</a>
+    </div>
+</nav>
+
+<div class="wrap">
+    <h1 class="page">Podcast Studio</h1>
+    <p class="sub">Pick a topic. The panel produces a two-host deep-dive episode from the research library — listen right here, or send it to NotebookLM.</p>
+
+    <div class="sec-label">Choose a Topic</div>
+    <div class="topics" id="topics"></div>
+    <div class="custom-row">
+        <input id="customTopic" placeholder="...or type any topic: 'winning probate listings in LA County'">
+    </div>
+    <div class="opts">
+        <select id="length"><option value="4">~4 minute episode</option><option value="6" selected>~6 minute episode</option><option value="10">~10 minute episode</option></select>
+        <select id="lang"><option value="en">English</option><option value="es">Español</option></select>
+    </div>
+    <button class="go" id="goBtn" onclick="makeEpisode()">Produce This Episode</button>
+
+    <div class="episode" id="episode">
+        <div class="ep-head">
+            <h2 id="epTitle"></h2>
+            <p id="epDesc"></p>
+        </div>
+        <div class="player">
+            <button class="play-btn" id="playBtn" onclick="togglePlay()" aria-label="Play episode">
+                <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            <div class="info">
+                <div class="now" id="nowPlaying">Ready — press play to listen</div>
+                <div class="bar"><i id="progress"></i></div>
+            </div>
+            <button class="mini-btn" onclick="stopPlay()">Stop</button>
+            <button class="mini-btn" onclick="downloadTranscript()">Transcript</button>
+        </div>
+        <div class="transcript" id="transcript"></div>
+        <div class="nlm">
+            <h4>Send to NotebookLM</h4>
+            <p>Google's NotebookLM has no public API, so this is the fastest legal path: one click downloads this episode's <b>source document</b> and opens NotebookLM — drop the file into a new notebook and press <b>Audio Overview</b> for Google's studio-quality podcast version of this exact topic.</p>
+            <div class="row">
+                <button class="mini-btn" style="background:var(--gold);color:var(--ink);border-color:var(--gold)" onclick="sendToNotebookLM()">Download Source + Open NotebookLM</button>
+                <button class="mini-btn" onclick="downloadSource()">Just the Source Doc</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const API_URL = 'https://ask-ryan-nb3w.onrender.com';
+const TOPICS = [
+    'Winning probate listings (CA court process)',
+    'Short sales & NOD: saving underwater sellers',
+    'FSBO & expired scripts that actually work',
+    'Negotiation psychology for agents',
+    'Flip math: the 65% formula & rehab budgets',
+    'BRRRR & building a rental portfolio',
+    'Staging that sells: room-by-room ROI',
+    'Video & social media for listings',
+    'Referral systems: the Buffini way',
+    'Commercial 101: cap rates & NNN leases',
+    'Prospección bilingüe: ganando el mercado latino',
+    'Tax liens & tax-deed auctions',
+    'Divorce listings: the neutral expert',
+    'Building your first real estate team',
+];
+let selectedTopic = TOPICS[0];
+let episode = null;
+let playing = false, turnIdx = 0, utter = null;
+
+function $(id){ return document.getElementById(id); }
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function toast(m){ const t=$('toast'); t.textContent=m; t.style.display='block'; setTimeout(()=>t.style.display='none',3000); }
+
+function renderTopics(){
+    $('topics').innerHTML = TOPICS.map((t,i)=>
+        `<button class="chip ${t===selectedTopic?'active':''}" onclick="pickTopic(${i})">${esc(t)}</button>`).join('');
+}
+function pickTopic(i){ selectedTopic = TOPICS[i]; $('customTopic').value=''; renderTopics(); }
+$('customTopic').addEventListener('input', function(){
+    if(this.value.trim()){ selectedTopic = this.value.trim(); document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); }
+});
+
+async function makeEpisode(){
+    stopPlay();
+    const btn=$('goBtn'); btn.disabled=true; btn.textContent='The panel is producing your episode...';
+    try{
+        const res = await fetch(`${API_URL}/api/podcast-script`, {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ topic: selectedTopic, minutes: Number($('length').value), language: $('lang').value })
+        });
+        if(!res.ok) throw new Error('server');
+        const data = await res.json();
+        episode = data.episode;
+        $('epTitle').textContent = episode.title || selectedTopic;
+        $('epDesc').textContent = episode.description || '';
+        $('transcript').innerHTML = (episode.turns||[]).map((t,i)=>
+            `<div class="turn ${t.host==='ALEX'?'a':'m'}" id="turn${i}">
+                <div class="who">${esc(t.host)}</div>
+                <div class="tx">${esc(t.text)}</div>
+            </div>`).join('');
+        $('episode').style.display='block';
+        $('nowPlaying').textContent = 'Ready — press play to listen';
+        $('progress').style.width = '0';
+        turnIdx = 0;
+        $('episode').scrollIntoView({behavior:'smooth', block:'start'});
+        toast('Episode produced');
+    }catch(e){
+        toast('Server waking up (free hosting) — try again in ~1 minute');
+    }finally{
+        btn.disabled=false; btn.textContent='Produce This Episode';
+    }
+}
+
+// ===== Playback: two distinct browser voices (free, instant) =====
+let voiceA=null, voiceM=null;
+function pickVoices(){
+    const vs = speechSynthesis.getVoices().filter(v=>v.lang.startsWith($('lang').value==='es'?'es':'en'));
+    if(!vs.length) return;
+    voiceA = vs.find(v=>/male|david|guy|daniel|diego|jorge/i.test(v.name)) || vs[0];
+    voiceM = vs.find(v=>v!==voiceA && /female|zira|jenny|samantha|aria|paulina|sabina/i.test(v.name)) || vs.find(v=>v!==voiceA) || vs[0];
+}
+speechSynthesis.onvoiceschanged = pickVoices;
+pickVoices();
+
+function speakTurn(i){
+    if(!episode || i >= episode.turns.length){ stopPlay(); $('nowPlaying').textContent='Episode complete'; $('progress').style.width='100%'; return; }
+    turnIdx = i;
+    const t = episode.turns[i];
+    document.querySelectorAll('.turn').forEach(el=>el.classList.remove('current'));
+    const el = $('turn'+i);
+    if(el){ el.classList.add('current'); el.scrollIntoView({behavior:'smooth', block:'center'}); }
+    $('nowPlaying').textContent = `Now speaking: ${t.host}`;
+    $('progress').style.width = Math.round(i/episode.turns.length*100)+'%';
+    utter = new SpeechSynthesisUtterance(t.text);
+    utter.voice = t.host==='ALEX' ? voiceA : voiceM;
+    utter.rate = 1.04; utter.pitch = t.host==='ALEX' ? 0.95 : 1.05;
+    utter.onend = ()=>{ if(playing) speakTurn(i+1); };
+    speechSynthesis.speak(utter);
+}
+function togglePlay(){
+    if(!episode) return;
+    if(playing){
+        playing=false; speechSynthesis.pause();
+        $('playIcon').innerHTML='<path d="M8 5v14l11-7z"/>';
+        $('nowPlaying').textContent='Paused';
+    } else {
+        playing=true;
+        $('playIcon').innerHTML='<path d="M6 4h4v16H6zM14 4h4v16h-4z"/>';
+        if(speechSynthesis.paused){ speechSynthesis.resume(); $('nowPlaying').textContent='Now speaking: '+(episode.turns[turnIdx]||{}).host; }
+        else { pickVoices(); speechSynthesis.cancel(); speakTurn(turnIdx); }
+    }
+}
+function stopPlay(){
+    playing=false; turnIdx=0;
+    try{ speechSynthesis.cancel(); }catch(e){}
+    $('playIcon').innerHTML='<path d="M8 5v14l11-7z"/>';
+    document.querySelectorAll('.turn').forEach(el=>el.classList.remove('current'));
+}
+
+// ===== Downloads + NotebookLM handoff =====
+function dl(name, text){
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([text],{type:'text/markdown'}));
+    a.download=name; a.click();
+}
+function slug(){ return ($('epTitle').textContent||'episode').replace(/[^a-z0-9]+/gi,'_').slice(0,60); }
+function downloadTranscript(){
+    if(!episode) return;
+    const txt = `# ${episode.title}\n\n${episode.description}\n\n` +
+        episode.turns.map(t=>`**${t.host}:** ${t.text}`).join('\n\n');
+    dl(slug()+'_transcript.md', txt);
+}
+function downloadSource(){
+    if(!episode) return;
+    dl(slug()+'_notebooklm_source.md', episode.source_doc || '');
+    toast('Source doc downloaded');
+}
+function sendToNotebookLM(){
+    if(!episode) return;
+    downloadSource();
+    window.open('https://notebooklm.google.com/', '_blank');
+    toast('NotebookLM opened - create a notebook, add the downloaded file, press Audio Overview');
+}
+
+renderTopics();
+</script>
+</body>
+</html>

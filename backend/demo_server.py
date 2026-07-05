@@ -320,6 +320,70 @@ def analyze_image_with_groq(file_path: str, query: Optional[str], file_name: str
         return None
 
 
+@app.post("/api/podcast-script")
+async def podcast_script(data: dict):
+    """Podcast Studio: pick a topic -> a two-host NotebookLM-style deep-dive episode
+    script grounded in the researched advisor library, plus a source document
+    formatted for NotebookLM upload (Audio Overview handoff)."""
+    topic = (data.get("topic") or "real estate success habits").strip()[:200]
+    minutes = int(data.get("minutes") or 6)
+    language = data.get("language", "en")
+
+    kb_extra = retrieve_kb_sections(topic, max_chars=6000, max_files=4)
+    lang_rule = ("Write the dialogue in natural US-Latino professional Spanish."
+                 if language == "es" else "Write the dialogue in English.")
+
+    prompt = f"""Create a two-host podcast episode about: {topic}
+
+The show is "The Roundtable Sessions" - a sharp, warm real estate coaching podcast for agents.
+Host ALEX (curious, asks the questions agents are thinking, summarizes takeaways).
+Host MORGAN (the expert voice - draws on the research below, gives frameworks, numbers, and word-for-word scripts).
+
+RESEARCH LIBRARY (ground every claim here when relevant - use the real numbers, formulas, and named frameworks):
+{kb_extra if kb_extra else '(no library match - use solid general real estate coaching knowledge, no invented statistics)'}
+
+Rules: ~{minutes} minutes of audio (~{minutes * 140} words). Banter like NotebookLM's audio overviews -
+natural interruptions, "right", "exactly", short reactions - but ALWAYS substantive. Open with a hook,
+close with 3 actionable takeaways. {lang_rule}
+
+Respond ONLY with JSON:
+{{"title": "punchy episode title",
+"description": "2-sentence episode description",
+"turns": [{{"host": "ALEX", "text": "..."}}, {{"host": "MORGAN", "text": "..."}}]}}"""
+
+    try:
+        client = _groq_client()
+        if client is None:
+            raise RuntimeError("no client")
+        r = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=3000,
+            temperature=0.85,
+            response_format={"type": "json_object"},
+        )
+        import json as _json
+        ep = _json.loads(r.choices[0].message.content)
+
+        # NotebookLM source document: the deep-dive doc an agent can upload for an Audio Overview
+        doc_lines = [f"# {ep.get('title', topic)}", "",
+                     f"Topic: {topic}", "",
+                     ep.get("description", ""), "",
+                     "## Episode transcript", ""]
+        for t in ep.get("turns", []):
+            doc_lines.append(f"**{t.get('host', 'HOST')}:** {t.get('text', '')}")
+            doc_lines.append("")
+        if kb_extra:
+            doc_lines += ["## Source research (from The Roundtable advisor library)", "", kb_extra]
+        ep["source_doc"] = "\n".join(doc_lines)
+        return {"status": "success", "episode": ep}
+    except Exception as e:
+        print(f"podcast-script error: {e}")
+        return JSONResponse(status_code=503, content={
+            "status": "error",
+            "message": "The panel is waking up - try again in about a minute."})
+
+
 @app.post("/api/parse-listing")
 async def parse_listing_endpoint(data: dict):
     """Flyer Studio importer: paste a Zillow / Redfin / Realtor / MLS link ->
