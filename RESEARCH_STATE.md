@@ -23,8 +23,8 @@ Update after EVERY advisor. Trust this file over memory.
 - [x] serhant (Ryan Serhant) — kb/serhant.md written, dossier folded — WAVE 3 RESEARCH COMPLETE
 
 ## Wave 4 — Coaching & Business
-- [ ] ferry (Tom Ferry)
-- [ ] buffini (Brian Buffini)
+- [x] ferry (Tom Ferry) — kb/ferry.md written, dossier folded (8x8/33-touch misattribution corrected)
+- [~] buffini (Brian Buffini) — next: searches
 - [ ] keller (Gary Keller)
 - [ ] sharran (Sharran Srivatsaa)
 
