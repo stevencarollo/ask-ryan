@@ -106,45 +106,17 @@ async def _run_async(job_id, title, source_doc, language):
         nb_id = getattr(nb, "id", None) or getattr(nb, "notebook_id", None) or str(nb)
         try:
             _set(job_id, step="Adding the episode source document...")
-            sources = client.sources
-            added = False
-            for meth, args in (("add_text", (nb_id, source_doc)),):
-                fn = getattr(sources, meth, None)
-                if fn:
-                    try:
-                        await fn(*args, title=f"{title} - source")
-                    except TypeError:
-                        await fn(*args)
-                    added = True
-                    break
-            if not added:
-                # fallback: write a temp .md and add as file
-                tmp = os.path.join(tempfile.gettempdir(), f"nlm_src_{job_id}.md")
-                with open(tmp, "w", encoding="utf-8") as f:
-                    f.write(source_doc)
-                fn = getattr(sources, "add_file", None)
-                if not fn:
-                    raise RuntimeError("notebooklm-py: no source-add method found")
-                await fn(nb_id, tmp)
+            # verified signature: add_text(notebook_id, title, content, *, wait=...)
+            await client.sources.add_text(nb_id, f"{title} - source", source_doc,
+                                          wait=True, wait_timeout=120.0)
 
             _set(job_id, step="Generating the Audio Overview (Google usually takes 2-5 minutes)...")
-            artifacts = client.artifacts
-            gen = getattr(artifacts, "generate_audio", None)
-            if gen is None:
-                raise RuntimeError("notebooklm-py: generate_audio not available")
-            kwargs = {}
-            if language and language != "en":
-                kwargs["language"] = language
-            try:
-                await gen(nb_id, **kwargs)
-            except TypeError:
-                await gen(nb_id)
+            # verified signature: generate_audio(notebook_id, source_ids=None, language='en', instructions=None, ...)
+            await client.artifacts.generate_audio(nb_id, language=(language or "en"))
 
             # Poll for completion + download
             out = os.path.join(tempfile.gettempdir(), f"nlm_audio_{job_id}.mp3")
-            dl = getattr(artifacts, "download_audio", None)
-            if dl is None:
-                raise RuntimeError("notebooklm-py: download_audio not available")
+            dl = client.artifacts.download_audio
             deadline = time.time() + 15 * 60
             last_err = None
             while time.time() < deadline:
