@@ -320,6 +320,65 @@ def analyze_image_with_groq(file_path: str, query: Optional[str], file_name: str
         return None
 
 
+@app.post("/api/flyer-copy")
+async def flyer_copy(data: dict):
+    """Flyer Studio copy engine: property facts in -> polished marketing copy out.
+    Uses the marketing-weighted panel (Serhant lifestyle-selling, Glennda storytelling,
+    Pantana hooks, Eisen aspiration). Returns strict JSON for the studio to fill."""
+    prop = data.get("property", {})
+    language = data.get("language", "en")  # en | es | both
+    tone = data.get("tone", "luxury")
+
+    facts = "\n".join(f"- {k}: {v}" for k, v in prop.items() if v)
+    lang_rule = {
+        "en": "Write everything in English.",
+        "es": "Write everything in natural US-Latino professional Spanish.",
+        "both": "Write every field in English, then add the same fields with '_es' suffix in natural US-Latino professional Spanish.",
+    }.get(language, "Write everything in English.")
+
+    prompt = f"""You are the marketing panel of The Roundtable (lifestyle-selling, hook-first, story-driven, aspirational staging language). Write flyer copy for this property:
+
+{facts}
+
+Tone: {tone}. {lang_rule}
+
+Respond with ONLY a JSON object (no markdown, no commentary) with exactly these keys:
+{{"headline": "5-8 word emotional hook - sell the lifestyle, not square footage",
+"subhead": "one elegant supporting line",
+"description": "2-3 flyer-length sentences that make a buyer feel the life they'd live here; end with a soft call to action",
+"features": ["4-6 short punchy feature bullets"],
+"ig_caption": "an Instagram caption with a hook first line, 2-3 short lines, and 5 relevant hashtags",
+"email_subject": "an email subject line under 9 words",
+"email_body": "a 3-4 sentence email blast to a buyer database about this listing"}}"""
+
+    try:
+        client = _groq_client()
+        if client is None:
+            raise RuntimeError("no client")
+        r = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=900,
+            temperature=0.8,
+            response_format={"type": "json_object"},
+        )
+        import json as _json
+        copy = _json.loads(r.choices[0].message.content)
+        return {"status": "success", "copy": copy}
+    except Exception as e:
+        print(f"flyer-copy error: {e}")
+        addr = prop.get("address", "This home")
+        return {"status": "fallback", "copy": {
+            "headline": f"Welcome Home to {addr}",
+            "subhead": "A rare opportunity in a coveted neighborhood",
+            "description": "Beautifully presented and move-in ready, this home blends comfort with effortless style. Schedule your private showing today.",
+            "features": ["Move-in ready", "Coveted location", "Bright open layout", "Private outdoor space"],
+            "ig_caption": f"Just listed: {addr}. DM for a private tour. #justlisted #realestate #dreamhome #newlisting #househunting",
+            "email_subject": f"New Listing: {addr}",
+            "email_body": f"I just listed {addr} and thought of you. Homes like this rarely last. Reply for a private showing before it hits the broader market.",
+        }}
+
+
 @app.get("/api/experts")
 async def list_experts():
     """The full advisor panel available for selection"""

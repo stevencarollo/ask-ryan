@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flyer Studio — The Roundtable</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#C9A85C;--gold-bright:#E5C87E;--ink:#0B0B0D;--charcoal:#131316;--line:rgba(201,168,92,.25);--ivory:#F5F1E8;--muted:#8E887B;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:radial-gradient(ellipse 70% 50% at 50% -10%,rgba(201,168,92,.14),transparent 60%),var(--ink);color:var(--ivory);min-height:100vh}
+button{cursor:pointer;font-family:'Inter',sans-serif}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--gold-bright);outline-offset:2px}
+
+nav.topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px clamp(14px,3vw,28px);border-bottom:1px solid var(--line);background:rgba(11,11,13,.85);backdrop-filter:blur(14px);position:sticky;top:0;z-index:40}
+.nav-left{display:flex;align-items:center;gap:14px}
+.back-link{display:inline-flex;align-items:center;gap:7px;color:var(--muted);text-decoration:none;font-size:.8em;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:8px 12px;border:1px solid var(--line);border-radius:4px;transition:all .2s}
+.back-link:hover{color:var(--ink);background:var(--gold);border-color:var(--gold)}
+.back-link svg{width:15px;height:15px;stroke:currentColor}
+.brand-mini{display:flex;align-items:center;gap:9px;text-decoration:none}
+.brand-mini span{font-family:'Cinzel',serif;font-size:1.02em;font-weight:600;letter-spacing:.1em;color:var(--gold);text-transform:uppercase}
+.nav-btn{padding:8px 14px;font-size:.76em;font-weight:600;letter-spacing:.08em;text-transform:uppercase;background:transparent;color:var(--gold);border:1px solid var(--line);border-radius:4px;transition:all .2s;text-decoration:none;display:inline-block}
+.nav-btn:hover{background:var(--gold);color:var(--ink)}
+@media(max-width:720px){.brand-mini span{display:none}}
+
+.studio{display:grid;grid-template-columns:minmax(330px,430px) 1fr;gap:0;min-height:calc(100vh - 61px)}
+@media(max-width:980px){.studio{grid-template-columns:1fr}}
+
+/* ===== Controls column ===== */
+.controls{border-right:1px solid var(--line);padding:20px 20px 60px;overflow-y:auto;max-height:calc(100vh - 61px)}
+@media(max-width:980px){.controls{max-height:none;border-right:none;border-bottom:1px solid var(--line)}}
+.sec{margin-bottom:22px}
+.sec h3{font-size:.72em;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.tpl-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tpl{border:2px solid var(--line);border-radius:6px;padding:9px 4px;text-align:center;background:var(--charcoal);color:var(--muted);font-size:.68em;font-weight:600;transition:all .2s;line-height:1.3}
+.tpl .sw{height:26px;border-radius:3px;margin-bottom:6px}
+.tpl.active{border-color:var(--gold);color:var(--gold-bright)}
+.tpl:hover{border-color:var(--gold)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+label.f{display:block;margin-bottom:8px;font-size:.72em;color:var(--muted);font-weight:600;letter-spacing:.04em}
+label.f input,label.f textarea,label.f select{display:block;width:100%;margin-top:4px;padding:9px 11px;background:var(--charcoal);border:1px solid var(--line);border-radius:4px;color:var(--ivory);font-family:'Inter',sans-serif;font-size:.92rem}
+label.f textarea{resize:vertical;min-height:64px}
+.photos{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.ph{aspect-ratio:1;border:1.5px dashed var(--line);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:1.4em;background:var(--charcoal);background-size:cover;background-position:center;position:relative;transition:border-color .2s}
+.ph:hover{border-color:var(--gold)}
+.ph .x{position:absolute;top:2px;right:5px;color:#fff;text-shadow:0 1px 3px #000;font-size:.7em;display:none}
+.ph.filled .x{display:block}
+.ph.filled span.plus{display:none}
+.hint{font-size:.68em;color:var(--muted);margin-top:6px;line-height:1.5}
+.ai-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--gold) 0%,#B8964A 100%);color:var(--ink);border:none;border-radius:5px;font-weight:700;font-size:.82em;letter-spacing:.1em;text-transform:uppercase;transition:all .2s}
+.ai-btn:hover:not(:disabled){background:var(--gold-bright)}
+.ai-btn:disabled{opacity:.55;cursor:wait}
+.ghost-btn{width:100%;padding:11px;background:transparent;color:var(--gold);border:1px solid var(--line);border-radius:5px;font-weight:600;font-size:.78em;letter-spacing:.08em;text-transform:uppercase;transition:all .2s;margin-top:8px}
+.ghost-btn:hover{background:rgba(201,168,92,.12);border-color:var(--gold)}
+.copyrow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+
+/* ===== Preview column ===== */
+.preview-wrap{padding:24px;display:flex;flex-direction:column;align-items:center;gap:14px;overflow-y:auto;max-height:calc(100vh - 61px)}
+@media(max-width:980px){.preview-wrap{max-height:none}}
+.actions{display:flex;gap:9px;flex-wrap:wrap;justify-content:center}
+.sheet-scale{width:min(100%,640px)}
+#sheetHolder{width:100%;aspect-ratio:8.5/11;box-shadow:0 24px 80px rgba(0,0,0,.5);border-radius:2px;overflow:hidden;background:#fff}
+#sheet{width:850px;height:1100px;transform-origin:top left;background:#fff}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--charcoal);border:1px solid var(--gold);color:var(--gold-bright);padding:10px 22px;border-radius:6px;font-size:.82em;display:none;z-index:60}
+</style>
+</head>
+<body>
+<nav class="topbar">
+    <div class="nav-left">
+        <a href="/" class="back-link"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>Dashboard</a>
+        <a href="/" class="brand-mini"><span>The Roundtable</span></a>
+    </div>
+    <div class="nav-right" style="display:flex;gap:9px;align-items:center">
+        <a class="nav-btn" href="/frontend.html">Coaching Chat</a>
+    </div>
+</nav>
+
+<div class="studio">
+    <!-- ============ CONTROLS ============ -->
+    <div class="controls">
+        <div class="sec">
+            <h3>Template</h3>
+            <div class="tpl-grid" id="tplGrid"></div>
+        </div>
+
+        <div class="sec">
+            <h3>Flyer Type</h3>
+            <div class="row">
+                <label class="f">Banner
+                    <select id="banner">
+                        <option value="JUST LISTED">Just Listed</option>
+                        <option value="OPEN HOUSE">Open House</option>
+                        <option value="COMING SOON">Coming Soon</option>
+                        <option value="JUST SOLD">Just Sold</option>
+                        <option value="FOR LEASE">For Lease</option>
+                        <option value="PRICE IMPROVED">Price Improved</option>
+                    </select>
+                </label>
+                <label class="f">Open house date/time <input id="ohWhen" placeholder="Sat &amp; Sun 1-4 PM"></label>
+            </div>
+        </div>
+
+        <div class="sec">
+            <h3>Property</h3>
+            <label class="f">Address <input id="addr" placeholder="24923 Island Ave"></label>
+            <div class="row">
+                <label class="f">City / area <input id="city" placeholder="Carson, CA 90745"></label>
+                <label class="f">Price <input id="price" placeholder="$725,000"></label>
+            </div>
+            <div class="row3">
+                <label class="f">Beds <input id="beds" placeholder="4"></label>
+                <label class="f">Baths <input id="baths" placeholder="3"></label>
+                <label class="f">Sq Ft <input id="sqft" placeholder="1,708"></label>
+            </div>
+            <label class="f">Feature notes for the AI (what makes it special?)
+                <textarea id="notes" placeholder="corner lot, remodeled kitchen, ADU potential, near schools..."></textarea>
+            </label>
+        </div>
+
+        <div class="sec">
+            <h3>Photos (tap to add)</h3>
+            <div class="photos" id="photos"></div>
+            <div class="hint">First photo = hero. Photos embed into the downloaded flyer file. Landscape photos work best.</div>
+        </div>
+
+        <div class="sec">
+            <h3>AI Copy</h3>
+            <div class="row">
+                <label class="f">Tone
+                    <select id="tone"><option value="luxury">Luxury</option><option value="warm family">Warm &amp; Family</option><option value="bold urgent">Bold &amp; Urgent</option><option value="investor numbers-first">Investor</option></select>
+                </label>
+                <label class="f">Language
+                    <select id="lang"><option value="en">English</option><option value="es">Español</option></select>
+                </label>
+            </div>
+            <button class="ai-btn" id="aiBtn" onclick="writeCopy()">Write My Copy With The Panel</button>
+            <label class="f" style="margin-top:10px">Headline <input id="headline" placeholder="Your Coastal-Modern Sanctuary Awaits"></label>
+            <label class="f">Subhead <input id="subhead" placeholder="A rare corner-lot offering in the heart of Carson"></label>
+            <label class="f">Description <textarea id="desc"></textarea></label>
+            <label class="f">Feature bullets (one per line) <textarea id="feats"></textarea></label>
+            <div class="copyrow">
+                <button class="ghost-btn" onclick="copyExtra('ig')">Copy IG Caption</button>
+                <button class="ghost-btn" onclick="copyExtra('email')">Copy Email Blast</button>
+            </div>
+        </div>
+
+        <div class="sec">
+            <h3>Agent</h3>
+            <div class="row">
+                <label class="f">Name <input id="aName" placeholder="Steve Carollo"></label>
+                <label class="f">Phone <input id="aPhone" placeholder="(310) 555-0123"></label>
+            </div>
+            <div class="row">
+                <label class="f">Email <input id="aEmail" placeholder="you@brokerage.com"></label>
+                <label class="f">Brokerage / DRE <input id="aBrok" placeholder="Brokerage · DRE #01234567"></label>
+            </div>
+            <label class="f">Headshot / logo (optional)
+                <input type="file" id="aPhoto" accept=".jpg,.jpeg,.png,.webp">
+            </label>
+        </div>
+    </div>
+
+    <!-- ============ PREVIEW ============ -->
+    <div class="preview-wrap">
+        <div class="actions">
+            <button class="ai-btn" style="width:auto;padding:11px 26px" onclick="printFlyer()">Print / Save PDF</button>
+            <button class="ghost-btn" style="width:auto;margin-top:0;padding:11px 22px" onclick="downloadFlyer()">Download Flyer (HTML)</button>
+        </div>
+        <div class="sheet-scale">
+            <div id="sheetHolder"><div id="sheet"></div></div>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<input type="file" id="photoInput" accept=".jpg,.jpeg,.png,.webp" style="display:none">
+
+<script>
+const API_URL = 'https://ask-ryan-nb3w.onrender.com';
+
+// ===== State =====
+const state = {
+    template: 'luxury',
+    photos: [null, null, null, null],
+    agentPhoto: null,
+    ig: '', email_subject: '', email_body: ''
+};
+let photoSlot = 0;
+
+const TEMPLATES = [
+    { id: 'luxury',  name: 'Luxury Gold',  sw: 'linear-gradient(135deg,#0B0B0D 60%,#C9A85C)' },
+    { id: 'onyx',    name: 'Onyx Mono',    sw: 'linear-gradient(135deg,#111 60%,#444)' },
+    { id: 'bold',    name: 'Bold Banner',  sw: 'linear-gradient(135deg,#fff 55%,#C0392B)' },
+    { id: 'coastal', name: 'Fresh Modern', sw: 'linear-gradient(135deg,#F7F5F0 55%,#2E6E8E)' },
+];
+
+// ===== Helpers =====
+function $(id){ return document.getElementById(id); }
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function toast(msg){ const t=$('toast'); t.textContent=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',2500); }
+function val(id, fallback){ return $(id).value.trim() || fallback; }
+
+function renderTplGrid(){
+    $('tplGrid').innerHTML = TEMPLATES.map(t =>
+        `<button type="button" class="tpl ${state.template===t.id?'active':''}" onclick="setTpl('${t.id}')">
+            <div class="sw" style="background:${t.sw}"></div>${t.name}</button>`).join('');
+}
+function setTpl(id){ state.template=id; renderTplGrid(); render(); }
+
+// ===== Photos =====
+function renderPhotos(){
+    $('photos').innerHTML = state.photos.map((p,i)=>
+        `<div class="ph ${p?'filled':''}" style="${p?`background-image:url(${p})`:''}" onclick="pickPhoto(${i})">
+            <span class="plus">+</span><span class="x" onclick="event.stopPropagation();removePhoto(${i})">&#10005;</span></div>`).join('');
+}
+function pickPhoto(i){ photoSlot=i; $('photoInput').click(); }
+function removePhoto(i){ state.photos[i]=null; renderPhotos(); render(); }
+$('photoInput').addEventListener('change', function(){
+    const f=this.files[0]; if(!f) return;
+    const r=new FileReader();
+    r.onload=e=>{ downscale(e.target.result, 1400, d=>{ state.photos[photoSlot]=d; renderPhotos(); render(); }); };
+    r.readAsDataURL(f); this.value='';
+});
+$('aPhoto').addEventListener('change', function(){
+    const f=this.files[0]; if(!f){state.agentPhoto=null;render();return;}
+    const r=new FileReader();
+    r.onload=e=>{ downscale(e.target.result, 400, d=>{ state.agentPhoto=d; render(); }); };
+    r.readAsDataURL(f);
+});
+function downscale(dataUrl, maxW, cb){
+    const img=new Image();
+    img.onload=()=>{ const s=Math.min(1,maxW/img.width);
+        const c=document.createElement('canvas'); c.width=img.width*s; c.height=img.height*s;
+        c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+        cb(c.toDataURL('image/jpeg',0.82)); };
+    img.src=dataUrl;
+}
+
+// ===== AI copy =====
+async function writeCopy(){
+    const btn=$('aiBtn'); btn.disabled=true; btn.textContent='The panel is writing...';
+    try{
+        const res=await fetch(`${API_URL}/api/flyer-copy`,{method:'POST',headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({language:$('lang').value,tone:$('tone').value,property:{
+                address:val('addr',''),city:val('city',''),price:val('price',''),
+                beds:val('beds',''),baths:val('baths',''),sqft:val('sqft',''),
+                banner:$('banner').value,notes:val('notes','')}})});
+        const data=await res.json();
+        const c=data.copy||{};
+        if(c.headline)$('headline').value=c.headline;
+        if(c.subhead)$('subhead').value=c.subhead;
+        if(c.description)$('desc').value=c.description;
+        if(Array.isArray(c.features))$('feats').value=c.features.join('\n');
+        state.ig=c.ig_caption||''; state.email_subject=c.email_subject||''; state.email_body=c.email_body||'';
+        render(); toast(data.status==='success'?'Panel copy written':'Copy written (fallback mode)');
+    }catch(e){ toast('Server waking up - try again in ~1 minute'); }
+    finally{ btn.disabled=false; btn.textContent='Write My Copy With The Panel'; }
+}
+function copyExtra(kind){
+    const txt = kind==='ig' ? state.ig : (state.email_subject? 'Subject: '+state.email_subject+'\n\n' : '') + state.email_body;
+    if(!txt.trim()){ toast('Generate the copy first'); return; }
+    navigator.clipboard.writeText(txt); toast(kind==='ig'?'Instagram caption copied':'Email blast copied');
+}
+
+// ===== Flyer data snapshot =====
+function flyerData(){
+    return {
+        banner: $('banner').value,
+        ohWhen: val('ohWhen',''),
+        addr: val('addr','123 Main Street'),
+        city: val('city','Los Angeles, CA'),
+        price: val('price','$000,000'),
+        beds: val('beds','—'), baths: val('baths','—'), sqft: val('sqft','—'),
+        headline: val('headline','A Home Worth Falling For'),
+        subhead: val('subhead',''),
+        desc: val('desc','Beautifully presented and move-in ready. Schedule your private tour today.'),
+        feats: $('feats').value.split('\n').map(s=>s.trim()).filter(Boolean).slice(0,6),
+        aName: val('aName','Your Name'), aPhone: val('aPhone',''), aEmail: val('aEmail',''), aBrok: val('aBrok',''),
+        photos: state.photos.filter(Boolean),
+        agentPhoto: state.agentPhoto
+    };
+}
+
+// ===== Templates (850x1100 = 8.5x11) =====
+function ph(url, css){ return url ? `background-image:url(${url});background-size:cover;background-position:center;${css||''}` : `background:linear-gradient(135deg,#2a2a2e,#3a3a40);${css||''}`; }
+
+function agentBar(d, dark){
+    const fg = dark ? '#F5F1E8' : '#17150F';
+    const sub = dark ? 'rgba(245,241,232,.7)' : '#5B564B';
+    return `<div style="display:flex;align-items:center;gap:16px;">
+        ${d.agentPhoto?`<div style="width:64px;height:64px;border-radius:50%;flex:0 0 auto;border:2px solid #C9A85C;${ph(d.agentPhoto)}"></div>`:''}
+        <div style="flex:1">
+            <div style="font-weight:700;font-size:19px;color:${fg};letter-spacing:.02em">${esc(d.aName)}</div>
+            <div style="font-size:14px;color:${sub};margin-top:2px">${esc([d.aPhone,d.aEmail].filter(Boolean).join(' · '))}</div>
+            <div style="font-size:12px;color:${sub}">${esc(d.aBrok)}</div>
+        </div>
+        <div style="text-align:right;font-family:Cinzel,serif;color:#C9A85C;font-size:13px;letter-spacing:.18em">SCHEDULE A<br>PRIVATE TOUR</div>
+    </div>`;
+}
+function statRow(d, color, border){
+    const s = (n,l)=>`<div style="text-align:center;padding:0 26px;${border?'border-right:1px solid '+border:''}"><div style="font-size:30px;font-weight:700;color:${color}">${esc(n)}</div><div style="font-size:11px;letter-spacing:.2em;color:${color};opacity:.65">${l}</div></div>`;
+    return `<div style="display:flex;justify-content:center">${s(d.beds,'BEDS')}${s(d.baths,'BATHS')}<div style="text-align:center;padding:0 26px"><div style="font-size:30px;font-weight:700;color:${color}">${esc(d.sqft)}</div><div style="font-size:11px;letter-spacing:.2em;color:${color};opacity:.65">SQ FT</div></div></div>`;
+}
+function thumbs(d, h){
+    if(d.photos.length<2) return '';
+    const t=d.photos.slice(1,4);
+    return `<div style="display:grid;grid-template-columns:repeat(${t.length},1fr);gap:10px;height:${h}px">${t.map(p=>`<div style="${ph(p)};border-radius:2px"></div>`).join('')}</div>`;
+}
+function bannerText(d){ return d.banner + (d.banner==='OPEN HOUSE' && d.ohWhen ? ' · '+esc(d.ohWhen) : ''); }
+
+const RENDER = {
+luxury(d){ return `
+<div style="width:850px;height:1100px;background:#0B0B0D;font-family:Inter,sans-serif;display:flex;flex-direction:column;overflow:hidden">
+  <div style="height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 44px;border-bottom:1px solid rgba(201,168,92,.35)">
+    <span style="font-family:Cinzel,serif;color:#C9A85C;letter-spacing:.24em;font-size:14px">${bannerText(d)}</span>
+    <span style="color:#8E887B;font-size:12px;letter-spacing:.14em">${esc(d.city).toUpperCase()}</span>
+  </div>
+  <div style="height:472px;margin:22px 44px 0;${ph(d.photos[0])};border:1px solid rgba(201,168,92,.35)"></div>
+  <div style="padding:26px 44px 0;text-align:center">
+    <div style="font-family:'Playfair Display',serif;font-size:40px;color:#F5F1E8;line-height:1.15">${esc(d.headline)}</div>
+    ${d.subhead?`<div style="color:#C9A85C;font-size:16px;margin-top:8px;font-style:italic;font-family:'Playfair Display',serif">${esc(d.subhead)}</div>`:''}
+    <div style="width:70px;height:1px;background:#C9A85C;margin:16px auto"></div>
+    <div style="font-family:Cinzel,serif;color:#E5C87E;font-size:30px;letter-spacing:.04em">${esc(d.price)} <span style="font-size:16px;color:#8E887B">· ${esc(d.addr)}</span></div>
+  </div>
+  <div style="margin:18px 0 0">${statRow(d,'#F5F1E8','rgba(201,168,92,.3)')}</div>
+  <div style="padding:16px 70px 0;color:#C9C4B8;font-size:15px;line-height:1.75;text-align:center">${esc(d.desc)}</div>
+  <div style="padding:16px 44px 0">${thumbs(d,120)}</div>
+  <div style="margin-top:auto;padding:18px 44px 26px;border-top:1px solid rgba(201,168,92,.35)">${agentBar(d,true)}</div>
+</div>`; },
+
+onyx(d){ return `
+<div style="width:850px;height:1100px;background:#101012;font-family:Inter,sans-serif;display:flex;flex-direction:column;overflow:hidden">
+  <div style="height:600px;position:relative;${ph(d.photos[0])}">
+    <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(16,16,18,.15) 40%,rgba(16,16,18,.96) 96%)"></div>
+    <div style="position:absolute;top:34px;left:44px;font-size:12px;letter-spacing:.3em;color:#fff;background:rgba(0,0,0,.45);padding:9px 18px;border:1px solid rgba(255,255,255,.4)">${bannerText(d)}</div>
+    <div style="position:absolute;left:44px;right:44px;bottom:28px">
+      <div style="font-family:'Playfair Display',serif;font-size:46px;color:#fff;line-height:1.12">${esc(d.headline)}</div>
+      <div style="color:rgba(255,255,255,.75);font-size:17px;margin-top:8px">${esc(d.addr)} · ${esc(d.city)}</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:22px 44px;border-bottom:1px solid #2b2b30">
+    <div style="font-size:36px;font-weight:800;color:#fff">${esc(d.price)}</div>${statRow(d,'#fff','#2b2b30')}
+  </div>
+  <div style="display:flex;gap:34px;padding:24px 44px 0">
+    <div style="flex:1.3;color:#b9b9bd;font-size:15px;line-height:1.8">${esc(d.desc)}</div>
+    <div style="flex:1">${d.feats.map(f=>`<div style="color:#e8e8ea;font-size:14px;padding:7px 0;border-bottom:1px solid #232327">— ${esc(f)}</div>`).join('')}</div>
+  </div>
+  <div style="padding:16px 44px 0">${thumbs(d,110)}</div>
+  <div style="margin-top:auto;padding:18px 44px 26px;background:#0a0a0c">${agentBar(d,true)}</div>
+</div>`; },
+
+bold(d){ return `
+<div style="width:850px;height:1100px;background:#fff;font-family:Inter,sans-serif;display:flex;flex-direction:column;overflow:hidden">
+  <div style="background:#C0392B;color:#fff;text-align:center;padding:20px;font-weight:800;font-size:34px;letter-spacing:.14em">${bannerText(d)}</div>
+  <div style="height:450px;${ph(d.photos[0])}"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:22px 44px;background:#17150F">
+    <div><div style="color:#fff;font-size:26px;font-weight:800">${esc(d.addr)}</div><div style="color:rgba(255,255,255,.65);font-size:15px">${esc(d.city)}</div></div>
+    <div style="color:#fff;font-size:40px;font-weight:800">${esc(d.price)}</div>
+  </div>
+  <div style="padding:20px 44px 0">
+    <div style="font-size:26px;font-weight:800;color:#17150F">${esc(d.headline)}</div>
+    <div style="color:#5B564B;font-size:15px;line-height:1.7;margin-top:8px">${esc(d.desc)}</div>
+  </div>
+  <div style="display:flex;gap:26px;padding:16px 44px 0;align-items:flex-start">
+    <div style="flex:1">${d.feats.map(f=>`<div style="font-size:14px;color:#17150F;padding:6px 0;font-weight:600">&#9642; ${esc(f)}</div>`).join('')}</div>
+    <div style="flex:1.1">${thumbs(d,150)}</div>
+  </div>
+  <div style="margin:14px 0 0">${statRow(d,'#17150F','#e5e0d5')}</div>
+  <div style="margin-top:auto;padding:16px 44px 24px;border-top:4px solid #C0392B">${agentBar(d,false)}</div>
+</div>`; },
+
+coastal(d){ return `
+<div style="width:850px;height:1100px;background:#F7F5F0;font-family:Inter,sans-serif;display:flex;flex-direction:column;overflow:hidden">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:26px 44px 14px">
+    <span style="font-size:12px;letter-spacing:.3em;color:#2E6E8E;font-weight:700">${bannerText(d)}</span>
+    <span style="font-size:13px;color:#8a857a">${esc(d.city)}</span>
+  </div>
+  <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:12px;padding:0 44px;height:430px">
+    <div style="${ph(d.photos[0])};border-radius:8px"></div>
+    <div style="display:grid;grid-template-rows:1fr 1fr;gap:12px">
+      <div style="${ph(d.photos[1])};border-radius:8px"></div>
+      <div style="${ph(d.photos[2])};border-radius:8px"></div>
+    </div>
+  </div>
+  <div style="padding:26px 44px 0">
+    <div style="font-family:'Playfair Display',serif;font-size:38px;color:#1e293b;line-height:1.15">${esc(d.headline)}</div>
+    ${d.subhead?`<div style="color:#2E6E8E;font-size:16px;margin-top:6px">${esc(d.subhead)}</div>`:''}
+    <div style="display:flex;align-items:baseline;gap:18px;margin-top:12px">
+      <span style="font-size:34px;font-weight:800;color:#2E6E8E">${esc(d.price)}</span>
+      <span style="font-size:16px;color:#5B564B">${esc(d.addr)}</span>
+    </div>
+    <div style="color:#5B564B;font-size:15px;line-height:1.75;margin-top:12px">${esc(d.desc)}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px">
+      ${d.feats.map(f=>`<span style="background:#fff;border:1px solid #d8d2c4;color:#374151;font-size:13px;padding:7px 14px;border-radius:20px">${esc(f)}</span>`).join('')}
+    </div>
+  </div>
+  <div style="margin:16px 0 0">${statRow(d,'#1e293b','#d8d2c4')}</div>
+  <div style="margin-top:auto;padding:16px 44px 24px;background:#fff;border-top:1px solid #e2ddd0">${agentBar(d,false)}</div>
+</div>`; }
+};
+
+// ===== Render / export =====
+function flyerHTML(){
+    const d = flyerData();
+    return RENDER[state.template](d);
+}
+function render(){
+    $('sheet').innerHTML = flyerHTML();
+    fitSheet();
+}
+function fitSheet(){
+    const holder=$('sheetHolder');
+    const scale=holder.clientWidth/850;
+    $('sheet').style.transform=`scale(${scale})`;
+}
+window.addEventListener('resize', fitSheet);
+
+function fullDoc(){
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${esc(val('addr','Flyer'))} - Flyer</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+<style>@page{size:letter;margin:0}body{margin:0}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style>
+</head><body>${flyerHTML()}</body></html>`;
+}
+function printFlyer(){
+    const w=window.open('','_blank');
+    w.document.write(fullDoc());
+    w.document.close();
+    setTimeout(()=>w.print(), 600);
+}
+function downloadFlyer(){
+    const blob=new Blob([fullDoc()],{type:'text/html'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=(val('addr','flyer').replace(/[^a-z0-9]+/gi,'_'))+'_flyer.html';
+    a.click();
+    toast('Flyer downloaded - open it and print to PDF');
+}
+
+// live updates
+['banner','ohWhen','addr','city','price','beds','baths','sqft','headline','subhead','desc','feats','aName','aPhone','aEmail','aBrok'].forEach(id=>{
+    $(id).addEventListener('input', render);
+    $(id).addEventListener('change', render);
+});
+
+renderTplGrid();
+renderPhotos();
+render();
+</script>
+</body>
+</html>
