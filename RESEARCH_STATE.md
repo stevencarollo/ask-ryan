@@ -36,8 +36,8 @@ Update after EVERY advisor. Trust this file over memory.
 - [x] tarek (Tarek El Moussa) — kb/tarek.md written, dossier folded — WAVE 5 RESEARCH COMPLETE
 
 ## Wave 6 — Commercial
-- [ ] knakal (Bob Knakal)
-- [ ] cauble (Tyler Cauble)
+- [x] knakal (Bob Knakal) — kb/knakal.md written, dossier folded
+- [~] cauble (Tyler Cauble) — next: searches
 - [ ] mcelroy (Ken McElroy)
 
 ## Wave 7 — Marketing & Media
