@@ -44,8 +44,8 @@ Update after EVERY advisor. Trust this file over memory.
 - [x] glennda (Glennda Baker) — kb/glennda.md written, dossier folded
 - [x] lazine (Byron Lazine) — kb/lazine.md written, dossier folded
 - [x] burgess (Jimmy Burgess) — kb/burgess.md written, dossier folded
-- [~] pantana (Jason Pantana) — next: searches
-- [ ] peitz (Chelsea Peitz)
+- [x] pantana (Jason Pantana) — kb/pantana.md written, dossier folded
+- [~] peitz (Chelsea Peitz) — next: searches
 
 ## Wave 8 — Design & Staging
 - [ ] eisen (Cheryl Eisen)
