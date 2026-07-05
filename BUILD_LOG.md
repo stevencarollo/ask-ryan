@@ -26,3 +26,12 @@ generate_response_with_groq; backend/kb/espanol_scripts.md (7 scripts EN+ES: col
 door knock, probate condolence, NOD urgency, listing opener + ITIN/DPA cultural notes).
 Gate: retrieval_gate.py - 4/4 unit retrievals OK; FULL 34-advisor panel probate test PASS (cites PC-10311
 formula from library despite style-only dossiers). Skill zip rebuilt (research library + scripts bundled).
+
+## 2026-07-04 — WAVE 3 COMPLETE: Prospecting & Scripts
+kb files: mulrenin (Reverse Selling book breakdown - ASP method, waterfall, seed plant), harris (7 P's,
+verbatim 5-question buyer prequal), carruthers (Zero to Diamond - NAME CORRECTED to Ricky Carruth,
+five-step process, 3%->18% mail+call math, FSBO free-help play), serhant (Sell It Like Serhant - Three F's,
+FKD, six reasons balls drop, Four W's, seven client stages, Wow Effect).
+Research correction shipped: Ricky Carruthers -> Ricky Carruth in KB + frontend UI.
+Skill zip rebuilt with 15 research files. Progress: 14 of 34 advisors research-backed.
+Next: Wave 4 (ferry, buffini, keller, sharran).
