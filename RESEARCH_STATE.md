@@ -29,8 +29,8 @@ Update after EVERY advisor. Trust this file over memory.
 - [x] sharran (Sharran Srivatsaa) — kb/sharran.md written, dossier folded (role updated: now Acquisition.com CEO/MP) — WAVE 4 RESEARCH COMPLETE
 
 ## Wave 5 — Negotiation & Investing
-- [ ] voss (Chris Voss)
-- [ ] norton (Jerry Norton)
+- [x] voss (Chris Voss) — kb/voss.md written, dossier folded (Ackerman percentages added)
+- [~] norton (Jerry Norton) — next: searches
 - [ ] morby (Pace Morby)
 - [ ] greene (David Greene)
 - [ ] tarek (Tarek El Moussa)
