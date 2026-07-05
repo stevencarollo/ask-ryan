@@ -41,8 +41,8 @@ Update after EVERY advisor. Trust this file over memory.
 - [x] mcelroy (Ken McElroy) — kb/mcelroy.md written, dossier folded — WAVE 6 RESEARCH COMPLETE
 
 ## Wave 7 — Marketing & Media
-- [~] glennda (Glennda Baker) — next: searches
-- [ ] lazine (Byron Lazine)
+- [x] glennda (Glennda Baker) — kb/glennda.md written, dossier folded
+- [~] lazine (Byron Lazine) — next: searches
 - [ ] burgess (Jimmy Burgess)
 - [ ] pantana (Jason Pantana)
 - [ ] peitz (Chelsea Peitz)
