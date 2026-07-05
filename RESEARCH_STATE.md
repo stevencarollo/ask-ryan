@@ -57,5 +57,5 @@ Update after EVERY advisor. Trust this file over memory.
 - [x] espanol_scripts.md — 7 bilingual scripts + cultural/lending notes, wired into retrieval
 
 ## Ship steps
-- [ ] Regenerate roundtable-skill.zip with enriched dossiers + scripts.md
-- [ ] Final BUILD_LOG.md summary
+- [x] Skill zip regenerated with ALL 35 research files (34 advisors + espanol_scripts)
+- [x] Final BUILD_LOG.md summary written — PROGRAM COMPLETE

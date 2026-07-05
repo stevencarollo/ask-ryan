@@ -52,3 +52,19 @@ structures, 30K/0-down/0%-interest example, 1-in-22 conversion), greene (BRRRR w
 comp-band renovation rule, ~1,000 flips).
 Skill zip rebuilt (24 research files). Progress: 23 of 34 advisors research-backed.
 Next: Wave 6 Commercial (knakal, cauble, mcelroy), then Wave 7 Marketing (5), Wave 8 Design (3).
+
+## 2026-07-04 — DEEP RESEARCH PROGRAM COMPLETE: ALL 34 ADVISORS
+Waves 6-8 finished: knakal (territory system, map-room 98% stat), cauble (cap-rate teaching + 2026
+ranges), mcelroy (NOI doctrine, management levers), glennda (NAR-verified TikTok method + numbers),
+lazine (BAM playbook, Hot Sheet method), burgess ($11M video-CMA mechanics verified), pantana (9 GBP
+cheat codes), peitz (camera-first doctrine), eisen (Forbes-verified IMG scale + moments method),
+gaines (story-over-rules verbatim), mcgee (scale/texture/symmetry rules + 4 small-space tips).
+RESEARCH CORRECTIONS SHIPPED: Ricky Carruthers->Ricky Carruth (name); 8x8/33-touch belongs to Keller/
+MREA not Ferry; Norton = 65% formula not 70% rule; Sharran role updated to Acquisition.com CEO.
+FINAL REGRESSION: final_gate.py 5/5 PASS across flips math (65% formula computed correctly), Voss
+sequence, design rules, Spanish ITIN/DPA, GBP ranking.
+TOTALS: 34 sourced kb files + espanol_scripts.md (~35 research artifacts, every claim source-listed);
+all dossiers research-backed; retrieval layer serving deep sections to any panel size; skill zip
+bundles the full library. Gates passed: W1 5/5, W2 3/3, retrieval 4/4+full-panel, final 5/5.
+Sources consulted: ~70 searches + ~45 page fetches across podcasts transcripts, book breakdowns,
+publisher pages, industry press (NAR, Forbes, Inman-adjacent), and the advisors' own sites.
