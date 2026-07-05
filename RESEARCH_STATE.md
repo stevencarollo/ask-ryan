@@ -50,7 +50,7 @@ Update after EVERY advisor. Trust this file over memory.
 ## Wave 8 — Design & Staging
 - [x] eisen (Cheryl Eisen) — kb/eisen.md written, dossier folded
 - [x] gaines (Joanna Gaines) — kb/gaines.md written, dossier folded
-- [~] mcgee (Shea McGee) — FINAL ADVISOR — next: searches
+- [x] mcgee (Shea McGee) — kb/mcgee.md written, dossier folded — ALL 34 ADVISORS RESEARCH COMPLETE
 
 ## After Wave 2 (once, then maintain)
 - [x] Retrieval layer — kb_retrieval.py live, full-panel gate PASS (PC-10311 cited on 34-advisor panel)
