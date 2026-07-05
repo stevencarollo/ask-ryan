@@ -19,3 +19,10 @@ rene (Amplify Your Influence breakdown + RBC ep28 - AMPLIFII frame/message/tie-d
 Gate: wave2_gate.py 3/3 PASS incl. Spanish-language test (answered en espanol citing researched concepts).
 Skill zip REGENERATED with enriched dossiers + full research library bundled (references/research/*.md).
 Progress: 10 of 34 advisors research-backed. Next: retrieval layer + espanol_scripts.md, then Wave 3 (Mulrenin, Harris, Carruthers, Serhant).
+
+## 2026-07-04 — RETRIEVAL LAYER + BILINGUAL SCRIPT LIBRARY
+Built: backend/kb_retrieval.py (topic keyword -> kb section injection, capped 4.5K chars) wired into
+generate_response_with_groq; backend/kb/espanol_scripts.md (7 scripts EN+ES: cold call, FSBO, expired,
+door knock, probate condolence, NOD urgency, listing opener + ITIN/DPA cultural notes).
+Gate: retrieval_gate.py - 4/4 unit retrievals OK; FULL 34-advisor panel probate test PASS (cites PC-10311
+formula from library despite style-only dossiers). Skill zip rebuilt (research library + scripts bundled).

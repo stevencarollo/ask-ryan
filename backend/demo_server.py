@@ -110,8 +110,10 @@ async def health():
 # ============================================================
 try:
     from backend.experts_kb import EXPERTS, DEFAULT_EXPERT_IDS, DEEP_PANEL_MAX
+    from backend.kb_retrieval import retrieve_kb_sections
 except ImportError:
     from experts_kb import EXPERTS, DEFAULT_EXPERT_IDS, DEEP_PANEL_MAX
+    from kb_retrieval import retrieve_kb_sections
 
 
 def build_system_prompt(expert_ids: Optional[list] = None) -> str:
@@ -190,7 +192,16 @@ My question/request: {query if query else 'Review this and give me your take —
         else:
             user_content = query
 
-        messages = [{"role": "system", "content": build_system_prompt(expert_ids)}]
+        # Topic retrieval: inject the most relevant research-library sections
+        # (works even when the panel is too large for full dossiers)
+        retrieval_probe = query + " " + (context[:1500] if context else "")
+        kb_extra = retrieve_kb_sections(retrieval_probe)
+        system_content = build_system_prompt(expert_ids)
+        if kb_extra:
+            system_content += ("\n\nRESEARCH LIBRARY EXCERPTS (deep sourced material relevant to this "
+                               "question - draw on it where it fits):\n" + kb_extra)
+
+        messages = [{"role": "system", "content": system_content}]
         # Replay prior turns (validated + capped) so follow-up replies keep full context
         if history:
             for turn in history[-12:]:

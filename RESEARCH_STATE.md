@@ -17,7 +17,7 @@ Update after EVERY advisor. Trust this file over memory.
 - [x] rene (Rene Rodriguez) — kb/rene.md written, dossier folded — WAVE 2 RESEARCH COMPLETE
 
 ## Wave 3 — Prospecting & Scripts
-- [ ] mulrenin (Brandon Mulrenin)
+- [~] mulrenin (Brandon Mulrenin) — next: searches
 - [ ] harris (Tim & Julie Harris)
 - [ ] carruthers (Ricky Carruthers)
 - [ ] serhant (Ryan Serhant)
@@ -53,8 +53,8 @@ Update after EVERY advisor. Trust this file over memory.
 - [ ] mcgee (Shea McGee)
 
 ## After Wave 2 (once, then maintain)
-- [ ] Retrieval layer in demo_server.py (keyword → kb sections)
-- [ ] backend/kb/espanol_scripts.md bilingual script library
+- [x] Retrieval layer — kb_retrieval.py live, full-panel gate PASS (PC-10311 cited on 34-advisor panel)
+- [x] espanol_scripts.md — 7 bilingual scripts + cultural/lending notes, wired into retrieval
 
 ## Ship steps
 - [ ] Regenerate roundtable-skill.zip with enriched dossiers + scripts.md
