@@ -17,8 +17,8 @@ Update after EVERY advisor. Trust this file over memory.
 - [x] rene (Rene Rodriguez) — kb/rene.md written, dossier folded — WAVE 2 RESEARCH COMPLETE
 
 ## Wave 3 — Prospecting & Scripts
-- [~] mulrenin (Brandon Mulrenin) — next: searches
-- [ ] harris (Tim & Julie Harris)
+- [x] mulrenin (Brandon Mulrenin) — kb/mulrenin.md written, dossier folded
+- [~] harris (Tim & Julie Harris) — next: searches
 - [ ] carruthers (Ricky Carruthers)
 - [ ] serhant (Ryan Serhant)
 
