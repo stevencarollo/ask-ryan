@@ -171,7 +171,13 @@ select.adv{width:100%;padding:12px 13px;background:var(--charcoal);border:1px so
                 </div>
             </div>
             <div id="nlmManual">
-                <p>One click downloads this episode's <b>source document</b> and opens NotebookLM — drop the file into a new notebook and press <b>Audio Overview</b>.</p>
+                <p><b>Do-it-yourself path</b> (uses your own Google account):</p>
+                <p style="margin-bottom:12px">
+                    1. Click the button below — it downloads this episode's source file and opens NotebookLM.<br>
+                    2. Sign into Google if asked, then click <b>Create new notebook</b>.<br>
+                    3. Drag the downloaded file in as a source.<br>
+                    4. Press <b>Audio Overview</b> in the Studio panel — your podcast is ready in a few minutes.
+                </p>
                 <div class="row">
                     <button class="mini-btn" style="background:var(--gold);color:var(--ink);border-color:var(--gold)" onclick="sendToNotebookLM()">Download Source + Open NotebookLM</button>
                     <button class="mini-btn" onclick="downloadSource()">Just the Source Doc</button>
@@ -436,7 +442,18 @@ async function checkNlmReady(){
     try{
         const r = await fetch(`${API_URL}/api/nlm-ready`);
         const d = await r.json();
-        if(d.ready){ $('nlmAuto').style.display='block'; }
+        if(d.ready){
+            // One-click generation available: lead with it, tuck the DIY path away
+            $('nlmAuto').style.display='block';
+            const man = $('nlmManual');
+            man.style.display='none';
+            const t = document.createElement('button');
+            t.className = 'mini-btn';
+            t.style.marginTop = '10px';
+            t.textContent = 'Prefer your own Google account? Show DIY steps';
+            t.onclick = ()=>{ man.style.display = man.style.display==='none' ? 'block' : 'none'; };
+            $('nlmAuto').appendChild(t);
+        }
     }catch(e){}
 }
 function nlmInstructions(){
