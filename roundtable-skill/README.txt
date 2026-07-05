@@ -15,9 +15,17 @@ INSTALL (claude.ai web - Pro/Max/Team with Skills enabled):
 3. Upload the "roundtable-coach" folder (zipped) there.
 
 WHAT YOU GET
-- 34 advisor dossiers across 9 specialties: sales & prospecting, coaching,
+- 34 RESEARCH-BACKED advisor dossiers across 9 specialties (sales, coaching,
   marketing, negotiation, design & staging, commercial, flipping & investing,
-  probate/divorce/distressed, and Spanish-language coaching.
+  probate/divorce/distressed, Spanish-language coaching) - every advisor's
+  full research file with sources is bundled in references/research/.
+- Advisor-persona podcast scripts: single-advisor interviews or two-advisor
+  duo shows using their first names and real philosophies (102 ready
+  episode concepts in references/podcast_concepts.md).
+- Flyer & listing marketing copy: headlines, descriptions, feature bullets,
+  Instagram captions, and email blasts - English and Spanish.
+- Bilingual script library (cold call, FSBO, expired, door knock, probate,
+  NOD, listing openers) in references/research/espanol_scripts.md.
 - Ask for scripts, objection handling, deal analysis, staging plans,
   flyer critiques - or paste any document for review.
 

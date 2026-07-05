@@ -31,6 +31,20 @@ for group, ids in GROUPS:
         lines.append("")
 open("roundtable-skill/roundtable-coach/references/experts.md", "w", encoding="utf-8").write("\n".join(lines))
 
+
+# Podcast concepts catalog
+from backend.podcast_concepts import PODCAST_ADVISORS
+pc = ["# The Roundtable - Advisor Podcast Concepts", "",
+      "Per-advisor episode concepts (grounded in the research files), host first names,",
+      "and voice genders for two-host persona scripts.", ""]
+for aid, m in PODCAST_ADVISORS.items():
+    e = EXPERTS.get(aid, {})
+    pc.append(f"## {e.get('name', m['first'])} (host name: {m['first'].upper()}, voice: {'male' if m['gender']=='m' else 'female'})")
+    for c in m["concepts"]:
+        pc.append(f"- {c}")
+    pc.append("")
+open("roundtable-skill/roundtable-coach/references/podcast_concepts.md", "w", encoding="utf-8").write("\n".join(pc))
+
 # Bundle the full researched kb library too (if present)
 kb_dir = "backend/kb"
 out_dir = "roundtable-skill/roundtable-coach/references/research"
