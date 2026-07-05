@@ -227,6 +227,13 @@ function $(id){ return document.getElementById(id); }
 function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function toast(msg){ const t=$('toast'); t.textContent=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',2500); }
 function val(id, fallback){ return $(id).value.trim() || fallback; }
+function trimToSentence(text, max){
+    text = (text || '').replace(/\s+/g, ' ').trim();
+    if(text.length <= max) return text;
+    const cut = text.slice(0, max);
+    const lastEnd = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('! '), cut.lastIndexOf('? '));
+    return lastEnd > max * 0.5 ? cut.slice(0, lastEnd + 1) : cut.slice(0, cut.lastIndexOf(' ')) + '…';
+}
 
 function renderTplGrid(){
     $('tplGrid').innerHTML = TEMPLATES.map(t =>
@@ -291,7 +298,16 @@ async function importListing(){
         if(L.beds) $('beds').value = L.beds;
         if(L.baths) $('baths').value = L.baths;
         if(L.sqft) $('sqft').value = Number(String(L.sqft).replace(/[^0-9.]/g,'')) ? Number(String(L.sqft).replace(/[^0-9.]/g,'')).toLocaleString() : L.sqft;
-        if(L.description) $('notes').value = L.description.slice(0, 900);
+        if(L.description){
+            $('notes').value = L.description.slice(0, 900);
+            // Build the listing's OWN description straight into the flyer (clean sentence cut)
+            $('desc').value = trimToSentence(L.description, 520);
+            // First sentence seeds a headline if none written yet
+            if(!$('headline').value.trim()){
+                const firstSentence = (L.description.match(/^[^.!?]{10,90}[.!?]/) || [''])[0].replace(/[.!?]$/,'');
+                if(firstSentence) $('headline').value = firstSentence;
+            }
+        }
 
         state.gallery = (L.photos || []).slice(0, 20);
         if(state.gallery.length){
