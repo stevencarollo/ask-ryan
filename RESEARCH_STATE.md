@@ -48,8 +48,8 @@ Update after EVERY advisor. Trust this file over memory.
 - [x] peitz (Chelsea Peitz) — kb/peitz.md written, dossier folded — WAVE 7 RESEARCH COMPLETE
 
 ## Wave 8 — Design & Staging
-- [~] eisen (Cheryl Eisen) — next: searches
-- [ ] gaines (Joanna Gaines)
+- [x] eisen (Cheryl Eisen) — kb/eisen.md written, dossier folded
+- [~] gaines (Joanna Gaines) — next: searches
 - [ ] mcgee (Shea McGee)
 
 ## After Wave 2 (once, then maintain)
