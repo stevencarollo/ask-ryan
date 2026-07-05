@@ -43,3 +43,12 @@ verbatim 8x8 + 33-touch breakdowns - the true home of those systems), sharran (v
 update to Acquisition.com CEO; 94.5% listing consultation claim; pre-launch blueprint).
 Skill zip rebuilt (19 research files). Progress: 18 of 34 advisors research-backed.
 Next: Wave 5 (voss, norton, morby, greene, tarek).
+
+## 2026-07-04 — WAVE 5 COMPLETE: Negotiation & Investing
+kb files: voss (full toolkit + Ackerman 65/85/95/100, rule of three, pronoun analysis), norton (verbatim
+65% formula + worked example + hot-market gap strategy - CORRECTED from generic 70% rule), morby (verified
+structures, 30K/0-down/0%-interest example, 1-in-22 conversion), greene (BRRRR worked math 0K+0K->
+20K ARV->75% refi, Core Four + brokerage hack, contractor draw controls), tarek (four-step process,
+comp-band renovation rule, ~1,000 flips).
+Skill zip rebuilt (24 research files). Progress: 23 of 34 advisors research-backed.
+Next: Wave 6 Commercial (knakal, cauble, mcelroy), then Wave 7 Marketing (5), Wave 8 Design (3).

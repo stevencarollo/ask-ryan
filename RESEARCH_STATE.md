@@ -33,7 +33,7 @@ Update after EVERY advisor. Trust this file over memory.
 - [x] norton (Jerry Norton) — kb/norton.md written, dossier folded (65% formula corrected)
 - [x] morby (Pace Morby) — kb/morby.md written, dossier folded
 - [x] greene (David Greene) — kb/greene.md written, dossier folded
-- [~] tarek (Tarek El Moussa) — next: searches
+- [x] tarek (Tarek El Moussa) — kb/tarek.md written, dossier folded — WAVE 5 RESEARCH COMPLETE
 
 ## Wave 6 — Commercial
 - [ ] knakal (Bob Knakal)
