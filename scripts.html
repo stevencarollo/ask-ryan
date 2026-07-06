@@ -184,7 +184,7 @@ body.hasmkt .abtn.gold{display:inline-block}
 <div class="empty" id="empty">No scripts match those filters.</div>
 <div id="toast"></div>
 
-<script src="/scripts_data.js"></script>
+<script src="/scripts_data.js?v=3"></script>
 <script>
 const API_URL = 'https://ask-ryan-nb3w.onrender.com';
 
@@ -294,7 +294,7 @@ document.getElementById('q').addEventListener('input', render);
   const groups = {};
   for (const a of ADVISORS){
     if (!groups[a.g]){ groups[a.g] = document.createElement('optgroup'); groups[a.g].label = a.g; sel.appendChild(groups[a.g]); }
-    const o = document.createElement('option'); o.value = a.id; o.textContent = a.n;
+    const o = document.createElement('option'); o.value = a.id; o.textContent = a.n + (a.b ? ' — ' + a.b : '');
     groups[a.g].appendChild(o);
   }
   sel.onchange = async () => {
@@ -429,7 +429,7 @@ async function rewriteOne(i, epoch){
   const groups = {};
   for (const a of ADVISORS){
     if (!groups[a.g]){ groups[a.g] = document.createElement('optgroup'); groups[a.g].label = a.g; sel.appendChild(groups[a.g]); }
-    const o = document.createElement('option'); o.value = a.id; o.textContent = a.n;
+    const o = document.createElement('option'); o.value = a.id; o.textContent = a.n + (a.b ? ' — ' + a.b : '');
     groups[a.g].appendChild(o);
   }
 })();
