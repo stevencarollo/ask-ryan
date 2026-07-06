@@ -297,23 +297,57 @@ document.getElementById('q').addEventListener('input', render);
     const o = document.createElement('option'); o.value = a.id; o.textContent = a.n;
     groups[a.g].appendChild(o);
   }
-  sel.onchange = () => {
+  sel.onchange = async () => {
     VOICE = sel.value ? ADVISORS.find(a => a.id === sel.value) : null;
     sel.classList.toggle('custom', !!VOICE);
     voiceEpoch++; AUTOQ.length = 0;                    // cancel any in-flight queue
-    document.getElementById('vhint').textContent = VOICE
-      ? `Converting every card on screen to ${VOICE.n}'s voice — scroll and the rest follow automatically (free engine ≈ a card per second).`
-      : 'Default: each script answers in the voice of the specialty’s own expert.';
-    // restore originals, then let the cache / auto-queue re-apply for the new voice
-    SCRIPTS.forEach((s,i)=>{
-      const hit = VOICE && REVOICE_CACHE.get(cacheKey(i));
-      if (hit){ s.local = hit.script; s.why = hit.why; s.voicedBy = VOICE.n; }
-      else { delete s.local; delete s.why; delete s.voicedBy; }
-    });
+    const myEpoch = voiceEpoch;
+    // restore originals first (instant), then overlay prewritten variants
+    SCRIPTS.forEach(s=>{ delete s.local; delete s.why; delete s.voicedBy; delete s.preOnly; });
     syncGold(); render();
-    if (VOICE) toast(`Your Roundtable now speaks as ${VOICE.n}`);
+    if (!VOICE){
+      document.getElementById('vhint').textContent = 'Default: each script answers in the voice of the specialty’s own expert.';
+      return;
+    }
+    document.getElementById('vhint').textContent = `Loading ${VOICE.n}'s library…`;
+    const pre = await loadVoiceFile(VOICE.id);
+    if (voiceEpoch !== myEpoch) return;                // user switched again
+    let applied = 0;
+    SCRIPTS.forEach((s,i)=>{
+      const cached = REVOICE_CACHE.get(cacheKey(i));   // live results (may include market) win
+      const p = pre[skey(s)];
+      if (cached){ s.local = cached.script; s.why = cached.why; s.voicedBy = VOICE.n; applied++; }
+      else if (p){ s.local = p.script; s.why = p.why || ''; s.voicedBy = VOICE.n; s.preOnly = true; applied++; }
+    });
+    render();
+    const missing = SCRIPTS.length - applied;
+    document.getElementById('vhint').textContent = applied
+      ? (missing
+          ? `${applied} scripts switched to ${VOICE.n}'s voice instantly — the remaining ${missing} convert live as they appear on screen.`
+          : `The entire library now speaks as ${VOICE.n} — prewritten, instant, no waiting.`)
+      : `Converting cards to ${VOICE.n}'s voice live as they appear on screen (this voice's prewritten library isn't built yet).`;
+    toast(applied ? `${VOICE.n}'s library applied${missing ? ` (${applied} instant)` : ''}` : `Your Roundtable now speaks as ${VOICE.n}`);
   };
 })();
+
+/* prewritten voice libraries: /voices/<id>.json, built offline by
+   scripts/build_voice_variants.py - zero live calls when present */
+const VOICE_FILES = {};
+async function loadVoiceFile(vid){
+  if (VOICE_FILES[vid]) return VOICE_FILES[vid];
+  try{
+    const r = await fetch('/voices/' + vid + '.json');
+    VOICE_FILES[vid] = r.ok ? await r.json() : {};
+  } catch(e){ VOICE_FILES[vid] = {}; }
+  return VOICE_FILES[vid];
+}
+/* stable per-script key - mirrors scripts/dump_scripts.js */
+function skey(s){
+  let h = 5381;
+  const str = s.title + '|' + s.adv + '|' + s.ch + '|' + s.t;
+  for (const c of str) h = (((h * 33) | 0) ^ c.charCodeAt(0)) >>> 0;
+  return h.toString(36);
+}
 
 /* ===== Auto re-voice engine: converts cards as they appear on screen ===== */
 const REVOICE_CACHE = new Map();     // key -> {script, why}
@@ -328,7 +362,9 @@ function scanVisible(){
   document.querySelectorAll('.card').forEach(card => {
     const i = Number(card.dataset.i);
     const s = SCRIPTS[i];
-    if (!s || s.local || (s.retry > 1) || AUTOQ.includes(i)) return;
+    // needs live work if: no rewrite yet, or only the prewritten (no-market) variant while a market is set
+    const needs = !s.local || (MARKET && s.preOnly);
+    if (!s || !needs || (s.retry > 1) || AUTOQ.includes(i)) return;
     const r = card.getBoundingClientRect();
     if (r.bottom > -160 && r.top < H) AUTOQ.push(i);
   });
@@ -343,7 +379,7 @@ async function pumpQueue(){
   const myEpoch = voiceEpoch;
   while (AUTOQ.length && voiceEpoch === myEpoch){
     const i = AUTOQ.shift();
-    if (SCRIPTS[i].local) continue;
+    if (SCRIPTS[i].local && !(MARKET && SCRIPTS[i].preOnly)) continue;
     const card = document.querySelector(`.card[data-i="${i}"]`);
     if (card) card.classList.add('pending');
     const ok = await rewriteOne(i, myEpoch);
@@ -378,7 +414,7 @@ async function rewriteOne(i, epoch){
     s.why = d.why || (VOICE && MARKET ? `${MARKET.name}, in ${VOICE.n}'s voice` :
                       VOICE ? `Re-voiced as ${VOICE.n}` : `Tailored to ${MARKET.name}`);
     if (VOICE) s.voicedBy = VOICE.n; else delete s.voicedBy;
-    delete s.retry;
+    delete s.retry; delete s.preOnly;
     updateCard(i);
     return true;
   } catch(e){ return false; }
@@ -520,7 +556,7 @@ document.getElementById('locclr').onclick = ()=>{
   document.getElementById('mkt').classList.remove('on');
   document.getElementById('locbar').classList.remove('set');
   document.getElementById('locq').value='';
-  SCRIPTS.forEach(s=>{delete s.local; delete s.why; delete s.voicedBy;});
+  SCRIPTS.forEach(s=>{delete s.local; delete s.why; delete s.voicedBy; delete s.preOnly;});
   render();
 };
 
@@ -553,7 +589,7 @@ function setMarket(){
     ${m.rent?`<span class="chip">Median rent <b>$${f(m.rent)}/mo</b></span>`:''}
     <span class="upd">Altos Research weekly data · updated ${MD.updated}</span>`;
   mk.classList.add('on');
-  SCRIPTS.forEach(s=>{delete s.local; delete s.why; delete s.voicedBy;});
+  SCRIPTS.forEach(s=>{delete s.local; delete s.why; delete s.voicedBy; delete s.preOnly;});
   render();
   toast(`Scripts ready to tailor to ${m.name}`);
 }
@@ -568,6 +604,7 @@ async function tailor(i, manual){
   if (hit){
     SCRIPTS[i].local = hit.script; SCRIPTS[i].why = hit.why;
     if (VOICE) SCRIPTS[i].voicedBy = VOICE.n; else delete SCRIPTS[i].voicedBy;
+    delete SCRIPTS[i].preOnly;
     updateCard(i);
     return;
   }
@@ -580,7 +617,7 @@ async function tailor(i, manual){
   }
 }
 function revert(i){
-  delete SCRIPTS[i].local; delete SCRIPTS[i].why; delete SCRIPTS[i].voicedBy;
+  delete SCRIPTS[i].local; delete SCRIPTS[i].why; delete SCRIPTS[i].voicedBy; delete SCRIPTS[i].preOnly;
   updateCard(i);
 }
 
