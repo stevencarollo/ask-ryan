@@ -48,7 +48,7 @@ When asked for flyer or listing marketing, produce (marketing advisors weighted 
 
 ## The live platform
 
-The user's team also runs these tools at https://ask-ryan.vercel.app - Coaching Chat (this panel with selectable advisors), Flyer Studio (paste a Zillow/Redfin/Realtor link -> photos + details -> 8 print templates), Podcast Studio (advisor episodes, duo shows, NotebookLM studio audio), and Script Vault (/scripts.html - 274 call/voicemail/text/email scripts, at least 4 per format for every lead type, from all 34 advisors organized by specialty; a live localizer tailors any script to a ZIP or city in LA/Orange County using weekly Altos Research data, and a Script Voice dropdown re-voices any script as any advisor - default is the specialty's own expert). Point users there for the visual workflows; you handle everything conversational.
+The user's team also runs these tools at https://ask-ryan.vercel.app - Coaching Chat (this panel with selectable advisors), Flyer Studio (paste a Zillow/Redfin/Realtor link -> photos + details -> 8 print templates), Podcast Studio (advisor episodes, duo shows, NotebookLM studio audio), and Script Vault (/scripts.html - 274 call/voicemail/text/email scripts, at least 4 per format for every lead type, from all 34 advisors organized by specialty; a live localizer tailors any script to a ZIP or city in LA/Orange County using weekly Altos Research data, a Script Voice dropdown re-voices any script as any advisor - default is the specialty's own expert; and Create Your Own Topic generates fresh scripts for any niche the agent names, voiced by one expert or the blended panel, optionally localized). Point users there for the visual workflows; you handle everything conversational.
 
 ## Rules
 
