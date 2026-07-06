@@ -570,6 +570,82 @@ Respond with ONLY a JSON object (no markdown, no commentary) with exactly these 
         }}
 
 
+@app.post("/api/localize-script")
+async def localize_script(data: dict):
+    """Scripts Studio localizer: rewrite a script so it speaks to ONE local market.
+    Input: {script, channel, advisor, topic, market:{name, zip, p, sf, dom, cut, inv, mai, rent}}
+    The market block comes from the Altos Research snapshot (market_local.json)."""
+    script = (data.get("script") or "").strip()
+    channel = data.get("channel", "call")
+    advisor = data.get("advisor", "")
+    topic = data.get("topic", "")
+    m = data.get("market") or {}
+    if not script or not m.get("name"):
+        return {"status": "error", "error": "script and market required"}
+
+    mai = m.get("mai")
+    if isinstance(mai, (int, float)):
+        temp = ("a strong seller's market - buyers are competing" if mai >= 40 else
+                "a seller's market - well-priced homes move" if mai >= 30 else
+                "a balanced market - pricing and presentation decide" if mai >= 20 else
+                "a buyer's market - sellers need an edge to stand out")
+    else:
+        temp = "a shifting market"
+
+    stats = []
+    if m.get("p"):
+        stats.append(f"median list price ${int(m['p']):,}")
+    if m.get("dom"):
+        stats.append(f"median {int(m['dom'])} days on market")
+    if m.get("cut") is not None:
+        stats.append(f"{m['cut']}% of active listings have cut their price")
+    if m.get("inv") is not None:
+        stats.append(f"{m['inv']} active listings")
+    if m.get("rent"):
+        stats.append(f"median rent ${int(m['rent']):,}/mo")
+
+    chan_rule = {
+        "call": "Keep it a natural spoken phone script with the same beats and any agent/owner placeholders intact.",
+        "voicemail": "Keep it under 40 seconds spoken (about 90 words), one clear reason to call back.",
+        "text": "Keep it 1-3 short sentences, casual-professional, no links, ends with an easy question.",
+        "email": "Keep the subject line punchy (under 9 words) and the body under 130 words.",
+    }.get(channel, "Keep the same format and length.")
+
+    prompt = f"""You are The Roundtable's script coach. Rewrite this {channel} script so it speaks specifically to the {m['name']} market right now. Current Altos Research data for {m['name']}: {'; '.join(stats)}. Market temperature: {temp}.
+
+Rules:
+- Keep the original structure, intent, and advisor voice ({advisor or 'the original voice'}). Topic: {topic or 'general'}.
+- Weave in AT MOST two of the local numbers, naturally, the way a sharp local agent quotes stats in conversation - not a data dump.
+- Match the tone to the market temperature ({temp}).
+- Keep every {{{{placeholder}}}} exactly as written.
+- {chan_rule}
+
+ORIGINAL SCRIPT:
+{script}
+
+Respond with ONLY a JSON object: {{"script": "the localized script", "why": "one sentence on what you changed for this market"}}"""
+
+    try:
+        client = _groq_client()
+        if client is None:
+            raise RuntimeError("no client")
+        r = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=900,
+            temperature=0.7,
+            response_format={"type": "json_object"},
+        )
+        import json as _json
+        out = _json.loads(r.choices[0].message.content)
+        if not out.get("script"):
+            raise RuntimeError("empty rewrite")
+        return {"status": "success", "script": out["script"], "why": out.get("why", "")}
+    except Exception as e:
+        print(f"localize-script error: {e}")
+        return {"status": "error", "error": "The localizer is busy - try again in a few seconds."}
+
+
 @app.get("/api/experts")
 async def list_experts():
     """The full advisor panel available for selection"""
