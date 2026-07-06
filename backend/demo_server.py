@@ -572,16 +572,20 @@ Respond with ONLY a JSON object (no markdown, no commentary) with exactly these 
 
 @app.post("/api/localize-script")
 async def localize_script(data: dict):
-    """Scripts Studio localizer: rewrite a script so it speaks to ONE local market.
-    Input: {script, channel, advisor, topic, market:{name, zip, p, sf, dom, cut, inv, mai, rent}}
-    The market block comes from the Altos Research snapshot (market_local.json)."""
+    """Scripts Studio tailor engine: rewrite a script for a local market, a chosen
+    advisor voice, or both.
+    Input: {script, channel, advisor, topic,
+            market?:{name, zip, p, sf, dom, cut, inv, mai, rent},   # Altos snapshot
+            voice?:{id, name}}                                       # advisor persona
+    """
     script = (data.get("script") or "").strip()
     channel = data.get("channel", "call")
     advisor = data.get("advisor", "")
     topic = data.get("topic", "")
     m = data.get("market") or {}
-    if not script or not m.get("name"):
-        return {"status": "error", "error": "script and market required"}
+    voice = data.get("voice") or {}
+    if not script or not (m.get("name") or voice.get("name")):
+        return {"status": "error", "error": "script plus a market or a voice required"}
 
     mai = m.get("mai")
     if isinstance(mai, (int, float)):
@@ -611,19 +615,41 @@ async def localize_script(data: dict):
         "email": "Keep the subject line punchy (under 9 words) and the body under 130 words.",
     }.get(channel, "Keep the same format and length.")
 
-    prompt = f"""You are The Roundtable's script coach. Rewrite this {channel} script so it speaks specifically to the {m['name']} market right now. Current Altos Research data for {m['name']}: {'; '.join(stats)}. Market temperature: {temp}.
+    # Optional advisor-voice persona, grounded in the researched dossier
+    voice_block = ""
+    voice_rule = f"- Keep the original structure, intent, and advisor voice ({advisor or 'the original voice'}). Topic: {topic or 'general'}."
+    if voice.get("name"):
+        e = EXPERTS.get(voice.get("id") or "", {})
+        ground = ""
+        if e:
+            ground = (f"\nTheir voice: {e.get('style','')}"
+                      f"\nTheir frameworks and vocabulary: {str(e.get('deep',''))[:900]}")
+        voice_block = f"""
+THE VOICE: rewrite it entirely in the voice of {voice['name']}.{ground}
+Speak the way they speak - their pacing, their signature phrases, their philosophy - while keeping the script's job identical."""
+        voice_rule = f"- Keep the original structure and intent, but the VOICE becomes {voice['name']}'s. Topic: {topic or 'general'}."
+
+    market_block = ""
+    market_rules = ""
+    if m.get("name"):
+        market_block = f"""
+THE MARKET: make it speak specifically to {m['name']} right now. Current Altos Research data: {'; '.join(stats)}. Market temperature: {temp}."""
+        market_rules = f"""
+- Weave in AT MOST two of the local numbers, naturally, the way a sharp local agent quotes stats in conversation - not a data dump.
+- Match the tone to the market temperature ({temp})."""
+
+    prompt = f"""You are The Roundtable's script coach. Rewrite this {channel} script.
+{voice_block}{market_block}
 
 Rules:
-- Keep the original structure, intent, and advisor voice ({advisor or 'the original voice'}). Topic: {topic or 'general'}.
-- Weave in AT MOST two of the local numbers, naturally, the way a sharp local agent quotes stats in conversation - not a data dump.
-- Match the tone to the market temperature ({temp}).
+{voice_rule}{market_rules}
 - Keep every {{{{placeholder}}}} exactly as written.
 - {chan_rule}
 
 ORIGINAL SCRIPT:
 {script}
 
-Respond with ONLY a JSON object: {{"script": "the localized script", "why": "one sentence on what you changed for this market"}}"""
+Respond with ONLY a JSON object: {{"script": "the rewritten script", "why": "one sentence on what you changed"}}"""
 
     try:
         client = _groq_client()
