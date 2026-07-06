@@ -672,6 +672,97 @@ Respond with ONLY a JSON object: {{"script": "the rewritten script", "why": "one
         return {"status": "error", "error": "The localizer is busy - try again in a few seconds."}
 
 
+@app.post("/api/generate-scripts")
+async def generate_scripts(data: dict):
+    """Scripts Studio custom-topic generator: the agent names their own niche and
+    gets fresh scripts for it.
+    Input: {niche, channels:["call","voicemail","text","email"],
+            voice?:{id,name},            # one advisor - else the whole Roundtable answers
+            market?:{name,p,dom,cut,inv,mai,rent}}
+    Returns {status, scripts:[{channel, title, body}], advisor}"""
+    niche = (data.get("niche") or "").strip()[:300]
+    channels = [c for c in (data.get("channels") or []) if c in ("call", "voicemail", "text", "email")]
+    voice = data.get("voice") or {}
+    m = data.get("market") or {}
+    if not niche or not channels:
+        return {"status": "error", "error": "niche and at least one script type required"}
+
+    if voice.get("name"):
+        e = EXPERTS.get(voice.get("id") or "", {})
+        who = f"Write every script in the voice of {voice['name']}."
+        if e:
+            who += (f"\nTheir voice: {e.get('style','')}"
+                    f"\nTheir frameworks and vocabulary: {str(e.get('deep',''))[:900]}")
+        adv_label = voice["name"]
+    else:
+        who = ("You are the FULL Roundtable panel of 34 elite real estate coaches. "
+               "Blend the two or three advisors whose specialty best fits this niche "
+               "into one confident, direct voice.")
+        adv_label = "The Roundtable Panel"
+
+    mkt = ""
+    if m.get("name"):
+        stats = []
+        if m.get("p"):
+            stats.append(f"median list price ${int(m['p']):,}")
+        if m.get("dom"):
+            stats.append(f"median {int(m['dom'])} days on market")
+        if m.get("cut") is not None:
+            stats.append(f"{m['cut']}% of listings have cut price")
+        if m.get("inv") is not None:
+            stats.append(f"{m['inv']} active listings")
+        mai = m.get("mai")
+        temp = ("a strong seller's market" if isinstance(mai, (int, float)) and mai >= 40 else
+                "a seller's market" if isinstance(mai, (int, float)) and mai >= 30 else
+                "a balanced market" if isinstance(mai, (int, float)) and mai >= 20 else
+                "a buyer's market" if isinstance(mai, (int, float)) else "")
+        mkt = (f"\nLOCAL MARKET: write for {m['name']} specifically - Altos data: {'; '.join(stats)}"
+               + (f" ({temp})" if temp else "")
+               + ". Weave at most two of these numbers into each script, naturally.")
+
+    forms = {
+        "call": "a natural spoken phone script with beats/labels and (parenthetical coaching notes), 90-160 words",
+        "voicemail": "a voicemail under 40 seconds spoken (about 80 words) with one clear callback reason",
+        "text": "a text/DM of 1-3 short sentences ending with an easy question",
+        "email": "an email starting with 'Subject: ' (under 9 words), body under 130 words",
+    }
+    want = "\n".join(f'- "{c}": {forms[c]}' for c in channels)
+
+    prompt = f"""{who}
+{mkt}
+THE NICHE: {niche}
+
+Write one prospecting script per requested type below. Use placeholders like {{{{Owner}}}}, {{{{Agent}}}}, {{{{Brokerage}}}}, {{{{Address}}}}, {{{{Neighborhood}}}}, {{{{Phone}}}} for anything the agent fills in. Lead with insight specific to this niche - the pain, the deadline, or the money the owner doesn't know about. Never generic.
+
+Requested:
+{want}
+
+Respond with ONLY a JSON object:
+{{"scripts": [{{"channel": "call|voicemail|text|email", "title": "short specific title", "body": "the script"}}]}}"""
+
+    try:
+        client = _groq_client()
+        if client is None:
+            raise RuntimeError("no client")
+        r = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=2200,
+            temperature=0.8,
+            response_format={"type": "json_object"},
+        )
+        import json as _json
+        out = _json.loads(r.choices[0].message.content)
+        scripts = [s for s in (out.get("scripts") or [])
+                   if s.get("body") and s.get("channel") in ("call", "voicemail", "text", "email")]
+        if not scripts:
+            raise RuntimeError("empty generation")
+        return {"status": "success", "scripts": scripts, "advisor": adv_label}
+    except Exception as e:
+        print(f"generate-scripts error: {e}")
+        return {"status": "error", "error": "The script engine is busy - try again in a few seconds."}
+
+
 @app.get("/api/experts")
 async def list_experts():
     """The full advisor panel available for selection"""

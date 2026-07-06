@@ -46,6 +46,29 @@ nav.topbar{display:flex;justify-content:space-between;align-items:center;gap:10p
 .voicebar select.custom{border-color:var(--gold);color:var(--gold-bright)}
 .voicebar .vhint{font-size:.74em;color:var(--muted);line-height:1.4;flex:1 1 240px}
 
+/* ===== Custom topic builder ===== */
+.custom-topic{margin-top:10px;background:linear-gradient(135deg,rgba(201,168,92,.07),rgba(201,168,92,.02)),var(--charcoal);border:1px solid var(--gold);border-radius:10px;overflow:hidden}
+.custom-topic summary{cursor:pointer;padding:13px 16px;font-size:.85em;font-weight:700;letter-spacing:.06em;color:var(--gold-bright);list-style:none}
+.custom-topic summary::-webkit-details-marker{display:none}
+.custom-topic summary:hover{background:rgba(201,168,92,.08)}
+.ct-body{padding:4px 16px 16px;display:flex;flex-direction:column;gap:12px}
+.ct-body input[type=text],.ct-body input:not([type]),#ctNiche{width:100%;padding:12px 14px;background:var(--ink);border:1px solid var(--line);border-radius:6px;color:var(--ivory);font-family:'Inter',sans-serif;font-size:.95em}
+.ct-row{display:flex;gap:18px;flex-wrap:wrap}
+.ct-field{display:flex;flex-direction:column;gap:6px}
+.ct-field>label{font-size:.68em;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+.ct-field select{padding:9px 32px 9px 11px;background:var(--ink);border:1px solid var(--line);border-radius:6px;color:var(--ivory);font-family:'Inter',sans-serif;font-size:.88em;appearance:none;-webkit-appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23C9A85C' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;max-width:280px}
+.ct-checks{display:flex;gap:12px;flex-wrap:wrap}
+.ct-checks label,.ct-loc{display:inline-flex;align-items:center;gap:6px;font-size:.82em;color:var(--ivory);cursor:pointer}
+.ct-checks input,.ct-loc input{accent-color:var(--gold);width:15px;height:15px;cursor:pointer}
+.ct-loc span{color:var(--muted);font-size:.95em}
+.ct-loc.ready span{color:var(--teal)}
+#ctGo{align-self:flex-start;padding:12px 24px;background:linear-gradient(135deg,var(--gold) 0%,#B8964A 100%);color:var(--ink);border:none;border-radius:6px;font-weight:700;font-size:.82em;letter-spacing:.1em;text-transform:uppercase}
+#ctGo:hover:not(:disabled){background:var(--gold-bright)}
+#ctGo:disabled{opacity:.55;cursor:wait}
+.ct-status{font-size:.78em;color:var(--muted)}
+.topic.custom>h2{color:var(--gold-bright)}
+.topic.custom>h2::before{content:'✦ '}
+
 /* ===== Filters ===== */
 .filters{max-width:1180px;margin:22px auto 0;padding:0 clamp(14px,3vw,28px);display:flex;flex-direction:column;gap:10px}
 .chips{display:flex;gap:7px;flex-wrap:wrap}
@@ -115,6 +138,34 @@ body.hasmkt .abtn.gold{display:inline-block}
     <select id="voiceSel"></select>
     <span class="vhint" id="vhint">Default: each script answers in the voice of the specialty's own expert.</span>
   </div>
+
+  <details class="custom-topic" id="ctPanel">
+    <summary>✦ Create Your Own Topic — scripts for any niche you can name</summary>
+    <div class="ct-body">
+      <input id="ctNiche" maxlength="300" placeholder="Describe your niche — e.g. ADU-potential lots in Torrance, 1031 sellers with maturing loans, out-of-state heirs…">
+      <div class="ct-row">
+        <div class="ct-field">
+          <label for="ctVoice">Expert</label>
+          <select id="ctVoice"></select>
+        </div>
+        <div class="ct-field">
+          <label>Script types</label>
+          <div class="ct-checks">
+            <label><input type="checkbox" id="ctCall" checked> 📞 Call</label>
+            <label><input type="checkbox" id="ctVm" checked> 🎙 Voicemail</label>
+            <label><input type="checkbox" id="ctText" checked> 💬 Text</label>
+            <label><input type="checkbox" id="ctEmail" checked> ✉️ Email</label>
+          </div>
+        </div>
+        <div class="ct-field">
+          <label>Localize</label>
+          <label class="ct-loc"><input type="checkbox" id="ctLocal"> <span id="ctLocLabel">Set a market above first</span></label>
+        </div>
+      </div>
+      <button class="go" id="ctGo">✦ Generate My Scripts</button>
+      <span class="ct-status" id="ctStatus"></span>
+    </div>
+  </details>
   <div class="locerr" id="locerr"></div>
   <div class="mkt" id="mkt"></div>
 </section>
@@ -162,7 +213,7 @@ function render(){
       && (!q || (s.title+' '+s.adv+' '+s.body+' '+tname).toLowerCase().includes(q)));
     if (!items.length) continue;
     const sec = document.createElement('section');
-    sec.className = 'topic';
+    sec.className = 'topic' + (tid.startsWith('custom') ? ' custom' : '');
     sec.innerHTML = `<h2>${tname}</h2><div class="tdesc">${tdesc}</div>`;
     const grid = document.createElement('div'); grid.className='cards';
     for (const s of items){
@@ -197,11 +248,15 @@ const chWrap = document.getElementById('chChips');
   chWrap.appendChild(b);
 });
 const tWrap = document.getElementById('tChips');
-[["all","All Topics"],...TOPICS.map(t=>[t[0],t[1]])].forEach(([v,l])=>{
-  const b=document.createElement('button'); b.className='fchip'+(v==='all'?' on':''); b.textContent=l;
-  b.onclick=()=>{tFilter=v;[...tWrap.children].forEach(c=>c.classList.remove('on'));b.classList.add('on');render();};
-  tWrap.appendChild(b);
-});
+function buildTopicChips(){
+  tWrap.innerHTML='';
+  [["all","All Topics"],...TOPICS.map(t=>[t[0],t[1]])].forEach(([v,l])=>{
+    const b=document.createElement('button'); b.className='fchip'+(v===tFilter?' on':''); b.textContent=l;
+    b.onclick=()=>{tFilter=v;[...tWrap.children].forEach(c=>c.classList.remove('on'));b.classList.add('on');render();};
+    tWrap.appendChild(b);
+  });
+}
+buildTopicChips();
 document.getElementById('q').addEventListener('input', render);
 
 /* voice selector — build your own Roundtable */
@@ -226,6 +281,76 @@ document.getElementById('q').addEventListener('input', render);
     if (VOICE) toast(`Your Roundtable now speaks as ${VOICE.n}`);
   };
 })();
+
+/* ===== Custom topic builder ===== */
+(function(){
+  const sel = document.getElementById('ctVoice');
+  const def = document.createElement('option');
+  def.value = ''; def.textContent = '★ The Entire Roundtable — blended panel of all 34';
+  sel.appendChild(def);
+  const groups = {};
+  for (const a of ADVISORS){
+    if (!groups[a.g]){ groups[a.g] = document.createElement('optgroup'); groups[a.g].label = a.g; sel.appendChild(groups[a.g]); }
+    const o = document.createElement('option'); o.value = a.id; o.textContent = a.n;
+    groups[a.g].appendChild(o);
+  }
+})();
+let ctCounter = 0;
+function syncCtLocal(){
+  const lab = document.getElementById('ctLocLabel');
+  const box = document.getElementById('ctLocal');
+  const wrap = lab.closest('.ct-loc');
+  if (MARKET){ lab.textContent = `Tailor to ${MARKET.name}`; box.disabled = false; wrap.classList.add('ready'); }
+  else { lab.textContent = 'Set a market above first'; box.checked = false; box.disabled = true; wrap.classList.remove('ready'); }
+}
+syncCtLocal();
+
+document.getElementById('ctGo').onclick = async () => {
+  const niche = document.getElementById('ctNiche').value.trim();
+  const status = document.getElementById('ctStatus');
+  const channels = [];
+  if (document.getElementById('ctCall').checked) channels.push('call');
+  if (document.getElementById('ctVm').checked) channels.push('voicemail');
+  if (document.getElementById('ctText').checked) channels.push('text');
+  if (document.getElementById('ctEmail').checked) channels.push('email');
+  if (!niche){ status.textContent = 'Describe your niche first.'; return; }
+  if (!channels.length){ status.textContent = 'Pick at least one script type.'; return; }
+  const vid = document.getElementById('ctVoice').value;
+  const v = vid ? ADVISORS.find(a=>a.id===vid) : null;
+  const btn = document.getElementById('ctGo');
+  btn.disabled = true; btn.textContent = '✦ Writing your scripts…';
+  status.textContent = v ? `${v.n} is writing…` : 'The Roundtable is writing…';
+  try{
+    const payload = {niche, channels};
+    if (v) payload.voice = {id:v.id, name:v.n};
+    if (document.getElementById('ctLocal').checked && MARKET)
+      payload.market = {name:MARKET.name, p:MARKET.p, dom:MARKET.dom, cut:MARKET.cut, inv:MARKET.inv, mai:MARKET.mai, rent:MARKET.rent};
+    const r = await fetch(API_URL + '/api/generate-scripts', {
+      method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+    const d = await r.json();
+    if (d.status !== 'success') throw new Error(d.error || 'busy');
+    ctCounter++;
+    const tid = 'custom' + ctCounter;
+    const tname = 'Your Topic: ' + (niche.length > 60 ? niche.slice(0,57) + '…' : niche);
+    TOPICS.unshift([tid, tname, (v ? `Written by ${v.n}` : 'Written by the full Roundtable panel')
+      + (payload.market ? ` · tailored to ${MARKET.name}` : '') + ' · generated just for you.']);
+    for (const s of d.scripts){
+      SCRIPTS.push({t:tid, ch: s.channel === 'voicemail' ? 'vm' : s.channel,
+        adv: d.advisor || 'The Roundtable Panel', title: s.title || 'Custom Script', body: s.body});
+    }
+    tFilter = tid; chFilter = 'all';
+    buildTopicChips();
+    document.querySelectorAll('#chChips .fchip').forEach((c,i)=>c.classList.toggle('on', i===0));
+    render();
+    const first = document.querySelector('.topic');
+    if (first) first.scrollIntoView({behavior:'smooth'});
+    status.textContent = `${d.scripts.length} scripts ready below — filtered to your topic.`;
+    toast('Your custom scripts are ready');
+  } catch(e){
+    status.textContent = 'The engine is busy (free tier) — try again in ~30 seconds.';
+  }
+  btn.disabled = false; btn.textContent = '✦ Generate My Scripts';
+};
 
 /* copy */
 function copyScript(i){
@@ -288,7 +413,7 @@ function tempLabel(mai){
 document.getElementById('locgo').onclick = setMarket;
 document.getElementById('locq').addEventListener('keydown', e=>{ if(e.key==='Enter') setMarket(); });
 document.getElementById('locclr').onclick = ()=>{
-  MARKET = null; syncGold();
+  MARKET = null; syncGold(); syncCtLocal();
   document.getElementById('mkt').classList.remove('on');
   document.getElementById('locbar').classList.remove('set');
   document.getElementById('locq').value='';
@@ -309,7 +434,7 @@ function setMarket(){
     return;
   }
   MARKET = m;
-  syncGold();
+  syncGold(); syncCtLocal();
   document.getElementById('locbar').classList.add('set');
   const [tl, tc] = tempLabel(m.mai);
   const f = (v,pre='',post='') => v==null?'':`${pre}${typeof v==='number'? Math.round(v).toLocaleString():v}${post}`;
