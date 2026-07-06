@@ -228,7 +228,7 @@ function render(){
       card.innerHTML = `
         <div class="top"><span class="ctag ${s.ch}">${CH_LABEL[s.ch]}</span><span class="lchip">Localized</span><span class="pchip">✦ Re-voicing…</span></div>
         <h3>${s.title}</h3>
-        <div class="adv">In the voice of ${s.adv}</div>
+        <div class="adv">${advLabel(s)}</div>
         <pre>${esc(s.local || s.body)}</pre>
         <div class="why">${s.why ? '🎯 ' + esc(s.why) : ''}</div>
         <div class="acts">
@@ -244,6 +244,13 @@ function render(){
   document.getElementById('empty').style.display = shown ? 'none' : 'block';
 }
 
+/* the byline: a re-voiced card credits the NEW voice, with the original noted */
+function advLabel(s){
+  if (s.local && s.voicedBy && s.voicedBy !== s.adv)
+    return `In the voice of ${s.voicedBy} · original by ${s.adv}`;
+  return `In the voice of ${s.adv}`;
+}
+
 /* update ONE card in place (no full re-render, no scroll jump) */
 function updateCard(i){
   const s = SCRIPTS[i];
@@ -251,6 +258,7 @@ function updateCard(i){
   if (!card) return;
   card.querySelector('pre').innerHTML = esc(s.local || s.body);
   card.querySelector('.why').innerHTML = s.why ? '🎯 ' + esc(s.why) : '';
+  card.querySelector('.adv').textContent = advLabel(s);
   card.classList.toggle('localized', !!s.local);
   card.classList.remove('pending');
   const b = card.querySelector('.abtn.gold');
@@ -299,8 +307,8 @@ document.getElementById('q').addEventListener('input', render);
     // restore originals, then let the cache / auto-queue re-apply for the new voice
     SCRIPTS.forEach((s,i)=>{
       const hit = VOICE && REVOICE_CACHE.get(cacheKey(i));
-      if (hit){ s.local = hit.script; s.why = hit.why; }
-      else { delete s.local; delete s.why; }
+      if (hit){ s.local = hit.script; s.why = hit.why; s.voicedBy = VOICE.n; }
+      else { delete s.local; delete s.why; delete s.voicedBy; }
     });
     syncGold(); render();
     if (VOICE) toast(`Your Roundtable now speaks as ${VOICE.n}`);
@@ -369,6 +377,7 @@ async function rewriteOne(i, epoch){
     s.local = d.script;
     s.why = d.why || (VOICE && MARKET ? `${MARKET.name}, in ${VOICE.n}'s voice` :
                       VOICE ? `Re-voiced as ${VOICE.n}` : `Tailored to ${MARKET.name}`);
+    if (VOICE) s.voicedBy = VOICE.n; else delete s.voicedBy;
     delete s.retry;
     updateCard(i);
     return true;
@@ -511,7 +520,7 @@ document.getElementById('locclr').onclick = ()=>{
   document.getElementById('mkt').classList.remove('on');
   document.getElementById('locbar').classList.remove('set');
   document.getElementById('locq').value='';
-  SCRIPTS.forEach(s=>{delete s.local; delete s.why;});
+  SCRIPTS.forEach(s=>{delete s.local; delete s.why; delete s.voicedBy;});
   render();
 };
 
@@ -544,7 +553,7 @@ function setMarket(){
     ${m.rent?`<span class="chip">Median rent <b>$${f(m.rent)}/mo</b></span>`:''}
     <span class="upd">Altos Research weekly data · updated ${MD.updated}</span>`;
   mk.classList.add('on');
-  SCRIPTS.forEach(s=>{delete s.local; delete s.why;});
+  SCRIPTS.forEach(s=>{delete s.local; delete s.why; delete s.voicedBy;});
   render();
   toast(`Scripts ready to tailor to ${m.name}`);
 }
@@ -558,6 +567,7 @@ async function tailor(i, manual){
   const hit = REVOICE_CACHE.get(cacheKey(i));
   if (hit){
     SCRIPTS[i].local = hit.script; SCRIPTS[i].why = hit.why;
+    if (VOICE) SCRIPTS[i].voicedBy = VOICE.n; else delete SCRIPTS[i].voicedBy;
     updateCard(i);
     return;
   }
@@ -570,7 +580,7 @@ async function tailor(i, manual){
   }
 }
 function revert(i){
-  delete SCRIPTS[i].local; delete SCRIPTS[i].why;
+  delete SCRIPTS[i].local; delete SCRIPTS[i].why; delete SCRIPTS[i].voicedBy;
   updateCard(i);
 }
 
