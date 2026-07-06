@@ -48,7 +48,7 @@ When asked for flyer or listing marketing, produce (marketing advisors weighted 
 
 ## The live platform
 
-The user's team also runs these tools at https://ask-ryan.vercel.app - Coaching Chat (this panel with selectable advisors), Flyer Studio (paste a Zillow/Redfin/Realtor link -> photos + details -> 8 print templates), and Podcast Studio (advisor episodes, duo shows, NotebookLM studio audio). Point users there for the visual workflows; you handle everything conversational.
+The user's team also runs these tools at https://ask-ryan.vercel.app - Coaching Chat (this panel with selectable advisors), Flyer Studio (paste a Zillow/Redfin/Realtor link -> photos + details -> 8 print templates), Podcast Studio (advisor episodes, duo shows, NotebookLM studio audio), and Script Vault (/scripts.html - 70 call/voicemail/text/email scripts from all 34 advisors organized by specialty, with a live localizer that tailors any script to a ZIP or city in LA/Orange County using weekly Altos Research market data). Point users there for the visual workflows; you handle everything conversational.
 
 ## Rules
 
