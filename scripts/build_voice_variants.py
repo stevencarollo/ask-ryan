@@ -5,27 +5,39 @@ The Script Vault serves these statically, so picking a voice swaps the whole
 library INSTANTLY with zero live AI calls. Live calls remain only for
 market-tailoring and custom topics.
 
-Resumable: already-built variants are skipped, so run it as many nights as it
-takes (free-tier rate limits allow roughly 10-15 rewrites/minute; the full
-274 scripts x 34 voices ~ 9,300 variants takes several long runs).
+Calls the Gemini API directly (key in gitignored GEMINI_KEY.txt) so the batch
+never competes with the live site's Groq budget. Resumable: already-built
+variants are skipped, so it's safe to stop/restart any time.
 
 Usage:
   python scripts/build_voice_variants.py                 # all voices, roster order
   python scripts/build_voice_variants.py serhant voss    # just these voices
   python scripts/build_voice_variants.py --status        # coverage report
 """
-import json, os, sys, time, urllib.request
+import json, os, re, sys, time, urllib.request, urllib.error
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
-API = "https://ask-ryan-nb3w.onrender.com/api/localize-script"
 VOICES_DIR = os.path.join(REPO, "voices")
 os.makedirs(VOICES_DIR, exist_ok=True)
+
+GEMINI_KEY = open(os.path.join(REPO, "GEMINI_KEY.txt"), encoding="utf-8").read().strip()
+GEMINI_URL = ("https://generativelanguage.googleapis.com/v1beta/models/"
+              "gemini-2.5-flash:generateContent?key=" + GEMINI_KEY)
 
 DUMP = json.load(open(os.path.join(HERE, "scripts_dump.json"), encoding="utf-8"))
 ADVISORS = DUMP["advisors"]
 SCRIPTS = DUMP["scripts"]
-CH_API = {"vm": "voicemail"}
+DOSSIER = json.load(open(os.path.join(HERE, "experts_dossier.json"), encoding="utf-8"))
+
+CHAN_RULE = {
+    "call": "Keep it a natural spoken phone script with the same beats and any {{placeholders}} intact.",
+    "vm": "Keep it under 40 seconds spoken (about 90 words), one clear reason to call back.",
+    "text": "Keep it 1-3 short sentences, casual-professional, no links, ends with an easy question.",
+    "email": ("Return the email as ONE PLAIN STRING starting with the literal line "
+              "'Subject: ...' (under 9 words) followed by a blank line then the body "
+              "(under 130 words) - NOT a nested object with separate subject/body fields."),
+}
 
 
 def load(vid):
@@ -52,26 +64,79 @@ def status():
           f"({100*done_all/(total*len(ADVISORS)):.1f}%)")
 
 
+def build_prompt(script, voice):
+    e = DOSSIER.get(voice["id"], {})
+    ground = ""
+    if e:
+        ground = f"\nTheir voice: {e.get('style','')}\nTheir frameworks and vocabulary: {e.get('deep','')}"
+    chan_rule = CHAN_RULE.get(script["ch"], "Keep the same format and length.")
+    return f"""You are The Roundtable's script coach. Rewrite this {script['ch']} script.
+
+THE VOICE: rewrite it entirely in the voice of {voice['n']}.{ground}
+Speak the way they speak - their pacing, their signature phrases, their philosophy - while keeping the script's job identical.
+
+Rules:
+- Keep the original structure and intent, but the VOICE becomes {voice['n']}'s. Topic: {script['topic']}.
+- Keep every {{{{placeholder}}}} exactly as written.
+- {chan_rule}
+
+ORIGINAL SCRIPT:
+{script['body']}
+
+Respond with ONLY a JSON object: {{"script": "the rewritten script", "why": "one sentence on what you changed"}}"""
+
+
+def extract_json(text):
+    text = text.strip()
+    if text.startswith("```"):
+        text = re.sub(r"^```(json)?\s*|\s*```$", "", text)
+    return json.loads(text)
+
+
+def flatten_script(val):
+    """Defensive: if the model nests {subject, body} instead of one string, flatten it."""
+    if isinstance(val, str):
+        return val
+    if isinstance(val, dict):
+        subj = val.get("subject") or val.get("Subject") or ""
+        body = val.get("body") or val.get("Body") or ""
+        if subj and not str(subj).lower().startswith("subject:"):
+            subj = "Subject: " + str(subj)
+        return (str(subj) + "\n\n" + str(body)).strip() if subj else str(body).strip()
+    return str(val)
+
+
 def rewrite(script, voice, attempt=0):
     body = json.dumps({
-        "script": script["body"], "channel": CH_API.get(script["ch"], script["ch"]),
-        "advisor": script["adv"], "topic": script["topic"],
-        "voice": {"id": voice["id"], "name": voice["n"]},
+        "contents": [{"parts": [{"text": build_prompt(script, voice)}]}],
+        "generationConfig": {"temperature": 0.75, "responseMimeType": "application/json"},
     }).encode()
-    req = urllib.request.Request(API, data=body, method="POST",
+    req = urllib.request.Request(GEMINI_URL, data=body, method="POST",
                                  headers={"Content-Type": "application/json"})
     try:
-        with urllib.request.urlopen(req, timeout=120) as r:
+        with urllib.request.urlopen(req, timeout=90) as r:
             d = json.loads(r.read().decode())
-        if d.get("status") == "success":
-            return {"script": d["script"], "why": d.get("why", "")}
-        raise RuntimeError(d.get("error", "error"))
+        text = d["candidates"][0]["content"]["parts"][0]["text"]
+        out = extract_json(text)
+        flat = flatten_script(out.get("script"))
+        if not flat or len(flat) < 10:
+            raise RuntimeError("empty script field")
+        return {"script": flat, "why": out.get("why", "")}
+    except urllib.error.HTTPError as e:
+        body_err = e.read().decode(errors="replace")[:200]
+        if attempt >= 4:
+            print(f"    SKIP after retries: {script['title'][:40]} ({e.code} {body_err})")
+            return None
+        wait = [8, 20, 45, 90][attempt]
+        print(f"    HTTP {e.code} ({body_err[:80]}) - cooling {wait}s")
+        time.sleep(wait)
+        return rewrite(script, voice, attempt + 1)
     except Exception as e:
         if attempt >= 4:
             print(f"    SKIP after retries: {script['title'][:40]} ({e})")
             return None
-        wait = [20, 45, 90, 180][attempt]
-        print(f"    busy ({e}) - cooling {wait}s")
+        wait = [5, 12, 25, 50][attempt]
+        print(f"    error ({e}) - cooling {wait}s")
         time.sleep(wait)
         return rewrite(script, voice, attempt + 1)
 
@@ -88,8 +153,7 @@ def main():
         data = load(v["id"])
         todo = [s for s in SCRIPTS if s["key"] not in data
                 and s["adv"] != v["n"]]           # skip scripts already BY this advisor
-        # scripts by the advisor themselves: point at the original (identity variant)
-        for s in SCRIPTS:
+        for s in SCRIPTS:                          # identity variant for their own scripts
             if s["adv"] == v["n"] and s["key"] not in data:
                 data[s["key"]] = {"script": s["body"], "why": ""}
         if not todo:
@@ -102,12 +166,12 @@ def main():
             if out:
                 data[s["key"]] = out
                 made += 1
-                if made % 5 == 0:
+                if made % 10 == 0:
                     save(v["id"], data)
             el = time.time() - t0
             print(f"  [{v['id']} {n}/{len(todo)}] {s['ch']:<5} {s['title'][:44]:<46} "
                   f"total={made} elapsed={el/60:.0f}m")
-            time.sleep(3.5)                        # ~15/min, stay under free-tier TPM
+            time.sleep(1.2)                        # Gemini free tier: well under per-min caps
         save(v["id"], data)
         print(f"{v['n']} DONE: {len(data)}/{len(SCRIPTS)} saved")
     print(f"\nfinished: {made} new variants in {(time.time()-t0)/60:.0f} minutes")
