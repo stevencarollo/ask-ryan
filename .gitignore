@@ -16,3 +16,4 @@ build/
 RENDER_NLM_SECRET.txt
 NLM_KEY_ONLY.txt
 RENDER_API_KEY.txt
+voices_build*.log
