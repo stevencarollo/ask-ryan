@@ -244,10 +244,10 @@ function render(){
   document.getElementById('empty').style.display = shown ? 'none' : 'block';
 }
 
-/* the byline: a re-voiced card credits the NEW voice, with the original noted */
+/* the byline: a re-voiced card credits only the voice being spoken now */
 function advLabel(s){
   if (s.local && s.voicedBy && s.voicedBy !== s.adv)
-    return `In the voice of ${s.voicedBy} · original by ${s.adv}`;
+    return `In the voice of ${s.voicedBy}`;
   return `In the voice of ${s.adv}`;
 }
 

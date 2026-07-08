@@ -16,6 +16,9 @@ Usage:
 """
 import json, os, re, sys, time, urllib.request, urllib.error
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from reword_why import reword
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
 VOICES_DIR = os.path.join(REPO, "voices")
@@ -83,7 +86,7 @@ Rules:
 ORIGINAL SCRIPT:
 {script['body']}
 
-Respond with ONLY a JSON object: {{"script": "the rewritten script", "why": "one sentence on what you changed"}}"""
+Respond with ONLY a JSON object: {{"script": "the rewritten script", "why": "one short sentence naming the specific frameworks, signature phrases, or philosophy this version leans on - e.g. 'Leans on his 3 F's framework and the phrase big money energy.' NEVER start with 'I rewrote/changed/transformed' or describe the act of editing - name what's IN the script, not what you did to it."}}"""
 
 
 def extract_json(text):
@@ -121,7 +124,7 @@ def rewrite(script, voice, attempt=0):
         flat = flatten_script(out.get("script"))
         if not flat or len(flat) < 10:
             raise RuntimeError("empty script field")
-        return {"script": flat, "why": out.get("why", "")}
+        return {"script": flat, "why": reword(out.get("why", ""))}
     except urllib.error.HTTPError as e:
         body_err = e.read().decode(errors="replace")[:200]
         if attempt >= 4:

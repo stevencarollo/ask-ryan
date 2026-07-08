@@ -8,10 +8,74 @@ from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 import json
+import re
 from datetime import datetime
 from typing import Optional
 import os
 import tempfile
+
+# Safety-net cleanup for the "why" caption: even with an explicit prompt
+# instruction, a model occasionally still narrates the edit ("I rewrote the
+# script to..."). Strip that lead-in so the caption states what the script
+# incorporates, not what was done to it.
+_WHY_LEADINS = [
+    re.compile(
+        r'^(?:I\s+)?(?:have\s+)?(?:rewrote|transformed|incorporated|infused|revised|adapted|'
+        r'wrote|wove|built|crafted|reworked|revamped|reimagined|adjusted|updated|changed|'
+        r'reframed|rephrased)\s+'
+        r'(?:the\s+\w+\s+|it\s+)?'
+        r'(?:by\s+|to\s+)?',
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r'^The\s+(?:script|email|text|call|voicemail|message|rewrite)\s+'
+        r'(?:was|is|has been)\s+'
+        r'(?:rewritten|rephrased|transformed|adapted|revised|reworked|reworded|reframed|crafted)\s+'
+        r'(?:to\s+|in\s+(?:the\s+voice\s+of\s+)?|using\s+|entirely\s+in\s+(?:the\s+voice\s+of\s+)?)',
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r'^The\s+rewritten\s+(?:script|email|text|call|voicemail|message)\s+',
+        re.IGNORECASE,
+    ),
+]
+_WHY_CONJUGATE = {
+    "reflect": "Reflects", "incorporate": "Incorporates", "embody": "Embodies",
+    "capture": "Captures", "channel": "Channels", "mirror": "Mirrors",
+    "infuse": "Infuses", "emphasize": "Emphasizes", "lean": "Leans",
+    "draw": "Draws", "use": "Uses", "start": "Starts", "frame": "Frames",
+    "focus": "Focuses", "embed": "Embeds", "weave": "Weaves", "echo": "Echoes",
+    "adopt": "Adopts", "apply": "Applies", "employ": "Employs",
+    "deploy": "Deploys", "open": "Opens", "close": "Closes", "end": "Ends",
+    "keep": "Keeps", "give": "Gives", "add": "Adds", "swap": "Swaps",
+    "replace": "Replaces", "flip": "Flips", "turn": "Turns", "make": "Makes",
+    "bring": "Brings", "pair": "Pairs", "anchor": "Anchors",
+    "acknowledge": "Acknowledges", "address": "Addresses", "validate": "Validates",
+    "defuse": "Defuses", "position": "Positions", "present": "Presents",
+    "ask": "Asks", "invite": "Invites", "offer": "Offers", "highlight": "Highlights",
+    "quote": "Quotes", "cite": "Cites", "reference": "References", "note": "Notes",
+    "stress": "Stresses", "prioritize": "Prioritizes", "center": "Centers",
+    "ground": "Grounds", "root": "Roots",
+}
+
+
+def reword_why(why):
+    """Strip editing-narration lead-ins from a model-generated 'why' caption."""
+    if not why:
+        return why
+    m = None
+    for pat in _WHY_LEADINS:
+        m = pat.match(why)
+        if m:
+            break
+    if not m or m.end() < 4:
+        return why
+    remainder = why[m.end():].strip()
+    if len(remainder) < 15:
+        return why
+    first, _, rest = remainder.partition(" ")
+    conj = _WHY_CONJUGATE.get(first.lower())
+    return f"{conj} {rest}" if conj else (remainder[0].upper() + remainder[1:])
 
 # Using Groq (FREE) for response generation
 try:
@@ -649,7 +713,7 @@ Rules:
 ORIGINAL SCRIPT:
 {script}
 
-Respond with ONLY a JSON object: {{"script": "the rewritten script", "why": "one sentence on what you changed"}}"""
+Respond with ONLY a JSON object: {{"script": "the rewritten script", "why": "one short sentence naming the specific frameworks, signature phrases, or market numbers this version leans on - e.g. 'Leans on his 3 F's framework and the 30-day re-list stat.' NEVER start with 'I rewrote/changed/transformed' or describe the act of editing - name what's IN the script, not what you did to it."}}"""
 
     try:
         client = _groq_client()
@@ -666,7 +730,7 @@ Respond with ONLY a JSON object: {{"script": "the rewritten script", "why": "one
         out = _json.loads(r.choices[0].message.content)
         if not out.get("script"):
             raise RuntimeError("empty rewrite")
-        return {"status": "success", "script": out["script"], "why": out.get("why", "")}
+        return {"status": "success", "script": out["script"], "why": reword_why(out.get("why", ""))}
     except Exception as e:
         print(f"localize-script error: {e}")
         return {"status": "error", "error": "The localizer is busy - try again in a few seconds."}
