@@ -30,6 +30,7 @@ _WHY_LEADINS = [
     re.compile(
         r'^The\s+(?:script|email|text|call|voicemail|message|rewrite)\s+'
         r'(?:was|is|has been)\s+'
+        r'(?:entirely\s+|completely\s+|fully\s+|totally\s+)?'
         r'(?:rewritten|rephrased|transformed|adapted|revised|reworked|reworded|reframed|crafted)\s+'
         r'(?:to\s+|in\s+(?:the\s+voice\s+of\s+)?|using\s+|entirely\s+in\s+(?:the\s+voice\s+of\s+)?)',
         re.IGNORECASE,
