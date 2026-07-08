@@ -52,8 +52,10 @@
             -webkit-backdrop-filter: blur(18px);
             border-bottom: 1px solid var(--line);
         }
-        .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; cursor: pointer; }
-        .brand svg { width: 34px; height: 34px; }
+        .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; cursor: pointer; transition: filter 0.35s ease; }
+        .brand:hover, .brand:focus-visible { filter: drop-shadow(0 0 10px rgba(201,168,92,0.4)); }
+        .brand svg { width: 34px; height: 34px; transition: transform 0.6s cubic-bezier(.2,.8,.2,1); }
+        .brand:hover svg, .brand:focus-visible svg { transform: rotate(16deg); }
         .brand-name {
             font-family: 'Cinzel', serif;
             font-size: 1.25rem; font-weight: 600; letter-spacing: 0.12em;
@@ -320,23 +322,30 @@
     <nav aria-label="Main">
         <a href="/" class="brand" aria-label="The Roundtable home">
             <svg viewBox="0 0 34 34" fill="none" aria-hidden="true">
-                <circle cx="17" cy="17" r="15.5" stroke="#C9A85C" stroke-width="1.4"/>
-                <circle cx="17" cy="17" r="3" fill="#C9A85C"/>
-                <circle cx="17" cy="6.5" r="1.6" fill="#C9A85C"/><circle cx="27.5" cy="17" r="1.6" fill="#C9A85C"/>
-                <circle cx="17" cy="27.5" r="1.6" fill="#C9A85C"/><circle cx="6.5" cy="17" r="1.6" fill="#C9A85C"/>
-                <circle cx="24.4" cy="9.6" r="1.6" fill="#C9A85C"/><circle cx="24.4" cy="24.4" r="1.6" fill="#C9A85C"/>
-                <circle cx="9.6" cy="24.4" r="1.6" fill="#C9A85C"/><circle cx="9.6" cy="9.6" r="1.6" fill="#C9A85C"/>
+                <defs>
+                    <linearGradient id="rtLogoGrad" x1="2" y1="2" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                        <stop offset="0" stop-color="#F0DFAE"/>
+                        <stop offset="0.55" stop-color="#E5C87E"/>
+                        <stop offset="1" stop-color="#B8934A"/>
+                    </linearGradient>
+                </defs>
+                <circle cx="17" cy="17" r="15.3" stroke="url(#rtLogoGrad)" stroke-width="1.3"/>
+                <circle cx="17" cy="17" r="11.6" stroke="url(#rtLogoGrad)" stroke-width="0.6" opacity="0.4"/>
+                <circle cx="17" cy="17" r="3.4" fill="url(#rtLogoGrad)"/>
+                <circle cx="17" cy="6.6" r="1.55" fill="url(#rtLogoGrad)"/><circle cx="27.4" cy="17" r="1.55" fill="url(#rtLogoGrad)"/>
+                <circle cx="17" cy="27.4" r="1.55" fill="url(#rtLogoGrad)"/><circle cx="6.6" cy="17" r="1.55" fill="url(#rtLogoGrad)"/>
+                <circle cx="24.36" cy="9.64" r="1.4" fill="url(#rtLogoGrad)" opacity="0.85"/><circle cx="24.36" cy="24.36" r="1.4" fill="url(#rtLogoGrad)" opacity="0.85"/>
+                <circle cx="9.64" cy="24.36" r="1.4" fill="url(#rtLogoGrad)" opacity="0.85"/><circle cx="9.64" cy="9.64" r="1.4" fill="url(#rtLogoGrad)" opacity="0.85"/>
             </svg>
             <span class="brand-name">The Roundtable</span>
         </a>
         <div class="nav-links">
             <a href="#panel">The Panel</a>
             <a href="#capabilities">Capabilities</a>
-            <a href="#skill">Claude Skill</a>
             <a href="/flyer-studio.html">Flyer Studio</a>
             <a href="/scripts.html">Script Vault</a>
             <a href="/podcast-studio.html">Podcasts</a>
-            <a href="#pricing">Pricing</a>
+            <a href="#skill">Claude Skill</a>
             <a href="/frontend.html" class="btn btn-solid nav-cta">Enter</a>
         </div>
     </nav>
@@ -466,8 +475,8 @@
         <div class="caps">
             <div class="cap">
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
-                <h3>Title &amp; Prelim Review</h3>
-                <p>Liens, vesting, deeds of trust, tax status, ownership history — plus the talking points they give you with the seller. Scanned PDFs get read page-by-page.</p>
+                <h3>Contract &amp; Document Review</h3>
+                <p>Purchase agreements, counters, disclosures, title reports — the panel flags the business terms that matter and the talking points they create with your client. Scanned PDFs get read page-by-page.</p>
             </div>
             <div class="cap">
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
@@ -493,6 +502,36 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                 <h3>Conversation Memory</h3>
                 <p>Your coach remembers the document, the thread, and its own questions. Answer back and the session continues — nothing resets.</p>
+            </div>
+            <div class="cap">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 7 13.5 15.5l-5-5L2 17"/><path d="M16 7h6v6"/></svg>
+                <h3>Deal Math &amp; Investment Analysis</h3>
+                <p>ARV and MAO for flips, BRRRR math for rentals, cap rate and NOI for commercial, and creative-finance structures — run live, on your numbers.</p>
+            </div>
+            <div class="cap">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="21" y1="4" x2="14" y2="4"/><line x1="10" y1="4" x2="3" y2="4"/><line x1="21" y1="12" x2="12" y2="12"/><line x1="8" y1="12" x2="3" y2="12"/><line x1="21" y1="20" x2="16" y2="20"/><line x1="12" y1="20" x2="3" y2="20"/><line x1="14" y1="2" x2="14" y2="6"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="16" y1="18" x2="16" y2="22"/></svg>
+                <h3>Build-Your-Own Advisor Voice</h3>
+                <p>Pick any of the 34 advisors — or blend the whole panel — and every script, rewrite, and answer speaks in their exact voice, not a generic one.</p>
+            </div>
+            <div class="cap">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                <h3>Local Market Tailoring</h3>
+                <p>Live Altos Research data for any ZIP or city in LA or Orange County, woven right into your scripts — median price, days on market, the real numbers.</p>
+            </div>
+            <div class="cap">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                <h3>Advisor Podcast Studio</h3>
+                <p>Turn any topic into a two-host advisor episode, or generate real studio audio — pick the two perspectives you want arguing it out.</p>
+            </div>
+            <div class="cap">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+                <h3>Bilingual Coaching</h3>
+                <p>Full Spanish-language coaching alongside English — script for script, answer for answer — for bilingual farms and Latino homebuyer markets.</p>
+            </div>
+            <div class="cap">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h20"/><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"/><path d="m7 21 5-5 5 5"/></svg>
+                <h3>Listing Presentation Teardown</h3>
+                <p>Headline, hierarchy, story, and call-to-action — a marketer's critique of the deck you bring to sellers, not just the flyer you hand buyers.</p>
             </div>
         </div>
     </section>
