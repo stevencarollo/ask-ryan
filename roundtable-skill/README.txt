@@ -19,14 +19,23 @@ WHAT YOU GET
   marketing, negotiation, design & staging, commercial, flipping & investing,
   probate/divorce/distressed, Spanish-language coaching) - every advisor's
   full research file with sources is bundled in references/research/.
+- Single-advisor voice mode: ask for an answer, script, or rewrite in ONE
+  specific advisor's voice ("like Chris Voss would say it") and the whole
+  reply speaks in their exact tone and frameworks - no blending, no caveats.
+- Contract & document review, photo/headshot critique, lead-list attack
+  plans, deal math (ARV/MAO/BRRRR/cap rate/creative finance), listing
+  presentation teardowns, and conversation memory across the session.
 - Advisor-persona podcast scripts: single-advisor interviews or two-advisor
   duo shows using their first names and real philosophies (102 ready
   episode concepts in references/podcast_concepts.md).
 - Flyer & listing marketing copy: headlines, descriptions, feature bullets,
   Instagram captions, and email blasts - English and Spanish.
-- Bilingual script library (cold call, FSBO, expired, door knock, probate,
-  NOD, listing openers) in references/research/espanol_scripts.md.
+- Bilingual coaching, script for script, answer for answer - plus a
+  standalone bilingual script library in references/research/espanol_scripts.md.
 - Ask for scripts, objection handling, deal analysis, staging plans,
   flyer critiques - or paste any document for review.
 
-Free forever. Web version: https://ask-ryan.vercel.app
+Free forever. Full web version at https://ask-ryan.vercel.app also includes
+a 274+ script Script Vault (with live local-market tailoring and instant
+advisor-voice switching), a Flyer Studio (paste a listing link, get 8
+print-ready templates), and a Podcast Studio (real audio episodes).
