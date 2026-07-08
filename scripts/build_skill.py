@@ -59,3 +59,11 @@ if os.path.exists("roundtable-skill.zip"):
 shutil.make_archive("roundtable-skill", "zip", "roundtable-skill")
 print(f"zip rebuilt: {os.path.getsize('roundtable-skill.zip')/1024:.1f} KB, "
       f"{len([f for f in os.listdir(out_dir)]) if os.path.isdir(out_dir) else 0} research files bundled")
+
+# Keep Steve's own locally-installed copy in sync automatically, every rebuild.
+local_skill_dir = os.path.expanduser("~/.claude/skills/roundtable-coach")
+if os.path.isdir(os.path.dirname(local_skill_dir)):
+    if os.path.isdir(local_skill_dir):
+        shutil.rmtree(local_skill_dir)
+    shutil.copytree("roundtable-skill/roundtable-coach", local_skill_dir)
+    print(f"synced local skill -> {local_skill_dir}")
