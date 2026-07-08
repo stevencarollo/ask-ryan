@@ -146,15 +146,104 @@
         }
         .panel-card {
             background: var(--charcoal); padding: 38px 32px;
-            transition: background-color 0.3s ease;
+            position: relative; cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s cubic-bezier(.2,.8,.2,1), box-shadow 0.3s ease;
         }
-        .panel-card:hover { background: var(--surface); }
-        .panel-card svg { width: 26px; height: 26px; stroke: var(--gold); margin-bottom: 20px; }
+        .panel-card:hover, .panel-card:focus-visible {
+            background: var(--surface); transform: translateY(-4px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(201,168,92,0.28);
+            z-index: 2;
+        }
+        .panel-card:active { transform: translateY(-1px); }
+        .panel-card svg { width: 26px; height: 26px; stroke: var(--gold); margin-bottom: 20px; transition: transform 0.3s ease; }
+        .panel-card:hover svg { transform: scale(1.08); }
         .panel-card h3 {
             font-family: 'Cinzel', serif; font-size: 1.02rem; font-weight: 600;
             letter-spacing: 0.06em; color: var(--ivory); margin-bottom: 12px;
         }
         .panel-card p { font-size: 0.9rem; color: var(--muted); line-height: 1.7; }
+        .panel-cta {
+            display: flex; align-items: center; gap: 6px; margin-top: 18px;
+            font-size: 0.76rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--gold); opacity: 0.55; transition: opacity 0.3s ease, gap 0.3s ease;
+        }
+        .panel-cta svg { width: 14px; height: 14px; stroke: var(--gold); margin: 0; transition: transform 0.3s ease; }
+        .panel-card:hover .panel-cta, .panel-card:focus-visible .panel-cta { opacity: 1; gap: 10px; }
+        .panel-card:hover .panel-cta svg, .panel-card:focus-visible .panel-cta svg { transform: translateX(3px); }
+
+        /* ============ PANEL MODAL ============ */
+        .panel-modal {
+            position: fixed; inset: 0; z-index: 300; display: none;
+            align-items: center; justify-content: center; padding: 24px;
+        }
+        .panel-modal.on { display: flex; }
+        .panel-modal-backdrop {
+            position: absolute; inset: 0; background: rgba(6,6,8,0.72);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            animation: pmFadeIn 0.25s ease both;
+        }
+        .panel-modal-card {
+            position: relative; width: 100%; max-width: 900px; max-height: 86vh;
+            overflow-y: auto; overscroll-behavior: contain;
+            background: linear-gradient(165deg, rgba(26,26,30,0.92), rgba(19,19,22,0.96));
+            backdrop-filter: blur(24px) saturate(140%); -webkit-backdrop-filter: blur(24px) saturate(140%);
+            border: 1px solid rgba(201,168,92,0.32); border-radius: 22px;
+            box-shadow: 0 40px 120px rgba(0,0,0,0.55), 0 0 0 1px rgba(201,168,92,0.08) inset;
+            padding: clamp(28px, 5vw, 52px);
+            animation: pmRise 0.38s cubic-bezier(.2,.9,.25,1) both;
+        }
+        @keyframes pmFadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pmRise { from { opacity: 0; transform: translateY(22px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .panel-modal-close {
+            position: absolute; top: 20px; right: 20px; width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 50%;
+            color: var(--muted); font-size: 1.3rem; line-height: 1; cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .panel-modal-close:hover, .panel-modal-close:focus-visible { background: var(--gold); color: var(--ink); border-color: var(--gold); transform: rotate(90deg); }
+        .panel-modal-kicker {
+            font-size: 0.74rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+            color: var(--gold); display: block; margin-bottom: 10px;
+        }
+        .panel-modal-head h3 {
+            font-family: 'Cinzel', serif; font-weight: 600; color: var(--ivory);
+            font-size: clamp(1.5rem, 3vw, 2.1rem); padding-right: 40px;
+        }
+        .panel-modal-head p { color: var(--muted); margin-top: 12px; max-width: 640px; font-size: 0.98rem; line-height: 1.7; }
+        .panel-modal-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px; margin-top: 34px;
+        }
+        .panel-mini {
+            background: rgba(255,255,255,0.025); border: 1px solid var(--line); border-radius: 16px;
+            padding: 22px 20px; opacity: 0; transform: translateY(14px);
+            animation: pmMiniIn 0.5s cubic-bezier(.2,.9,.25,1) forwards;
+            transition: border-color 0.25s ease, background-color 0.25s ease;
+        }
+        .panel-mini:hover { border-color: rgba(201,168,92,0.4); background: rgba(255,255,255,0.045); }
+        @keyframes pmMiniIn { to { opacity: 1; transform: translateY(0); } }
+        .panel-mini-top { display: flex; align-items: center; gap: 13px; margin-bottom: 13px; }
+        .panel-mini-avatar {
+            flex: 0 0 auto; width: 46px; height: 46px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Cinzel', serif; font-weight: 600; font-size: 0.86rem; color: var(--ink);
+            background: linear-gradient(150deg, var(--gold-bright), var(--gold));
+        }
+        .panel-mini h4 { font-family: 'Cinzel', serif; font-size: 0.94rem; font-weight: 600; color: var(--ivory); line-height: 1.3; }
+        .panel-mini-tag {
+            display: block; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.06em;
+            text-transform: uppercase; color: var(--gold); margin-top: 3px;
+        }
+        .panel-mini p { font-size: 0.85rem; color: var(--muted); line-height: 1.65; }
+        body.panel-modal-open { overflow: hidden; }
+        @media (max-width: 640px) {
+            .panel-modal { padding: 0; }
+            .panel-modal-card { max-width: 100%; max-height: 100dvh; height: 100dvh; border-radius: 0; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .panel-modal-backdrop, .panel-modal-card, .panel-mini { animation: none !important; opacity: 1 !important; transform: none !important; }
+        }
 
         /* Light band — how it works */
         .light { background: var(--light-bg); }
@@ -275,53 +364,75 @@
             <p class="section-sub">Every answer blends only the perspectives you select. Fewer seats, deeper expertise.</p>
         </div>
         <div class="panel-grid">
-            <div class="panel-card">
+            <div class="panel-card" data-group="sales" tabindex="0" role="button" aria-haspopup="dialog" onclick="openPanelModal('sales',this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openPanelModal('sales',this)}">
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                 <h3>Sales &amp; Prospecting</h3>
                 <p>FSBO and expired scripts, cold-call structure, door-knocking systems, listing-appointment prequalification — tonality included.</p>
+                <span class="panel-cta">Meet the pros <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
             </div>
-            <div class="panel-card">
+            <div class="panel-card" data-group="coaching" tabindex="0" role="button" aria-haspopup="dialog" onclick="openPanelModal('coaching',this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openPanelModal('coaching',this)}">
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
                 <h3>Coaching &amp; Business</h3>
                 <p>Business-plan math, referral systems, team models, and CEO-level deal architecture from the industry's most-quoted coaches.</p>
+                <span class="panel-cta">Meet the pros <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
             </div>
-            <div class="panel-card">
+            <div class="panel-card" data-group="marketing" tabindex="0" role="button" aria-haspopup="dialog" onclick="openPanelModal('marketing',this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openPanelModal('marketing',this)}">
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
                 <h3>Marketing &amp; Media</h3>
                 <p>Storytelling that converts, hook-first video, listing-attraction plays, Google Business ranking, and camera-first branding.</p>
+                <span class="panel-cta">Meet the pros <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
             </div>
-            <div class="panel-card">
+            <div class="panel-card" data-group="negotiation" tabindex="0" role="button" aria-haspopup="dialog" onclick="openPanelModal('negotiation',this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openPanelModal('negotiation',this)}">
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>
                 <h3>Negotiation</h3>
                 <p>Tactical empathy, calibrated questions, accusation audits, and anchor strategy — hostage-negotiator psychology for the living room.</p>
+                <span class="panel-cta">Meet the pros <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
             </div>
-            <div class="panel-card">
+            <div class="panel-card" data-group="design" tabindex="0" role="button" aria-haspopup="dialog" onclick="openPanelModal('design',this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openPanelModal('design',this)}">
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3"/><path d="M2 11v5a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v2H6v-2a2 2 0 0 0-4 0Z"/><path d="M4 18v2"/><path d="M20 18v2"/></svg>
                 <h3>Design &amp; Staging</h3>
                 <p>Room-by-room staging plans, design rules that photograph beautifully, and luxury merchandising that shortens days-on-market.</p>
+                <span class="panel-cta">Meet the pros <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
             </div>
-            <div class="panel-card">
+            <div class="panel-card" data-group="commercial" tabindex="0" role="button" aria-haspopup="dialog" onclick="openPanelModal('commercial',this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openPanelModal('commercial',this)}">
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>
                 <h3>Commercial</h3>
                 <p>Cap-rate and NOI underwriting, NNN leasing, territory mastery, and multifamily value-add from investment-sales veterans.</p>
+                <span class="panel-cta">Meet the pros <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
             </div>
-            <div class="panel-card">
+            <div class="panel-card" data-group="flipping" tabindex="0" role="button" aria-haspopup="dialog" onclick="openPanelModal('flipping',this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openPanelModal('flipping',this)}">
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 12-8.373 8.373a1 1 0 1 1-3-3L12 9"/><path d="m18 15 4-4"/><path d="m21.5 11.5-1.914-1.914A2 2 0 0 1 19 8.172V7l-2.26-2.26a6 6 0 0 0-4.202-1.756L9 2.96l.92.82A6.18 6.18 0 0 1 12 8.4V10l2 2h1.172a2 2 0 0 1 1.414.586L18.5 14.5"/></svg>
                 <h3>Flipping &amp; Investing</h3>
                 <p>ARV discipline, MAO formulas, rehab budgets, BRRRR math, and creative-finance structures — subject-to, seller carry, novation.</p>
+                <span class="panel-cta">Meet the pros <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
             </div>
-            <div class="panel-card">
+            <div class="panel-card" data-group="probate" tabindex="0" role="button" aria-haspopup="dialog" onclick="openPanelModal('probate',this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openPanelModal('probate',this)}">
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22V8"/><path d="m5 12-2 3h18l-2-3"/><path d="M5 12V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v8"/><path d="M9 22h6"/></svg>
                 <h3>Probate, Divorce &amp; Distressed</h3>
                 <p>California IAEA authority, court-confirmation math, divorce-listing neutrality, NOD timelines, short sales, and tax-default plays.</p>
+                <span class="panel-cta">Meet the pros <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
             </div>
-            <div class="panel-card">
+            <div class="panel-card" data-group="espanol" tabindex="0" role="button" aria-haspopup="dialog" onclick="openPanelModal('espanol',this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openPanelModal('espanol',this)}">
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
                 <h3>Español &amp; Bilingual</h3>
                 <p>Full Spanish-language coaching — scripts en español, cultural fluency, ITIN lending paths, and the Latino homeownership market.</p>
+                <span class="panel-cta">Meet the pros <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
             </div>
         </div>
     </section>
+
+    <div class="panel-modal" id="panelModal">
+        <div class="panel-modal-backdrop" onclick="closePanelModal()"></div>
+        <div class="panel-modal-card" role="dialog" aria-modal="true" aria-labelledby="panelModalTitle" id="panelModalCard">
+            <button class="panel-modal-close" aria-label="Close" onclick="closePanelModal()">&times;</button>
+            <div class="panel-modal-head">
+                <span class="panel-modal-kicker">The Panel</span>
+                <h3 id="panelModalTitle"></h3>
+                <p id="panelModalSub"></p>
+            </div>
+            <div class="panel-modal-grid" id="panelModalGrid"></div>
+        </div>
+    </div>
 
     <section class="light" id="how">
         <div class="section-head">
@@ -419,5 +530,113 @@
         <span class="brand-name">The Roundtable</span>
         <p>AI coaching for real estate professionals. Perspectives inspired by publicly available industry content. Not affiliated with or endorsed by any individual, brokerage, or brand referenced. Not legal, tax, or financial advice.</p>
     </footer>
+
+    <script>
+        const PANEL_GROUPS = {
+            sales: { title: 'Sales & Prospecting', sub: 'FSBO and expired scripts, cold-call structure, door-knocking systems, listing-appointment prequalification — tonality included.', experts: [
+                ['Ryan Serhant', 'Luxury sales & branding', 'CEO of SERHANT. and star of Owning Manhattan, built his business on relentless follow-up (the "Three F\'s") and selling the improved life, not the square footage.'],
+                ['Tim & Julie Harris', 'Listing appointments & scripts', 'A husband-and-wife coaching duo behind one of the industry\'s longest-running daily podcasts, famous for scripting the exact words that turn expired and FSBO leads into signed listings.'],
+                ['Brandon Mulrenin', 'FSBO & expired prospecting', 'Reinvented prospecting around one idea — lead with a diagnosis, not a pitch — teaching agents to earn permission before ever asking for the appointment.'],
+                ['Ricky Carruth', 'Cold calling & relationships', 'Sold hundreds of homes without a team or big budget by mastering the zero-pressure cold call and playing the long, decade-spanning relationship game.'],
+            ]},
+            coaching: { title: 'Coaching & Business', sub: 'Business-plan math, referral systems, team models, and CEO-level deal architecture from the industry\'s most-quoted coaches.', experts: [
+                ['Tom Ferry', 'Coaching systems & planning', 'The industry\'s most-watched business coach, known for pairing rigorous business-planning math with high-energy systems for lead generation and time-blocking.'],
+                ['Brian Buffini', 'Referrals & relationships', 'Built an entire coaching empire on one principle — work by referral — turning pop-bys and genuine relationships into a repeatable, low-pressure pipeline.'],
+                ['Gary Keller', 'Teams & wealth models', 'Co-founder of Keller Williams and author of The Millionaire Real Estate Agent, the source of the economic models most top-producing teams still run on today.'],
+                ['Sharran Srivatsaa', 'Strategy, luxury & wealth', 'A former Wall Street trader turned real estate operator, known for CEO-level strategy, luxury positioning, and turning brokerages into scalable, high-margin businesses.'],
+            ]},
+            marketing: { title: 'Marketing & Media', sub: 'Storytelling that converts, hook-first video, listing-attraction plays, Google Business ranking, and camera-first branding.', experts: [
+                ['Glennda Baker', 'Storytelling & social', 'A social-media powerhouse who turns everyday listings into must-watch neighborhood stories, converting followers into buyers and sellers.'],
+                ['Byron Lazine', 'Market analysis & trends', 'Co-founder of the industry\'s top daily news briefing, known for translating market data into sharp, no-fluff takes agents actually use.'],
+                ['Jimmy Burgess', 'Listing attraction tactics', 'A value-first marketer who built his following on giving away real strategy — the tactics that make an agent the obvious listing choice in their market.'],
+                ['Jason Pantana', 'Visual marketing & tech', 'Tom Ferry\'s marketing-technology specialist, known for hook-first video content and turning cutting-edge marketing tech into simple, repeatable systems.'],
+                ['Chelsea Peitz', 'Visual social branding', 'A social-selling coach who teaches agents to show up as a real human on camera — DMs and stories that build trust before any listing conversation.'],
+            ]},
+            negotiation: { title: 'Negotiation', sub: 'Tactical empathy, calibrated questions, accusation audits, and anchor strategy — hostage-negotiator psychology for the living room.', experts: [
+                ['Chris Voss', 'Negotiation psychology', 'Former lead FBI international hostage negotiator and author of Never Split the Difference, whose tactical-empathy framework now anchors how top agents handle objections and stalled deals.'],
+            ]},
+            design: { title: 'Design & Staging', sub: 'Room-by-room staging plans, design rules that photograph beautifully, and luxury merchandising that shortens days-on-market.', experts: [
+                ['Joanna Gaines', 'Design & lifestyle storytelling', 'Co-founder of Magnolia and star of Fixer Upper, famous for warm, story-driven design that makes buyers feel a home\'s life before they ever move in.'],
+                ['Shea McGee', 'Design rules & transformations', 'Founder of Studio McGee, known for design rules and room-by-room transformations that photograph beautifully and shorten time on market.'],
+                ['Cheryl Eisen', 'Luxury staging that sells', 'A luxury home stager to some of the country\'s top listings, known for staging that sells an identity, not just a room.'],
+            ]},
+            commercial: { title: 'Commercial', sub: 'Cap-rate and NOI underwriting, NNN leasing, territory mastery, and multifamily value-add from investment-sales veterans.', experts: [
+                ['Bob Knakal', 'Investment sales', 'One of the most prolific investment-sales brokers in New York City history, known for cap-rate discipline and relentless ownership-tracking.'],
+                ['Tyler Cauble', 'Leasing & small CRE', 'A commercial broker and educator who made small-scale CRE and NNN leasing accessible to agents who never thought commercial was for them.'],
+                ['Ken McElroy', 'Multifamily investing', 'A multifamily investor and author known for operational discipline — the NOI-gap thinking that turns tired apartment buildings into serious cash flow.'],
+            ]},
+            flipping: { title: 'Flipping & Investing', sub: 'ARV discipline, MAO formulas, rehab budgets, BRRRR math, and creative-finance structures — subject-to, seller carry, novation.', experts: [
+                ['Tarek El Moussa', 'Flipping & renovation ROI', 'Star of Flip or Flop, known for renovation-ROI discipline — knowing exactly which repairs return money and which ones just burn it.'],
+                ['Jerry Norton', 'Flips & wholesaling deals', 'A flipping and wholesaling educator behind the widely used 65% MAO formula for pricing deals with certainty.'],
+                ['Pace Morby', 'Creative finance & subject-to', 'Popularized creative finance at scale — subject-to, seller-carry, and "get creative or get out of the business" deal structuring.'],
+                ['David Greene', 'BRRRR & long-distance investing', 'Co-host of BiggerPockets\' flagship podcast, known for the BRRRR method and building portfolios from anywhere via long-distance investing.'],
+            ]},
+            probate: { title: 'Probate, Divorce & Distressed', sub: 'California IAEA authority, court-confirmation math, divorce-listing neutrality, NOD timelines, short sales, and tax-default plays.', experts: [
+                ['Chad Corbett', 'Probate systems & outreach', 'Built a probate-specific outreach system around one rule — take things off the family\'s plate before ever mentioning the listing.'],
+                ['Al Nicoletti', 'Probate legal strategy (attorney)', 'A Florida probate attorney whose legal-strategy insight shapes how agents navigate estate sales without stepping on an attorney\'s toes.'],
+                ['Bill Gross', 'CA probate court process', 'An expert in California\'s probate court process — IAEA authority, court confirmation, and the sequencing that keeps estate sales from stalling.'],
+                ['Laurel Starks', 'Divorce & family-law collaboration', 'Founder of the Divorce Real Estate Institute, known for representing the house — not either spouse — as a strict, court-friendly neutral.'],
+                ['Nicole Espinosa', 'Short sales, NOD & pre-foreclosure', 'A short-sale and pre-foreclosure specialist who maps every option for a homeowner before the bank forecloses.'],
+                ['Ted Thomas', 'Tax liens & tax defaults', 'The country\'s leading authority on tax-defaulted property and the redemption-window strategies that protect an owner\'s equity.'],
+            ]},
+            espanol: { title: 'Español & Bilingual', sub: 'Full Spanish-language coaching — scripts en español, cultural fluency, ITIN lending paths, and the Latino homeownership market.', experts: [
+                ['Loida Velasquez', 'Bilingual (EN/ES) prospecting', 'A bilingual prospecting specialist who built her business proving that confianza — trust — closes more deals than any script.'],
+                ['Veronica Figueroa', 'Latino homebuyer market', 'Founder of the Figueroa Team and a leading voice on the Latino homebuyer market, from ITIN lending paths to first-time-buyer education.'],
+                ['Carlos Reyes', 'Investing & wholesaling en español', 'An investor and educator teaching wholesaling and real estate investing en español to a fast-growing Latino investor community.'],
+                ['Rene Rodriguez', 'Sales psychology & influence', 'A bilingual sales-psychology expert known for teaching influence and connection — the human side of closing — in both English and Spanish.'],
+            ]},
+        };
+
+        let panelLastFocus = null;
+
+        function initials(name) {
+            return name.replace(/&/g, ' ').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+        }
+
+        function openPanelModal(key, triggerEl) {
+            const g = PANEL_GROUPS[key];
+            if (!g) return;
+            panelLastFocus = triggerEl || document.activeElement;
+            document.getElementById('panelModalTitle').textContent = g.title;
+            document.getElementById('panelModalSub').textContent = g.sub;
+            const grid = document.getElementById('panelModalGrid');
+            grid.innerHTML = g.experts.map((e, i) => `
+                <div class="panel-mini" style="animation-delay:${i * 55}ms">
+                    <div class="panel-mini-top">
+                        <div class="panel-mini-avatar">${initials(e[0])}</div>
+                        <div>
+                            <h4>${e[0]}</h4>
+                            <span class="panel-mini-tag">${e[1]}</span>
+                        </div>
+                    </div>
+                    <p>${e[2]}</p>
+                </div>
+            `).join('');
+            const modal = document.getElementById('panelModal');
+            modal.classList.add('on');
+            document.body.classList.add('panel-modal-open');
+            document.addEventListener('keydown', panelKeyHandler);
+            setTimeout(() => document.getElementById('panelModalCard').querySelector('.panel-modal-close').focus(), 50);
+        }
+
+        function closePanelModal() {
+            const modal = document.getElementById('panelModal');
+            modal.classList.remove('on');
+            document.body.classList.remove('panel-modal-open');
+            document.removeEventListener('keydown', panelKeyHandler);
+            if (panelLastFocus) panelLastFocus.focus();
+        }
+
+        function panelKeyHandler(e) {
+            if (e.key === 'Escape') { closePanelModal(); return; }
+            if (e.key !== 'Tab') return;
+            const card = document.getElementById('panelModalCard');
+            const focusable = card.querySelectorAll('button, [tabindex]:not([tabindex="-1"]), a[href]');
+            if (!focusable.length) return;
+            const first = focusable[0], last = focusable[focusable.length - 1];
+            if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+            else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        }
+    </script>
 </body>
 </html>
