@@ -167,6 +167,8 @@
                 <input type="text" id="si-code" class="code-input" placeholder="ENTER CODE" autocomplete="off" required>
                 <label for="si-name">Your Name <span class="opt">(personalizes your scripts)</span></label>
                 <input type="text" id="si-name" placeholder="Jane Agent" autocomplete="name">
+                <label for="si-phone">Your Phone <span class="opt">(fills the "call me at…" lines)</span></label>
+                <input type="tel" id="si-phone" placeholder="(310) 555-0100" autocomplete="tel">
                 <label for="si-brokerage">Brokerage <span class="opt">(optional)</span></label>
                 <input type="text" id="si-brokerage" placeholder="Compass, KW, eXp…" autocomplete="organization">
                 <button type="submit" class="btn">Unlock Access</button>
@@ -250,9 +252,10 @@
             const email = document.getElementById('si-email').value.trim();
             const code = document.getElementById('si-code').value.trim();
             const name = document.getElementById('si-name').value.trim();
+            const phone = document.getElementById('si-phone').value.trim();
             const brokerage = document.getElementById('si-brokerage').value.trim();
             if (!email || !code) return flash('signin-err', 'Enter your email and activation code.');
-            if (await RTAuth.redeem(code, { email, name, brokerage })) location.href = nextDest();
+            if (await RTAuth.redeem(code, { email, name, phone, brokerage })) location.href = nextDest();
             else flash('signin-err', 'That activation code isn’t valid. Check it and try again, or request access below.');
         });
 

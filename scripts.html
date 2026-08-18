@@ -225,6 +225,7 @@ body.hasmkt .abtn.gold{display:inline-block}
     <button class="pedit" id="profEdit">Edit</button>
     <span class="pfields" id="profFields" style="display:none">
       <input id="pfName" placeholder="Your name" autocomplete="name">
+      <input id="pfPhone" type="tel" placeholder="Your phone (fills 'call me at…')" autocomplete="tel">
       <input id="pfBrok" placeholder="Brokerage (optional)" autocomplete="organization">
       <button class="go" id="pfSave">Save</button>
     </span>
@@ -317,6 +318,7 @@ function rxTok(names){
 }
 const RX_AGENT = rxTok(['Agent Name', 'Agent']);
 const RX_BROK  = rxTok(['Brokerage']);
+const RX_PHONE = rxTok(['Phone']);
 const RX_OWNER = rxTok(['Owner', 'Name']);
 const RX_ADDR  = rxTok(['Address']);
 const RX_STREET= rxTok(['Street']);
@@ -328,6 +330,7 @@ function mergePairs(){
   const p = [];
   if (PROFILE.name) p.push([RX_AGENT, PROFILE.name]);
   if (PROFILE.brokerage) p.push([RX_BROK, PROFILE.brokerage]);
+  if (PROFILE.phone) p.push([RX_PHONE, PROFILE.phone]);
   // spoken city: the lead's own city wins; otherwise the localized market
   // ("Torrance 90503" -> "Torrance" — a ZIP never reads naturally out loud)
   const mktCity = MARKET ? MARKET.name.replace(/\s+\d{5}$/, '') : null;
@@ -377,7 +380,8 @@ function syncProf(){
   if (PROFILE.name){
     t.innerHTML = '✒ Scripts signed as <b>' + esc(PROFILE.name) + '</b>' +
       (PROFILE.brokerage ? ' · <b>' + esc(PROFILE.brokerage) + '</b>' : '') +
-      ' — every {Agent} and {Brokerage} fills in automatically.';
+      (PROFILE.phone ? ' · <b>' + esc(PROFILE.phone) + '</b>' : '') +
+      ' — name, brokerage &amp; callback number fill in automatically.';
   } else {
     t.textContent = '✒ Add your name and every script signs itself automatically.';
   }
@@ -388,15 +392,18 @@ document.getElementById('profEdit').onclick = ()=>{
   f.style.display = open ? 'none' : 'flex';
   if (!open){
     document.getElementById('pfName').value = PROFILE.name || '';
+    document.getElementById('pfPhone').value = PROFILE.phone || '';
     document.getElementById('pfBrok').value = PROFILE.brokerage || '';
     document.getElementById('pfName').focus();
   }
 };
 document.getElementById('pfSave').onclick = ()=>{
   const name = document.getElementById('pfName').value.trim();
+  const phone = document.getElementById('pfPhone').value.trim();
   const brokerage = document.getElementById('pfBrok').value.trim();
-  RTAuth.saveProfile({name, brokerage});
+  RTAuth.saveProfile({name, phone, brokerage});
   if (name) PROFILE.name = name;
+  if (phone) PROFILE.phone = phone;
   if (brokerage) PROFILE.brokerage = brokerage;
   document.getElementById('profFields').style.display = 'none';
   syncProf(); render();
