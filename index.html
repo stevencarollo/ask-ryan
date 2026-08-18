@@ -87,6 +87,28 @@
         .nav-signout {
             font-size: 0.8rem !important; opacity: 0.75;
         }
+        .nav-burger {
+            display: none; background: none; border: 1px solid var(--line);
+            border-radius: 6px; color: var(--gold); font-size: 1.3rem;
+            width: 44px; height: 44px; cursor: pointer; line-height: 1;
+        }
+        @media (max-width: 860px) {
+            .nav-burger { display: inline-flex; align-items: center; justify-content: center; }
+            .nav-links {
+                display: none; position: absolute; top: 100%; left: 0; right: 0;
+                flex-direction: column; align-items: stretch; gap: 0;
+                background: rgba(11, 11, 13, 0.98); border-bottom: 1px solid var(--line);
+                padding: 8px 0 14px;
+            }
+            .nav-links.open { display: flex; }
+            .nav-links a {
+                padding: 15px 26px; font-size: 1rem;
+                border-bottom: 1px solid rgba(201, 168, 92, 0.08);
+            }
+            .nav-links .btn { margin: 12px 22px 0; }
+            .hero-ctas { width: 100%; }
+            .hero-ctas .btn { flex: 1 1 100%; }
+        }
         .btn {
             display: inline-flex; align-items: center; justify-content: center; gap: 10px;
             padding: 14px 34px; border-radius: 2px; cursor: pointer;
@@ -333,7 +355,9 @@
         footer p { margin-top: 14px; max-width: 640px; margin-left: auto; margin-right: auto; }
 
         @media (max-width: 720px) {
-            .nav-links a:not(.btn) { display: none; }
+            /* links now live in the burger menu; when it's open they all show */
+            .nav-links:not(.open) a:not(.btn) { display: none; }
+            .nav-links:not(.open) { display: none; }
             .hero { padding-top: 64px; }
         }
     </style>
@@ -359,7 +383,8 @@
             </svg>
             <span class="brand-name">The Roundtable</span>
         </a>
-        <div class="nav-links">
+        <button class="nav-burger" aria-label="Menu" aria-expanded="false" onclick="toggleNav()">☰</button>
+        <div class="nav-links" id="navLinks">
             <a href="#panel">The Panel</a>
             <a href="#capabilities">Capabilities</a>
             <a href="/scripts.html">Script Vault</a>
@@ -592,6 +617,17 @@
     </footer>
 
     <script>
+        function toggleNav() {
+            const nl = document.getElementById('navLinks');
+            const open = nl.classList.toggle('open');
+            document.querySelector('.nav-burger').setAttribute('aria-expanded', open);
+        }
+        // tapping any nav item closes the mobile menu
+        document.getElementById('navLinks').addEventListener('click', () => {
+            document.getElementById('navLinks').classList.remove('open');
+            document.querySelector('.nav-burger').setAttribute('aria-expanded', 'false');
+        });
+
         function comingSoon() {
             let t = document.getElementById('soon-toast');
             if (!t) {
