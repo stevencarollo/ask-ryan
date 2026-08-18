@@ -207,6 +207,14 @@
             <div class="msg err" id="challenge-err"></div>
         </div>
 
+        <!-- CHALLENGE VERDICT: correct -->
+        <div class="pane" id="pane-verdict">
+            <div class="pane-title">Correct.</div>
+            <p class="pane-sub">As its name suggests, a round table has no head — everyone who sits there has equal status, unlike conventional rectangular tables where participants order themselves according to rank.</p>
+            <p class="pane-sub">You understand the table. Five more days are yours.</p>
+            <button class="btn" onclick="claimExtension()">Take Your Seat</button>
+        </div>
+
         <!-- MERCY -->
         <div class="pane" id="pane-mercy">
             <div class="pane-title" id="mercy-title">Denied.</div>
@@ -333,15 +341,18 @@
         }
         function answerChallenge(saidTrue) {
             if (saidTrue) {
-                localStorage.setItem('rt_ext_used', String(Date.now()));
-                const email = document.getElementById('si-email').value.trim();
-                RTAuth.grant(email ? { email } : {});
-                location.href = nextDest();
+                showPane('verdict');
             } else {
-                document.getElementById('mercy-title').textContent = 'Denied.';
-                document.getElementById('mercy-sub').textContent = 'A round table… not round? The table has spoken. One path remains.';
+                document.getElementById('mercy-title').textContent = 'Incorrect.';
+                document.getElementById('mercy-sub').textContent = 'As its name suggests, a round table has no head — everyone who sits there has equal status, unlike conventional rectangular tables where participants order themselves according to rank. It is, in fact, round. The table has spoken; one path remains.';
                 showPane('mercy');
             }
+        }
+        function claimExtension() {
+            localStorage.setItem('rt_ext_used', String(Date.now()));
+            const email = document.getElementById('si-email').value.trim();
+            RTAuth.grant(email ? { email } : {});
+            location.href = nextDest();
         }
 
         /* ---- BEG FOR MERCY: emails the owner ---- */
