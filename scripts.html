@@ -249,7 +249,10 @@ body.hasmkt .abtn.gold{display:inline-block}
     <span class="pfields" id="profFields" style="display:none">
       <input id="pfName" placeholder="Your name" autocomplete="name">
       <input id="pfPhone" type="tel" placeholder="Your phone (fills 'call me at…')" autocomplete="tel">
-      <input id="pfBrok" placeholder="Brokerage (optional)" autocomplete="organization">
+      <input id="pfBrok" placeholder="Brokerage" autocomplete="organization">
+      <input id="pfTitle" placeholder="Title — Realtor®, Broker Assoc…" autocomplete="organization-title">
+      <input id="pfDre" placeholder="DRE # (goes in your email signature)" autocomplete="off">
+      <input id="pfSite" placeholder="Website" autocomplete="url">
       <button class="go" id="pfSave">Save</button>
     </span>
   </div>
@@ -398,11 +401,33 @@ function fillHTML(t){                    // escape first, then decorate the fill
 }
 
 /* ---- open a script in the agent's own email / texting app ---- */
+/* plain-text signature block from the agent's profile (mailto: is text-only) */
+function emailSignature(){
+  const P = PROFILE;
+  if (!P.name) return '';
+  const lines = [P.name];
+  const roleLine = [P.title, P.brokerage].filter(Boolean).join(' · ');
+  if (roleLine) lines.push(roleLine);
+  if (P.dre) lines.push('DRE #' + String(P.dre).replace(/^\s*dre\s*#?\s*/i, ''));
+  const reachLine = [P.phone, P.email].filter(Boolean).join(' · ');
+  if (reachLine) lines.push(reachLine);
+  if (P.website) lines.push(String(P.website).replace(/^https?:\/\//, ''));
+  return '\n\n' + lines.join('\n');
+}
+
 function mailtoURL(i){
   const s = SCRIPTS[i];
   let txt = fillPlain(s.local || s.body), subject = '', body = txt;
   const m = txt.match(/^Subject:\s*(.+)\r?\n+([\s\S]*)$/);
   if (m){ subject = m[1].trim(); body = m[2].trim(); }
+  // scripts often close with their own "{{Agent}} · {{Brokerage}}" sign-off —
+  // drop that line so the full signature doesn't repeat it
+  if (PROFILE.name){
+    const lines = body.replace(/\s+$/, '').split('\n');
+    if (lines.length && lines[lines.length - 1].includes(PROFILE.name)) lines.pop();
+    body = lines.join('\n').replace(/\s+$/, '');
+  }
+  body += emailSignature();
   const to = (ACTIVE_LEAD && ACTIVE_LEAD.email) ? encodeURIComponent(ACTIVE_LEAD.email) : '';
   return 'mailto:' + to + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
 }
@@ -434,17 +459,24 @@ document.getElementById('profEdit').onclick = ()=>{
     document.getElementById('pfName').value = PROFILE.name || '';
     document.getElementById('pfPhone').value = PROFILE.phone || '';
     document.getElementById('pfBrok').value = PROFILE.brokerage || '';
+    document.getElementById('pfTitle').value = PROFILE.title || '';
+    document.getElementById('pfDre').value = PROFILE.dre || '';
+    document.getElementById('pfSite').value = PROFILE.website || '';
     document.getElementById('pfName').focus();
   }
 };
 document.getElementById('pfSave').onclick = ()=>{
-  const name = document.getElementById('pfName').value.trim();
-  const phone = document.getElementById('pfPhone').value.trim();
-  const brokerage = document.getElementById('pfBrok').value.trim();
-  RTAuth.saveProfile({name, phone, brokerage});
-  if (name) PROFILE.name = name;
-  if (phone) PROFILE.phone = phone;
-  if (brokerage) PROFILE.brokerage = brokerage;
+  const p = {
+    name: document.getElementById('pfName').value.trim(),
+    phone: document.getElementById('pfPhone').value.trim(),
+    brokerage: document.getElementById('pfBrok').value.trim(),
+    title: document.getElementById('pfTitle').value.trim(),
+    dre: document.getElementById('pfDre').value.trim(),
+    website: document.getElementById('pfSite').value.trim()
+  };
+  RTAuth.saveProfile(p);
+  for (const k in p) if (p[k]) PROFILE[k] = p[k];
+  const name = p.name;
   document.getElementById('profFields').style.display = 'none';
   syncProf(); render();
   toast(name ? 'Scripts now signed as ' + name : 'Profile saved');

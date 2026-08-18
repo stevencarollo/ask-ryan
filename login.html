@@ -188,6 +188,13 @@
                 <input type="tel" id="ca-phone" placeholder="(310) 555-0100" autocomplete="tel" required>
                 <label for="ca-brokerage">Brokerage <span class="opt">(optional)</span></label>
                 <input type="text" id="ca-brokerage" placeholder="Compass, KW, eXp…" autocomplete="organization">
+                <div class="divider">Your email signature — optional</div>
+                <label for="ca-title">Title</label>
+                <input type="text" id="ca-title" placeholder="Realtor® · Broker Associate…" autocomplete="organization-title">
+                <label for="ca-dre">DRE License #</label>
+                <input type="text" id="ca-dre" placeholder="01234567" autocomplete="off">
+                <label for="ca-website">Website</label>
+                <input type="text" id="ca-website" placeholder="janeagenthomes.com" autocomplete="url">
                 <label for="ca-code">Promo Code <span class="opt">(instant access if you have one)</span></label>
                 <input type="text" id="ca-code" class="code-input" placeholder="PROMO CODE" autocomplete="off">
                 <button type="submit" class="btn" id="ca-submit">Create Account</button>
@@ -265,7 +272,10 @@
                 name: document.getElementById('ca-name').value.trim(),
                 email: document.getElementById('ca-email').value.trim(),
                 phone: document.getElementById('ca-phone').value.trim(),
-                brokerage: document.getElementById('ca-brokerage').value.trim()
+                brokerage: document.getElementById('ca-brokerage').value.trim(),
+                title: document.getElementById('ca-title').value.trim(),
+                dre: document.getElementById('ca-dre').value.trim(),
+                website: document.getElementById('ca-website').value.trim()
             };
         }
         function validProfile(p, requireAll) {

@@ -57,7 +57,7 @@
             if (!p) return;
             const cur = this.profile();
             const merged = Object.assign({}, cur);
-            for (const k of ['name', 'email', 'phone', 'brokerage']) {
+            for (const k of ['name', 'email', 'phone', 'brokerage', 'title', 'dre', 'website']) {
                 if (p[k]) merged[k] = p[k];
             }
             localStorage.setItem('rt_profile', JSON.stringify(merged));
