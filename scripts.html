@@ -173,7 +173,7 @@ body.hasmkt .abtn.gold{display:inline-block}
 .pick{margin-left:auto;background:none;border:none;font-size:1.25em;line-height:1;color:var(--muted);padding:2px 4px;transition:color .15s,transform .15s}
 .pick:hover{color:var(--gold-bright);transform:scale(1.15)}
 .pick.on{color:var(--gold-bright)}
-#voicePanel summary b,#marketPanel summary b{color:var(--gold-bright)}
+#marketPanel summary b{color:var(--gold-bright)}
 #pickGo{position:fixed;bottom:22px;right:22px;z-index:70;display:none;align-items:center;gap:9px;padding:14px 22px;background:linear-gradient(135deg,var(--gold) 0%,#B8964A 100%);color:var(--ink);border:none;border-radius:999px;font-weight:800;font-size:.88em;letter-spacing:.06em;box-shadow:0 10px 34px rgba(201,168,92,.45);cursor:pointer}
 #pickGo.on{display:inline-flex}
 #pickGo:disabled{opacity:.6;cursor:wait}
@@ -253,22 +253,17 @@ body.hasmkt .abtn.gold{display:inline-block}
       <button class="go" id="pfSave">Save</button>
     </span>
   </div>
-  <details class="custom-topic" id="voicePanel">
-    <summary id="voiceSum">🎙 Script Voice — Roundtable default · each specialty's own expert answers</summary>
-    <div class="ct-body">
-      <div class="voicebar">
-        <label for="voiceSel">Script voice</label>
-        <select id="voiceSel"></select>
-        <span class="lang-ask" id="langAsk" style="display:none">
-          <span class="la-q">¿Quiere los guiones en español?</span>
-          <button class="la-btn si" onclick="setSpanish(true)">Sí — en español</button>
-          <button class="la-btn" onclick="setSpanish(false)">Keep English</button>
-        </span>
-        <button class="lang-chip" id="langChip" style="display:none" onclick="setSpanish(!SPANISH)">🌎 Español: OFF</button>
-        <span class="vhint" id="vhint">Default: each script answers in the voice of the specialty's own expert.</span>
-      </div>
-    </div>
-  </details>
+  <div class="voicebar">
+    <label for="voiceSel">🎙 Script voice</label>
+    <select id="voiceSel"></select>
+    <span class="lang-ask" id="langAsk" style="display:none">
+      <span class="la-q">¿Quiere los guiones en español?</span>
+      <button class="la-btn si" onclick="setSpanish(true)">Sí — en español</button>
+      <button class="la-btn" onclick="setSpanish(false)">Keep English</button>
+    </span>
+    <button class="lang-chip" id="langChip" style="display:none" onclick="setSpanish(!SPANISH)">🌎 Español: OFF</button>
+    <span class="vhint" id="vhint">Default: each script answers in the voice of the specialty's own expert.</span>
+  </div>
   <details class="custom-topic" id="marketPanel">
     <summary id="marketSum">📍 Market — not set · tap to localize your scripts</summary>
     <div class="ct-body">
@@ -960,12 +955,6 @@ async function tailorPicks(){
 
 /* voice + market strip summaries reflect current state at a glance */
 function syncSetupSum(){
-  const vEl = document.getElementById('voiceSum');
-  if (VOICE){
-    vEl.innerHTML = '🎙 Script Voice — <b>' + esc(VOICE.n + (SPANISH ? ' · Español' : '')) + '</b>';
-  } else {
-    vEl.textContent = '🎙 Script Voice — Roundtable default · each specialty\'s own expert answers';
-  }
   const mEl = document.getElementById('marketSum');
   if (MARKET){
     mEl.innerHTML = '📍 Market — <b>' + esc(MARKET.name) + '</b> · scripts quote this week\'s numbers when tailored';
