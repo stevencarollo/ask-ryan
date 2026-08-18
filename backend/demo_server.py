@@ -754,6 +754,7 @@ async def localize_script(data: dict):
     topic = data.get("topic", "")
     m = data.get("market") or {}
     voice = data.get("voice") or {}
+    lang = data.get("lang") or "en"
     if not script or not (m.get("name") or voice.get("name")):
         return {"status": "error", "error": "script plus a market or a voice required"}
 
@@ -808,11 +809,20 @@ THE MARKET: make it speak specifically to {m['name']} right now. Current Altos R
 - Weave in AT MOST two of the local numbers, naturally, the way a sharp local agent quotes stats in conversation - not a data dump.
 - Match the tone to the market temperature ({temp})."""
 
+    lang_block = ""
+    lang_rule = ""
+    if lang == "es":
+        lang_block = """
+THE LANGUAGE: write the rewritten script ENTIRELY in Spanish - natural, warm, professional US-Latino Spanish the way a bilingual agent actually speaks on the phone (not a stiff textbook translation)."""
+        lang_rule = """
+- The script itself is 100% Spanish. Keep every {{placeholder}} in its original English form (e.g. {{Agent}}, {{Owner}}). For email scripts keep the literal "Subject: " label but write the subject text in Spanish.
+- The "why" stays in English."""
+
     prompt = f"""You are The Roundtable's script coach. Rewrite this {channel} script.
-{voice_block}{market_block}
+{voice_block}{market_block}{lang_block}
 
 Rules:
-{voice_rule}{market_rules}
+{voice_rule}{market_rules}{lang_rule}
 - Keep every {{{{placeholder}}}} exactly as written.
 - {chan_rule}
 
@@ -825,7 +835,7 @@ Respond with ONLY a JSON object: {{"script": "the rewritten script", "why": "one
     import hashlib
     import json as _json
     ck = hashlib.sha256(_json.dumps(
-        [script, channel, m, voice.get("id") or voice.get("name")],
+        [script, channel, m, voice.get("id") or voice.get("name"), lang],
         sort_keys=True, default=str).encode()).hexdigest()
     hit = _REWRITE_CACHE.get(ck)
     if hit:
@@ -857,6 +867,7 @@ async def generate_scripts(data: dict):
     channels = [c for c in (data.get("channels") or []) if c in ("call", "voicemail", "text", "email")]
     voice = data.get("voice") or {}
     m = data.get("market") or {}
+    lang = data.get("lang") or "en"
     if not niche or not channels:
         return {"status": "error", "error": "niche and at least one script type required"}
 
@@ -900,6 +911,11 @@ async def generate_scripts(data: dict):
         "email": "an email starting with 'Subject: ' (under 9 words), body under 130 words",
     }
     want = "\n".join(f'- "{c}": {forms[c]}' for c in channels)
+
+    if lang == "es":
+        who += ("\nWrite every script ENTIRELY in Spanish - natural, warm, professional US-Latino Spanish. "
+                "Keep every {{placeholder}} in its original English form. Email scripts keep the literal "
+                "'Subject: ' label with the subject text itself in Spanish.")
 
     prompt = f"""{who}
 {mkt}
