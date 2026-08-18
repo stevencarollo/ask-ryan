@@ -38,7 +38,7 @@
             content: ''; position: fixed; inset: 0; pointer-events: none;
             background: radial-gradient(ellipse 60% 45% at 50% -5%, rgba(201, 168, 92, 0.14), transparent 65%);
         }
-        a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+        a:focus-visible, button:focus-visible, input:focus-visible {
             outline: 2px solid var(--gold-bright); outline-offset: 2px; border-radius: 3px;
         }
         .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; margin: 18px 0 8px; }
@@ -57,36 +57,25 @@
             padding: 34px clamp(24px, 5vw, 40px) 38px;
             box-shadow: 0 30px 80px rgba(0,0,0,0.5);
         }
-        .tabs { display: flex; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
-        .tab {
-            flex: 1; background: none; border: none; cursor: pointer;
-            font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600;
-            letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted);
-            padding: 12px 4px; border-bottom: 2px solid transparent; margin-bottom: -1px;
-            transition: color 0.2s ease, border-color 0.2s ease;
-        }
-        .tab:hover { color: var(--gold-bright); }
-        .tab.active { color: var(--gold-bright); border-bottom-color: var(--gold); }
         .pane { display: none; }
         .pane.active { display: block; }
+        .pane-title {
+            font-family: 'Cinzel', serif; font-weight: 600; font-size: 1.3rem;
+            color: var(--ivory); margin-bottom: 6px;
+        }
+        .pane-sub { font-size: 0.88rem; color: var(--muted); margin-bottom: 10px; }
         label {
             display: block; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.14em;
             text-transform: uppercase; color: var(--muted); margin: 18px 0 7px;
         }
         label .opt { text-transform: none; letter-spacing: 0.02em; font-weight: 400; }
-        input, textarea {
+        input {
             width: 100%; background: var(--surface); border: 1px solid var(--line);
             border-radius: 3px; color: var(--ivory); font-family: 'Inter', sans-serif;
             font-size: 16px; padding: 13px 15px; transition: border-color 0.2s ease;
         }
-        @media (max-width: 480px) {
-            body { padding: 22px 14px 40px; }
-            .card { padding: 26px 18px 30px; }
-            .brand-name { font-size: 1.15rem; }
-            .tab { font-size: 0.74rem; letter-spacing: 0.08em; }
-        }
-        input::placeholder, textarea::placeholder { color: var(--muted); opacity: 0.7; }
-        input:focus, textarea:focus { border-color: var(--gold); outline: none; }
+        input::placeholder { color: var(--muted); opacity: 0.7; }
+        input:focus { border-color: var(--gold); outline: none; }
         .code-input { letter-spacing: 0.25em; text-transform: uppercase; font-weight: 600; }
         .btn {
             display: inline-flex; align-items: center; justify-content: center; width: 100%;
@@ -101,6 +90,8 @@
         .btn:disabled { opacity: 0.55; cursor: wait; box-shadow: none; }
         .btn-ghost { background: transparent; color: var(--gold); margin-top: 14px; }
         .btn-ghost:hover { background: var(--gold); color: var(--ink); }
+        .tf-row { display: flex; gap: 14px; margin-top: 26px; }
+        .tf-row .btn { margin-top: 0; flex: 1; }
         .msg {
             display: none; margin-top: 20px; padding: 13px 16px; border-radius: 3px;
             font-size: 0.88rem; line-height: 1.5;
@@ -111,7 +102,7 @@
         .fine {
             font-size: 0.8rem; color: var(--muted); margin-top: 22px; text-align: center;
         }
-        .fine a { color: var(--gold); text-decoration: none; }
+        .fine a { color: var(--gold); text-decoration: none; cursor: pointer; }
         .fine a:hover { color: var(--gold-bright); }
         .divider {
             display: flex; align-items: center; gap: 14px; margin: 26px 0 4px;
@@ -124,12 +115,22 @@
             font-size: 0.78rem; color: var(--muted);
         }
         .access-note strong { color: var(--body); font-weight: 500; }
+        .access-note a { color: var(--gold); text-decoration: none; }
+        .big-q {
+            font-family: 'Cinzel', serif; font-size: 1.15rem; color: var(--gold-bright);
+            text-align: center; margin: 26px 0 4px; line-height: 1.5;
+        }
         .success-panel { text-align: center; padding: 18px 0 6px; }
         .success-panel h2 {
             font-family: 'Cinzel', serif; font-weight: 600; font-size: 1.45rem;
             color: var(--ivory); margin-bottom: 14px;
         }
         .success-panel p { font-size: 0.92rem; margin-bottom: 6px; }
+        @media (max-width: 480px) {
+            body { padding: 22px 14px 40px; }
+            .card { padding: 26px 18px 30px; }
+            .brand-name { font-size: 1.15rem; }
+        }
     </style>
 </head>
 <body>
@@ -153,60 +154,90 @@
     <span class="access-kicker">Members Only</span>
 
     <div class="card">
-        <div class="tabs" role="tablist">
-            <button class="tab active" id="tab-signin" role="tab" aria-selected="true" onclick="showPane('signin')">Sign In</button>
-            <button class="tab" id="tab-create" role="tab" aria-selected="false" onclick="showPane('create')">Create Account</button>
-        </div>
 
-        <!-- SIGN IN -->
-        <div class="pane active" id="pane-signin" role="tabpanel">
+        <!-- SIGN IN — the one front door -->
+        <div class="pane active" id="pane-signin">
+            <div class="pane-title">Sign In</div>
             <form id="form-signin" novalidate>
                 <label for="si-email">Email</label>
                 <input type="email" id="si-email" placeholder="you@brokerage.com" autocomplete="email" required>
                 <label for="si-code">Activation Code</label>
                 <input type="text" id="si-code" class="code-input" placeholder="ENTER CODE" autocomplete="off" required>
-                <label for="si-name">Your Name <span class="opt">(personalizes your scripts)</span></label>
-                <input type="text" id="si-name" placeholder="Jane Agent" autocomplete="name">
-                <label for="si-phone">Your Phone <span class="opt">(fills the "call me at…" lines)</span></label>
-                <input type="tel" id="si-phone" placeholder="(310) 555-0100" autocomplete="tel">
-                <label for="si-brokerage">Brokerage <span class="opt">(optional)</span></label>
-                <input type="text" id="si-brokerage" placeholder="Compass, KW, eXp…" autocomplete="organization">
                 <button type="submit" class="btn">Unlock Access</button>
             </form>
             <div class="msg err" id="signin-err"></div>
-            <p class="fine">Your code unlocks <strong>5 days</strong> of access. No code? <a href="#" onclick="showPane('create');return false;">Create an account</a> and request one.</p>
+            <p class="fine">
+                No activation code? <a onclick="showPane('request')">Request access</a><br>
+                Code stopped working? <a onclick="startChallenge()">Ask for a 5-day extension</a>
+            </p>
         </div>
 
-        <!-- CREATE ACCOUNT -->
-        <div class="pane" id="pane-create" role="tabpanel">
-            <form id="form-create" novalidate>
-                <label for="ca-name">Full Name</label>
-                <input type="text" id="ca-name" placeholder="Jane Agent" autocomplete="name" required>
-                <label for="ca-email">Email</label>
-                <input type="email" id="ca-email" placeholder="you@brokerage.com" autocomplete="email" required>
-                <label for="ca-phone">Phone</label>
-                <input type="tel" id="ca-phone" placeholder="(310) 555-0100" autocomplete="tel" required>
-                <label for="ca-brokerage">Brokerage <span class="opt">(optional)</span></label>
-                <input type="text" id="ca-brokerage" placeholder="Compass, KW, eXp…" autocomplete="organization">
-                <div class="divider">Your email signature — optional</div>
-                <label for="ca-title">Title</label>
-                <input type="text" id="ca-title" placeholder="Realtor® · Broker Associate…" autocomplete="organization-title">
-                <label for="ca-dre">DRE License #</label>
-                <input type="text" id="ca-dre" placeholder="01234567" autocomplete="off">
-                <label for="ca-website">Website</label>
-                <input type="text" id="ca-website" placeholder="janeagenthomes.com" autocomplete="url">
-                <label for="ca-code">Promo Code <span class="opt">(instant access if you have one)</span></label>
-                <input type="text" id="ca-code" class="code-input" placeholder="PROMO CODE" autocomplete="off">
-                <button type="submit" class="btn" id="ca-submit">Create Account</button>
+        <!-- FIRST-TIME PROFILE — full sign-up after a valid code -->
+        <div class="pane" id="pane-profile">
+            <div class="pane-title">Welcome to the table.</div>
+            <p class="pane-sub">First time here — set up your profile once and every script signs, calls, and emails as you.</p>
+            <form id="form-profile" novalidate>
+                <label for="pr-name">Full Name</label>
+                <input type="text" id="pr-name" placeholder="Jane Agent" autocomplete="name" required>
+                <label for="pr-phone">Phone <span class="opt">(fills the "call me at…" lines)</span></label>
+                <input type="tel" id="pr-phone" placeholder="(310) 555-0100" autocomplete="tel">
+                <label for="pr-brokerage">Brokerage</label>
+                <input type="text" id="pr-brokerage" placeholder="Compass, KW, eXp…" autocomplete="organization">
+                <div class="divider">Email signature — optional</div>
+                <label for="pr-title">Title</label>
+                <input type="text" id="pr-title" placeholder="Realtor® · Broker Associate…">
+                <label for="pr-dre">DRE License #</label>
+                <input type="text" id="pr-dre" placeholder="01234567" autocomplete="off">
+                <label for="pr-website">Website</label>
+                <input type="text" id="pr-website" placeholder="janeagenthomes.com">
+                <button type="submit" class="btn">Enter the Roundtable</button>
             </form>
-            <div class="divider">No promo code?</div>
-            <button class="btn btn-ghost" id="ca-request">Request Access</button>
-            <div class="msg err" id="create-err"></div>
-            <div class="msg ok" id="create-ok"></div>
+            <p class="fine"><a onclick="finishEntry({})">Skip for now — I'll fill this in later</a></p>
+        </div>
+
+        <!-- EXTENSION CHALLENGE -->
+        <div class="pane" id="pane-challenge">
+            <div class="pane-title">One question stands between you and 5 more days.</div>
+            <p class="pane-sub">Answer truthfully. The table is watching.</p>
+            <div class="big-q">True or False:<br>A round table is actually round.</div>
+            <div class="tf-row">
+                <button class="btn" onclick="answerChallenge(true)">True</button>
+                <button class="btn btn-ghost" onclick="answerChallenge(false)">False</button>
+            </div>
+            <div class="msg err" id="challenge-err"></div>
+        </div>
+
+        <!-- MERCY -->
+        <div class="pane" id="pane-mercy">
+            <div class="pane-title" id="mercy-title">Denied.</div>
+            <p class="pane-sub" id="mercy-sub">The table has spoken. There is, however, one path left to you.</p>
+            <button class="btn" id="mercy-btn" onclick="begForMercy()">🙏 Beg for Mercy</button>
+            <div class="msg ok" id="mercy-ok"></div>
+            <div class="msg err" id="mercy-err"></div>
+            <p class="fine"><a onclick="showPane('signin')">Back to Sign In</a></p>
+        </div>
+
+        <!-- REQUEST ACCESS (no code at all) -->
+        <div class="pane" id="pane-request">
+            <div class="pane-title">Request Access</div>
+            <p class="pane-sub">No code yet? Tell us who you are — approvals come with an activation code by email.</p>
+            <form id="form-request" novalidate>
+                <label for="rq-name">Full Name</label>
+                <input type="text" id="rq-name" placeholder="Jane Agent" autocomplete="name" required>
+                <label for="rq-email">Email</label>
+                <input type="email" id="rq-email" placeholder="you@brokerage.com" autocomplete="email" required>
+                <label for="rq-phone">Phone</label>
+                <input type="tel" id="rq-phone" placeholder="(310) 555-0100" autocomplete="tel" required>
+                <label for="rq-brokerage">Brokerage <span class="opt">(optional)</span></label>
+                <input type="text" id="rq-brokerage" placeholder="Compass, KW, eXp…" autocomplete="organization">
+                <button type="submit" class="btn" id="rq-submit">Request Access</button>
+            </form>
+            <div class="msg err" id="request-err"></div>
+            <p class="fine"><a onclick="showPane('signin')">Back to Sign In</a></p>
         </div>
 
         <!-- REQUEST SENT -->
-        <div class="pane" id="pane-sent" role="tabpanel">
+        <div class="pane" id="pane-sent">
             <div class="success-panel">
                 <h2>Request Received</h2>
                 <p>Your access request has been submitted for approval.</p>
@@ -217,112 +248,158 @@
     </div>
 
     <p class="access-note">Current member access includes <strong>The Panel</strong>, <strong>Capabilities</strong> &amp; the <strong>Script Vault</strong>. Podcasts, Flyer Studio &amp; the Claude Skill are coming soon.</p>
-    <p class="access-note">By signing in or creating an account you agree to the <a href="/terms.html" style="color:var(--gold)">Terms of Use</a>. Scripts are AI-generated educational content inspired by publicly available teachings — the named advisors are not affiliated with and have not endorsed this site. You are responsible for TCPA / Do-Not-Call / fair-housing compliance in your own outreach.</p>
+    <p class="access-note">By signing in or creating an account you agree to the <a href="/terms.html">Terms of Use</a>. Scripts are AI-generated educational content inspired by publicly available teachings — the named advisors are not affiliated with and have not endorsed this site. You are responsible for TCPA / Do-Not-Call / fair-housing compliance in your own outreach.</p>
 
     <script src="/auth.js"></script>
     <script>
-        // where to land after sign-in (guard passes ?next=/scripts.html etc.)
         function nextDest(){
             const n = new URLSearchParams(location.search).get('next') || '/';
             return (n.startsWith('/') && !n.startsWith('//') && n !== '/login.html') ? n : '/';
         }
-        // Already signed in? Straight to the site.
         if (RTAuth.session()) location.replace(nextDest());
 
         if (new URLSearchParams(location.search).get('expired')) {
             const e = document.getElementById('signin-err');
-            e.textContent = 'Your 5-day access has expired. Enter a new activation code to continue.';
+            e.textContent = 'Your 5-day access has expired. Enter your activation code to continue — or ask for an extension below.';
             e.classList.add('on');
         }
 
         function showPane(which) {
-            ['signin', 'create', 'sent'].forEach(k => {
-                const pane = document.getElementById('pane-' + k);
-                const tab = document.getElementById('tab-' + k);
-                pane.classList.toggle('active', k === which);
-                if (tab) {
-                    tab.classList.toggle('active', k === which);
-                    tab.setAttribute('aria-selected', k === which ? 'true' : 'false');
-                }
-            });
+            document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+            document.getElementById('pane-' + which).classList.add('active');
         }
-
         function flash(id, text) {
             const el = document.getElementById(id);
             if (text) { el.textContent = text; el.classList.add('on'); }
             else el.classList.remove('on');
         }
 
-        // ---- Sign in with activation code ----
+        /* ---- SIGN IN: the front door ---- */
+        let pendingEmail = '', pendingCode = '';
+
         document.getElementById('form-signin').addEventListener('submit', async (ev) => {
             ev.preventDefault();
             flash('signin-err');
             const email = document.getElementById('si-email').value.trim();
             const code = document.getElementById('si-code').value.trim();
-            const name = document.getElementById('si-name').value.trim();
-            const phone = document.getElementById('si-phone').value.trim();
-            const brokerage = document.getElementById('si-brokerage').value.trim();
             if (!email || !code) return flash('signin-err', 'Enter your email and activation code.');
-            if (await RTAuth.redeem(code, { email, name, phone, brokerage })) location.href = nextDest();
-            else flash('signin-err', 'That activation code isn’t valid. Check it and try again, or request access below.');
+            if (!/.+@.+\..+/.test(email)) return flash('signin-err', 'That email doesn’t look right.');
+
+            const hashOK = await RTAuth.redeem(code, { email });
+            if (!hashOK) {
+                return flash('signin-err', 'That code isn’t valid. Check for typos — or if your code was revoked, use "Ask for a 5-day extension" below.');
+            }
+            // valid code: known member goes straight in; first-timers finish sign-up
+            pendingEmail = email; pendingCode = code;
+            const p = RTAuth.profile();
+            const known = p && p.name && (!p.email || p.email.toLowerCase() === email.toLowerCase());
+            if (known) return location.href = nextDest();
+            // new person (or new email on this device) → full sign-up
+            if (p && p.email && p.email.toLowerCase() !== email.toLowerCase()) {
+                // different member on this device — start their profile clean
+                localStorage.removeItem('rt_profile');
+            }
+            showPane('profile');
+            document.getElementById('pr-name').focus();
         });
 
-        // ---- Create account (promo code = instant access) ----
-        function collectProfile() {
-            return {
-                name: document.getElementById('ca-name').value.trim(),
-                email: document.getElementById('ca-email').value.trim(),
-                phone: document.getElementById('ca-phone').value.trim(),
-                brokerage: document.getElementById('ca-brokerage').value.trim(),
-                title: document.getElementById('ca-title').value.trim(),
-                dre: document.getElementById('ca-dre').value.trim(),
-                website: document.getElementById('ca-website').value.trim()
-            };
+        /* ---- FIRST-TIME SIGN-UP ---- */
+        function finishEntry(extra) {
+            RTAuth.saveProfile(Object.assign({ email: pendingEmail }, extra));
+            location.href = nextDest();
         }
-        function validProfile(p, requireAll) {
-            if (!p.name || !p.email) return false;
-            if (requireAll && !p.phone) return false;
-            return /.+@.+\..+/.test(p.email);
-        }
-
-        document.getElementById('form-create').addEventListener('submit', async (ev) => {
+        document.getElementById('form-profile').addEventListener('submit', (ev) => {
             ev.preventDefault();
-            flash('create-err'); flash('create-ok');
-            const p = collectProfile();
-            const code = document.getElementById('ca-code').value.trim();
-            if (!validProfile(p, true)) return flash('create-err', 'Fill in your name, email, and phone.');
-            if (!code) return flash('create-err', 'No promo code entered — use "Request Access" below and we’ll review your request.');
-            if (await RTAuth.redeem(code, p)) location.href = nextDest();
-            else flash('create-err', 'That promo code isn’t valid. Double-check it, or request access below.');
+            const name = document.getElementById('pr-name').value.trim();
+            if (!name) { document.getElementById('pr-name').focus(); return; }
+            finishEntry({
+                name: name,
+                phone: document.getElementById('pr-phone').value.trim(),
+                brokerage: document.getElementById('pr-brokerage').value.trim(),
+                title: document.getElementById('pr-title').value.trim(),
+                dre: document.getElementById('pr-dre').value.trim(),
+                website: document.getElementById('pr-website').value.trim()
+            });
         });
 
-        // ---- Request access (no code) → emails southbaydaily@gmail.com ----
-        document.getElementById('ca-request').addEventListener('click', async () => {
-            flash('create-err'); flash('create-ok');
-            const p = collectProfile();
-            if (!validProfile(p, true)) return flash('create-err', 'Fill in your name, email, and phone so we can approve you.');
-            const btn = document.getElementById('ca-request');
+        /* ---- EXTENSION CHALLENGE: one per browser, then mercy only ---- */
+        function startChallenge() {
+            if (localStorage.getItem('rt_ext_used')) {
+                document.getElementById('mercy-title').textContent = 'Your extension is spent.';
+                document.getElementById('mercy-sub').textContent = 'One extension per member — the table remembers. But mercy remains.';
+                return showPane('mercy');
+            }
+            showPane('challenge');
+        }
+        function answerChallenge(saidTrue) {
+            if (saidTrue) {
+                localStorage.setItem('rt_ext_used', String(Date.now()));
+                const email = document.getElementById('si-email').value.trim();
+                RTAuth.grant(email ? { email } : {});
+                location.href = nextDest();
+            } else {
+                document.getElementById('mercy-title').textContent = 'Denied.';
+                document.getElementById('mercy-sub').textContent = 'A round table… not round? The table has spoken. One path remains.';
+                showPane('mercy');
+            }
+        }
+
+        /* ---- BEG FOR MERCY: emails the owner ---- */
+        async function begForMercy() {
+            flash('mercy-ok'); flash('mercy-err');
+            const btn = document.getElementById('mercy-btn');
+            btn.disabled = true; btn.textContent = 'Pleading…';
+            const email = document.getElementById('si-email').value.trim() || '(they didn’t say)';
+            const p = RTAuth.profile();
+            try {
+                const res = await fetch('https://formsubmit.co/ajax/southbaydaily@gmail.com', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({
+                        _subject: '🙏 Mercy plea — Roundtable access',
+                        Email: email,
+                        Name: (p && p.name) || '(unknown)',
+                        Plea: 'This member’s access ran out and their extension is spent. They have formally begged for mercy.',
+                        When: new Date().toLocaleString()
+                    })
+                });
+                if (!res.ok) throw new Error('send failed');
+                flash('mercy-ok', 'Your plea has been delivered. If mercy is granted, a fresh activation code will find you.');
+                btn.textContent = 'Plea delivered';
+            } catch (e) {
+                btn.disabled = false; btn.textContent = '🙏 Beg for Mercy';
+                flash('mercy-err', 'The messenger stumbled — try again, or email southbaydaily@gmail.com directly.');
+            }
+        }
+
+        /* ---- REQUEST ACCESS (no code) ---- */
+        document.getElementById('form-request').addEventListener('submit', async (ev) => {
+            ev.preventDefault();
+            flash('request-err');
+            const name = document.getElementById('rq-name').value.trim();
+            const email = document.getElementById('rq-email').value.trim();
+            const phone = document.getElementById('rq-phone').value.trim();
+            const brokerage = document.getElementById('rq-brokerage').value.trim();
+            if (!name || !email || !phone || !/.+@.+\..+/.test(email))
+                return flash('request-err', 'Fill in your name, email, and phone so we can approve you.');
+            const btn = document.getElementById('rq-submit');
             btn.disabled = true; btn.textContent = 'Sending…';
             try {
                 const res = await fetch('https://formsubmit.co/ajax/southbaydaily@gmail.com', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                     body: JSON.stringify({
-                        _subject: 'Roundtable Access Request — ' + p.name,
-                        Name: p.name, Email: p.email, Phone: p.phone,
-                        Brokerage: p.brokerage || '(none given)',
+                        _subject: 'Roundtable Access Request — ' + name,
+                        Name: name, Email: email, Phone: phone,
+                        Brokerage: brokerage || '(none given)',
                         Requested: new Date().toLocaleString()
                     })
                 });
                 if (!res.ok) throw new Error('send failed');
                 showPane('sent');
             } catch (e) {
-                // Fallback: open a pre-filled email instead
-                const body = encodeURIComponent(
-                    'Roundtable access request\n\nName: ' + p.name + '\nEmail: ' + p.email +
-                    '\nPhone: ' + p.phone + '\nBrokerage: ' + (p.brokerage || '(none)'));
-                location.href = 'mailto:southbaydaily@gmail.com?subject=' +
-                    encodeURIComponent('Roundtable Access Request — ' + p.name) + '&body=' + body;
+                const body = encodeURIComponent('Roundtable access request\n\nName: ' + name + '\nEmail: ' + email + '\nPhone: ' + phone + '\nBrokerage: ' + (brokerage || '(none)'));
+                location.href = 'mailto:southbaydaily@gmail.com?subject=' + encodeURIComponent('Roundtable Access Request — ' + name) + '&body=' + body;
                 showPane('sent');
             } finally {
                 btn.disabled = false; btn.textContent = 'Request Access';

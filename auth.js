@@ -62,6 +62,11 @@
             }
             localStorage.setItem('rt_profile', JSON.stringify(merged));
         },
+        /* mercy path: start a 5-day session without a code (extension challenge) */
+        grant(profile) {
+            localStorage.setItem(KEY, JSON.stringify(Object.assign({}, profile || {}, { activatedAt: Date.now(), ext: true })));
+            this.saveProfile(profile);
+        },
         signOut() {
             localStorage.removeItem(KEY);
             location.href = '/login.html';
