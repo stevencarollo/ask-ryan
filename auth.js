@@ -44,6 +44,7 @@
             const hash = await sha256(String(code || '').trim().toUpperCase());
             if (hash !== CODE_HASH) return false;
             localStorage.setItem(KEY, JSON.stringify(Object.assign({}, profile || {}, { activatedAt: Date.now() })));
+            localStorage.setItem('rt_code', String(code).trim().toUpperCase());   // for member-registry sync
             this.saveProfile(profile);
             return true;
         },

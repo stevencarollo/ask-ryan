@@ -481,6 +481,14 @@ document.getElementById('pfSave').onclick = ()=>{
   };
   RTAuth.saveProfile(p);
   for (const k in p) if (p[k]) PROFILE[k] = p[k];
+  // sync to the member registry so edits follow them to other devices
+  const code = localStorage.getItem('rt_code');
+  if (PROFILE.email && code){
+    fetch(API_URL + '/api/member', {method: 'POST', keepalive: true,
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({email: PROFILE.email, code, profile: Object.assign({}, PROFILE)})
+    }).catch(()=>{});
+  }
   const name = p.name;
   document.getElementById('profFields').style.display = 'none';
   syncProf(); render();

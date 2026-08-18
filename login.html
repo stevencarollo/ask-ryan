@@ -260,6 +260,29 @@
 
     <script src="/auth.js"></script>
     <script>
+        const API_URL = 'https://ask-ryan-nb3w.onrender.com';
+        fetch(API_URL + '/').catch(()=>{});   // pre-wake the free-tier server
+
+        /* member accounts live on the server keyed by email, so a profile
+           created on one device follows the member to every other device */
+        async function serverLookup(email, code){
+            try{
+                const ctl = new AbortController();
+                const t = setTimeout(() => ctl.abort(), 7000);
+                const r = await fetch(API_URL + '/api/member?email=' + encodeURIComponent(email) +
+                                      '&code=' + encodeURIComponent(code), {signal: ctl.signal});
+                clearTimeout(t);
+                return await r.json();
+            } catch(e){ return {status: 'unavailable'}; }
+        }
+        function serverSave(email, code, profile){
+            fetch(API_URL + '/api/member', {
+                method: 'POST', keepalive: true,
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({email, code, profile})
+            }).catch(()=>{});
+        }
+
         function nextDest(){
             const n = new URLSearchParams(location.search).get('next') || '/';
             return (n.startsWith('/') && !n.startsWith('//') && n !== '/login.html') ? n : '/';
@@ -293,27 +316,42 @@
             if (!email || !code) return flash('signin-err', 'Enter your email and activation code.');
             if (!/.+@.+\..+/.test(email)) return flash('signin-err', 'That email doesn’t look right.');
 
+            const btn = ev.target.querySelector('.btn');
+            btn.disabled = true; btn.textContent = 'Unlocking…';
             const hashOK = await RTAuth.redeem(code, { email });
             if (!hashOK) {
+                btn.disabled = false; btn.textContent = 'Unlock Access';
                 return flash('signin-err', 'That code isn’t valid. Check for typos — or if your code was revoked, use "Ask for a 7-day extension" below.');
             }
-            // valid code: known member goes straight in; first-timers finish sign-up
             pendingEmail = email; pendingCode = code;
+
+            // known on this device → straight in
             const p = RTAuth.profile();
-            const known = p && p.name && (!p.email || p.email.toLowerCase() === email.toLowerCase());
-            if (known) return location.href = nextDest();
-            // new person (or new email on this device) → full sign-up
+            const localKnown = p && p.name && p.email && p.email.toLowerCase() === email.toLowerCase();
+            if (localKnown) { serverSave(email, code, p); return location.href = nextDest(); }
+
+            // new email on this device — check the member registry (their account
+            // may live on another device); fresh profile store either way
             if (p && p.email && p.email.toLowerCase() !== email.toLowerCase()) {
-                // different member on this device — start their profile clean
                 localStorage.removeItem('rt_profile');
             }
+            btn.textContent = 'Looking you up…';
+            const res = await serverLookup(email, code);
+            if (res.status === 'found' && res.profile && res.profile.name) {
+                RTAuth.saveProfile(res.profile);
+                return location.href = nextDest();
+            }
+            // genuinely new (or registry unreachable) → full sign-up
+            btn.disabled = false; btn.textContent = 'Unlock Access';
             showPane('profile');
             document.getElementById('pr-name').focus();
         });
 
         /* ---- FIRST-TIME SIGN-UP ---- */
         function finishEntry(extra) {
-            RTAuth.saveProfile(Object.assign({ email: pendingEmail }, extra));
+            const profile = Object.assign({ email: pendingEmail }, extra);
+            RTAuth.saveProfile(profile);
+            if (profile.name) serverSave(pendingEmail, pendingCode, profile);   // register for other devices
             location.href = nextDest();
         }
         document.getElementById('form-profile').addEventListener('submit', (ev) => {

@@ -20,3 +20,4 @@ voices_build*.log
 GEMINI_KEY.txt
 logs/
 CEREBRAS_KEY.txt
+RENDER_ENV_TODO.txt

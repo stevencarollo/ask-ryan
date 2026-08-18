@@ -404,6 +404,80 @@ _REWRITE_CACHE: dict = {}
 _REWRITE_CACHE_MAX = 5000
 
 
+# ── Member profiles: accounts that follow the email across devices ──────────
+# Stored as one JSON object per member in a private Supabase Storage bucket.
+# Requests are gated by the activation code (hash mirrors auth.js CODE_HASH)
+# so profile PII is never readable without a valid member code.
+RT_CODE_HASH = "3b0708577e23db56a440e7212e0fbfdebe8912bc6e2469c90ec6b70ffaa95edb"
+_MEMBER_BUCKET = "rt-members"
+
+
+def _member_store():
+    url = os.getenv("SUPABASE_URL", "").rstrip("/")
+    key = os.getenv("SUPABASE_SERVICE_KEY", "")
+    return (url, key) if url and key else None
+
+
+def _code_ok(code: str) -> bool:
+    import hashlib
+    return hashlib.sha256((code or "").strip().upper().encode()).hexdigest() == RT_CODE_HASH
+
+
+def _member_path(email: str) -> str:
+    import urllib.parse
+    return urllib.parse.quote(email.strip().lower(), safe="") + ".json"
+
+
+@app.get("/api/member")
+async def member_lookup(email: str = "", code: str = ""):
+    if not _code_ok(code):
+        return {"status": "denied"}
+    if not email or "@" not in email:
+        return {"status": "not_found"}
+    store = _member_store()
+    if not store:
+        return {"status": "unavailable"}
+    import requests as _rq
+    url, key = store
+    try:
+        r = _rq.get(f"{url}/storage/v1/object/{_MEMBER_BUCKET}/{_member_path(email)}",
+                    headers={"Authorization": f"Bearer {key}"}, timeout=15)
+        if r.status_code == 200:
+            return {"status": "found", "profile": r.json()}
+        return {"status": "not_found"}
+    except Exception as e:  # noqa: BLE001
+        print(f"member lookup error: {e}")
+        return {"status": "unavailable"}
+
+
+@app.post("/api/member")
+async def member_save(data: dict):
+    if not _code_ok(data.get("code", "")):
+        return {"status": "denied"}
+    email = (data.get("email") or "").strip().lower()
+    profile = data.get("profile") or {}
+    if not email or "@" not in email or not isinstance(profile, dict):
+        return {"status": "error"}
+    allowed = {k: str(profile[k])[:200] for k in
+               ("name", "email", "phone", "brokerage", "title", "dre", "website") if profile.get(k)}
+    allowed["email"] = email
+    store = _member_store()
+    if not store:
+        return {"status": "unavailable"}
+    import json as _json
+    import requests as _rq
+    url, key = store
+    try:
+        r = _rq.post(f"{url}/storage/v1/object/{_MEMBER_BUCKET}/{_member_path(email)}",
+                     headers={"Authorization": f"Bearer {key}",
+                              "Content-Type": "application/json", "x-upsert": "true"},
+                     data=_json.dumps(allowed), timeout=15)
+        return {"status": "saved" if r.status_code in (200, 201) else "error"}
+    except Exception as e:  # noqa: BLE001
+        print(f"member save error: {e}")
+        return {"status": "unavailable"}
+
+
 def ocr_pdf_with_groq_vision(file_path: str, max_pages: int = 8) -> str:
     """OCR a scanned (image-only) PDF: render pages to images with PyMuPDF,
     transcribe each with Groq's free vision model. $0 cost."""
