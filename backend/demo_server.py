@@ -1026,6 +1026,12 @@ async def diag():
     """Diagnostic: is the Groq key loaded and working on this server?"""
     key = os.getenv("GROQ_API_KEY", "")
     info = {
+        "env_seen": {
+            "GEMINI_API_KEY": bool(os.getenv("GEMINI_API_KEY")),
+            "CEREBRAS_API_KEY": bool(os.getenv("CEREBRAS_API_KEY")),
+            "SUPABASE_URL": bool(os.getenv("SUPABASE_URL")),
+            "SUPABASE_SERVICE_KEY": bool(os.getenv("SUPABASE_SERVICE_KEY")),
+        },
         "groq_sdk_installed": GROQ_AVAILABLE,
         "key_present": bool(key),
         "key_fingerprint": (key[:7] + "..." + key[-4:]) if key else None,
