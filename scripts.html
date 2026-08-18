@@ -156,6 +156,17 @@ body.hasmkt .abtn.gold{display:inline-block}
 .leadbanner b{color:var(--gold-bright)}
 .leadbanner .lb-x{margin-left:auto;background:none;border:1px solid var(--line);color:var(--muted);border-radius:6px;padding:4px 12px;font-size:.9em}
 .leadbanner .lb-x:hover{color:var(--ink);background:var(--gold)}
+
+/* Pick & tailor: star the scripts you want, tailor just those */
+.pick{margin-left:auto;background:none;border:none;font-size:1.25em;line-height:1;color:var(--muted);padding:2px 4px;transition:color .15s,transform .15s}
+.pick:hover{color:var(--gold-bright);transform:scale(1.15)}
+.pick.on{color:var(--gold-bright)}
+#setupPanel summary b{color:var(--gold-bright)}
+#pickGo{position:fixed;bottom:22px;right:22px;z-index:70;display:none;align-items:center;gap:9px;padding:14px 22px;background:linear-gradient(135deg,var(--gold) 0%,#B8964A 100%);color:var(--ink);border:none;border-radius:999px;font-weight:800;font-size:.88em;letter-spacing:.06em;box-shadow:0 10px 34px rgba(201,168,92,.45);cursor:pointer}
+#pickGo.on{display:inline-flex}
+#pickGo:disabled{opacity:.6;cursor:wait}
+#pickGo:hover:not(:disabled){background:var(--gold-bright)}
+@media(max-width:720px){#pickGo{left:14px;right:14px;justify-content:center;bottom:16px;min-height:52px}}
 @media(max-width:720px){
   /* top bar: drop the dead coming-soon buttons, keep brand + Sign Out big and tappable */
   .nav-btn[aria-disabled="true"]{display:none}
@@ -219,7 +230,7 @@ body.hasmkt .abtn.gold{display:inline-block}
 
 <section class="loc">
   <h1>Script Vault</h1>
-  <p class="tag">274 call, voicemail, text, and email scripts from all 34 advisors — at least four per format for every lead type, each written in the voice of the coach who owns that specialty. Set your market and every script tailors live to your farm's numbers from this week's Altos Research data. Want a different voice? Build your own Roundtable below.</p>
+  <p class="tag">274 call, voicemail, text, and email scripts from all 34 advisors. Find the script you want, then make it yours — ★ star your picks and tailor just those to your market's live Altos numbers, or tailor any card on the spot.</p>
   <div class="profbar" id="profbar">
     <span id="profTxt"></span>
     <button class="pedit" id="profEdit">Edit</button>
@@ -230,17 +241,24 @@ body.hasmkt .abtn.gold{display:inline-block}
       <button class="go" id="pfSave">Save</button>
     </span>
   </div>
-  <div class="locbar" id="locbar">
-    <input id="locq" list="citylist" placeholder="Type a ZIP or city in LA or Orange County — e.g. 90277 or Irvine" autocomplete="off">
-    <datalist id="citylist"></datalist>
-    <button class="go" id="locgo">Localize Scripts</button>
-    <button class="clr" id="locclr">✕ Clear</button>
-  </div>
-  <div class="voicebar">
-    <label for="voiceSel">Script voice</label>
-    <select id="voiceSel"></select>
-    <span class="vhint" id="vhint">Default: each script answers in the voice of the specialty's own expert.</span>
-  </div>
+  <details class="custom-topic" id="setupPanel">
+    <summary id="setupSum">📍 Market &amp; Voice — not set · tap to localize your scripts</summary>
+    <div class="ct-body">
+      <div class="locbar" id="locbar">
+        <input id="locq" list="citylist" placeholder="Type a ZIP or city in LA or Orange County — e.g. 90277 or Irvine" autocomplete="off">
+        <datalist id="citylist"></datalist>
+        <button class="go" id="locgo">Set My Market</button>
+        <button class="clr" id="locclr">✕ Clear</button>
+      </div>
+      <div class="voicebar">
+        <label for="voiceSel">Script voice</label>
+        <select id="voiceSel"></select>
+        <span class="vhint" id="vhint">Default: each script answers in the voice of the specialty's own expert.</span>
+      </div>
+      <div class="locerr" id="locerr"></div>
+      <div class="mkt" id="mkt"></div>
+    </div>
+  </details>
 
   <details class="custom-topic" id="ctPanel">
     <summary>✦ Create Your Own Topic — scripts for any niche you can name</summary>
@@ -282,8 +300,6 @@ body.hasmkt .abtn.gold{display:inline-block}
       <div class="lead-rows" id="leadRows"></div>
     </div>
   </details>
-  <div class="locerr" id="locerr"></div>
-  <div class="mkt" id="mkt"></div>
 </section>
 <div class="leadbanner" id="leadBanner" style="display:none"></div>
 
@@ -295,6 +311,7 @@ body.hasmkt .abtn.gold{display:inline-block}
 
 <main class="lib" id="lib"></main>
 <div class="empty" id="empty">No scripts match those filters.</div>
+<button id="pickGo" onclick="tailorPicks()">✦ Tailor picks</button>
 <div id="toast"></div>
 
 <script src="/scripts_data.js?v=3"></script>
@@ -623,7 +640,7 @@ function render(){
       card.dataset.i = s.i;
       card.className = 'card' + (s.local ? ' localized' : '');
       card.innerHTML = `
-        <div class="top"><span class="ctag ${s.ch}">${CH_LABEL[s.ch]}</span><span class="lchip">Localized</span><span class="pchip">✦ Re-voicing…</span></div>
+        <div class="top"><span class="ctag ${s.ch}">${CH_LABEL[s.ch]}</span><span class="lchip">Localized</span><span class="pchip">✦ Re-voicing…</span><button class="pick${PICKS.has(skey(s)) ? ' on' : ''}" onclick="togglePick(${s.i})" title="Pick this script to tailor">${PICKS.has(skey(s)) ? '★' : '☆'}</button></div>
         <h3>${s.title}</h3>
         <div class="adv">${advLabel(s)}</div>
         <pre>${fillHTML(s.local || s.body)}</pre>
@@ -699,6 +716,7 @@ document.getElementById('q').addEventListener('input', render);
   sel.onchange = async () => {
     VOICE = sel.value ? ADVISORS.find(a => a.id === sel.value) : null;
     sel.classList.toggle('custom', !!VOICE);
+    syncSetupSum();
     voiceEpoch++; AUTOQ.length = 0;                    // cancel any in-flight queue
     const myEpoch = voiceEpoch;
     // restore originals first (instant), then overlay prewritten variants
@@ -722,9 +740,9 @@ document.getElementById('q').addEventListener('input', render);
     const missing = SCRIPTS.length - applied;
     document.getElementById('vhint').textContent = applied
       ? (missing
-          ? `${applied} scripts switched to ${VOICE.n}'s voice instantly — the remaining ${missing} convert live as they appear on screen.`
+          ? `${applied} scripts switched to ${VOICE.n}'s voice instantly — star the remaining ${missing} and tap Tailor to convert them.`
           : `The entire library now speaks as ${VOICE.n} — prewritten, instant, no waiting.`)
-      : `Converting cards to ${VOICE.n}'s voice live as they appear on screen (this voice's prewritten library isn't built yet).`;
+      : `${VOICE.n}'s prewritten library isn't built yet — star the scripts you want and tap Tailor to convert them.`;
     toast(applied ? `${VOICE.n}'s library applied${missing ? ` (${applied} instant)` : ''}` : `Your Roundtable now speaks as ${VOICE.n}`);
   };
 })();
@@ -754,23 +772,75 @@ const AUTOQ = [];                    // card indexes waiting for conversion
 let voiceEpoch = 0, qBusy = false;
 function cacheKey(i){ return i + '|' + (VOICE ? VOICE.id : '') + '|' + (MARKET ? MARKET.name : ''); }
 
-/* visibility scanner: any unconverted card near the viewport joins the queue */
-function scanVisible(){
-  if (!VOICE && !MARKET) return;
-  const H = innerHeight + 160;
-  document.querySelectorAll('.card').forEach(card => {
-    const i = Number(card.dataset.i);
-    const s = SCRIPTS[i];
-    // needs live work if: no rewrite yet, or only the prewritten (no-market) variant while a market is set
-    const needs = !s.local || (MARKET && s.preOnly);
-    if (!s || !needs || (s.retry > 1) || AUTOQ.includes(i)) return;
-    const r = card.getBoundingClientRect();
-    if (r.bottom > -160 && r.top < H) AUTOQ.push(i);
-  });
-  if (AUTOQ.length) pumpQueue();
+/* ===== Pick & tailor: AI only ever works on scripts the agent chose =====
+   (replaces the old auto-convert-on-scroll, which burned quota on every
+   visible card whether the agent wanted it or not) */
+let PICKS = new Set();
+try{ PICKS = new Set(JSON.parse(localStorage.getItem('rt_picks')) || []); }catch(e){}
+
+function togglePick(i){
+  const k = skey(SCRIPTS[i]);
+  if (PICKS.has(k)) PICKS.delete(k); else PICKS.add(k);
+  localStorage.setItem('rt_picks', JSON.stringify([...PICKS]));
+  const card = document.querySelector(`.card[data-i="${i}"] .pick`);
+  if (card){ card.classList.toggle('on', PICKS.has(k)); card.textContent = PICKS.has(k) ? '★' : '☆'; }
+  syncPickGo();
 }
-setInterval(scanVisible, 900);
-addEventListener('scroll', scanVisible, {passive: true});
+function pickedIndexes(){
+  return SCRIPTS.map((s, i) => PICKS.has(skey(s)) ? i : -1).filter(i => i > -1);
+}
+function syncPickGo(){
+  const btn = document.getElementById('pickGo');
+  const n = pickedIndexes().length;
+  if (!n){ btn.classList.remove('on'); return; }
+  btn.classList.add('on');
+  btn.textContent = '✦ Tailor ' + n + ' pick' + (n > 1 ? 's' : '') +
+    (MARKET ? ' to ' + MARKET.name.replace(/\s+\d{5}$/, '') : VOICE ? ' as ' + VOICE.n.split(' ')[0] : '');
+}
+async function tailorPicks(){
+  if (!MARKET && !VOICE){
+    document.getElementById('setupPanel').open = true;
+    document.getElementById('setupPanel').scrollIntoView({behavior: 'smooth'});
+    toast('Set your market (or pick a voice) first — then tailor your picks');
+    return;
+  }
+  const todo = pickedIndexes().filter(i => {
+    const s = SCRIPTS[i];
+    return (!s.local || (MARKET && s.preOnly)) && !AUTOQ.includes(i);
+  });
+  if (!todo.length){ toast('All your picks are already tailored'); return; }
+  AUTOQ.push(...todo);
+  const btn = document.getElementById('pickGo');
+  btn.disabled = true;
+  const total = todo.length;
+  const tick = setInterval(() => {
+    const left = AUTOQ.length + (qBusy ? 1 : 0);
+    btn.textContent = '✦ Tailoring… ' + Math.max(0, total - left) + '/' + total;
+  }, 700);
+  // queue-driven completion — reliable even when the tab is backgrounded
+  window._onQueueDrain = () => {
+    clearInterval(tick);
+    btn.disabled = false;
+    syncPickGo();
+    const missed = pickedIndexes().filter(i => !SCRIPTS[i].local && !(VOICE && SCRIPTS[i].preOnly)).length;
+    toast(missed ? missed + ' pick' + (missed > 1 ? 's' : '') + ' didn’t convert — tap Tailor again'
+                 : 'Your picks are tailored and ready');
+  };
+  pumpQueue();
+}
+
+/* setup strip summary reflects current market + voice at a glance */
+function syncSetupSum(){
+  const el = document.getElementById('setupSum');
+  const mk = MARKET ? MARKET.name : null;
+  const vc = VOICE ? VOICE.n : null;
+  if (mk || vc){
+    el.innerHTML = '📍 Market &amp; Voice — <b>' + esc([mk, vc].filter(Boolean).join(' · ')) + '</b>';
+  } else {
+    el.textContent = '📍 Market & Voice — not set · tap to localize your scripts';
+  }
+  syncPickGo();
+}
 
 async function pumpQueue(){
   if (qBusy) return;
@@ -792,6 +862,7 @@ async function pumpQueue(){
     }
   }
   qBusy = false;
+  if (window._onQueueDrain){ const f = window._onQueueDrain; window._onQueueDrain = null; f(); }
 }
 
 async function rewriteOne(i, epoch){
@@ -964,6 +1035,7 @@ document.getElementById('locclr').onclick = ()=>{
   document.getElementById('locq').value='';
   SCRIPTS.forEach(s=>{delete s.local; delete s.why; delete s.voicedBy; delete s.preOnly;});
   render();
+  syncSetupSum();
 };
 
 function setMarket(restoring){
@@ -998,8 +1070,8 @@ function setMarket(restoring){
   localStorage.setItem('rt_market', q.trim());
   SCRIPTS.forEach(s=>{delete s.local; delete s.why; delete s.voicedBy; delete s.preOnly;});
   render();
-  toast(restoring ? `Welcome back — scripts tailoring to ${m.name}` : `Scripts tailoring to ${m.name} as you scroll`);
-  scanVisible();                        // start converting what's on screen right away
+  syncSetupSum();
+  toast(restoring ? `Welcome back — market set to ${m.name}` : `${m.name} set — star your picks or tailor any card`);
 }
 
 async function tailor(i, manual){
@@ -1031,6 +1103,7 @@ function revert(i){
 
 syncProf();
 render();
+syncSetupSum();
 </script>
 </body>
 </html>
