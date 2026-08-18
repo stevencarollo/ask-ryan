@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Roundtable — Your AI Panel of Real Estate's Best Minds</title>
     <meta name="description" content="One AI coach blending 34 selectable expert perspectives: sales, negotiation, staging, commercial, flipping, probate, divorce, pre-foreclosure — en español too. Free forever.">
+    <script src="/auth.js"></script>
+    <script>RTAuth.guard();</script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -67,6 +69,24 @@
             letter-spacing: 0.04em; transition: color 0.2s ease; padding: 10px 2px; cursor: pointer;
         }
         .nav-links a:hover { color: var(--gold-bright); }
+
+        /* Coming-soon (grayed) segments */
+        .soon {
+            opacity: 0.38; cursor: not-allowed !important;
+            pointer-events: auto; position: relative;
+        }
+        .soon:hover { color: var(--muted) !important; background: transparent !important; box-shadow: none !important; }
+        .btn.soon { border-color: var(--muted); background: transparent; color: var(--muted); }
+        .btn.soon:hover { border-color: var(--muted); background: transparent; color: var(--muted); }
+        .soon-badge {
+            display: inline-block; margin-left: 8px; padding: 2px 7px;
+            font-size: 0.58rem; font-weight: 700; letter-spacing: 0.12em;
+            text-transform: uppercase; color: var(--gold); border: 1px solid var(--line);
+            border-radius: 999px; vertical-align: middle; opacity: 0.9;
+        }
+        .nav-signout {
+            font-size: 0.8rem !important; opacity: 0.75;
+        }
         .btn {
             display: inline-flex; align-items: center; justify-content: center; gap: 10px;
             padding: 14px 34px; border-radius: 2px; cursor: pointer;
@@ -343,10 +363,11 @@
             <a href="#panel">The Panel</a>
             <a href="#capabilities">Capabilities</a>
             <a href="/scripts.html">Script Vault</a>
-            <a href="/podcast-studio.html">Podcasts</a>
-            <a href="/flyer-studio.html">Flyer Studio</a>
-            <a href="#skill">Claude Skill</a>
-            <a href="/frontend.html" class="btn btn-solid nav-cta">Enter</a>
+            <a href="#" class="soon" onclick="return comingSoon()" aria-disabled="true">Podcasts<span class="soon-badge">Soon</span></a>
+            <a href="#" class="soon" onclick="return comingSoon()" aria-disabled="true">Flyer Studio<span class="soon-badge">Soon</span></a>
+            <a href="#" class="soon" onclick="return comingSoon()" aria-disabled="true">Claude Skill<span class="soon-badge">Soon</span></a>
+            <a href="#" class="btn nav-cta soon" onclick="return comingSoon()" aria-disabled="true">Enter<span class="soon-badge">Soon</span></a>
+            <a href="#" class="nav-signout" onclick="RTAuth.signOut();return false;">Sign Out</a>
         </div>
     </nav>
 
@@ -355,8 +376,8 @@
         <h1>One coach.<br><em>Thirty-four</em> of the industry's best minds.</h1>
         <p class="hero-sub">Choose the advisors at your table — prospecting scripts, negotiation psychology, luxury staging, commercial underwriting, probate process, creative finance — and get one clear answer. In English o en español.</p>
         <div class="hero-ctas">
-            <a href="/frontend.html" class="btn btn-solid">Take a Seat</a>
-            <a href="#panel" class="btn btn-ghost">Meet the Panel</a>
+            <a href="#panel" class="btn btn-solid">Meet the Panel</a>
+            <a href="#" class="btn btn-ghost soon" onclick="return comingSoon()" aria-disabled="true">Take a Seat<span class="soon-badge">Soon</span></a>
         </div>
         <div class="hero-stats" role="list">
             <div class="stat" role="listitem"><div class="stat-n">34</div><div class="stat-l">Advisors</div></div>
@@ -542,7 +563,7 @@
             <h2>Take the panel with you.</h2>
             <p class="section-sub">Download The Roundtable as a Claude Skill. Any agent with Claude gets the full 34-advisor panel inside their own Claude — no website needed.</p>
             <div class="code-snippet">roundtable-skill.zip → unzip into ~/.claude/skills/</div>
-            <a href="/roundtable-skill.zip" class="btn btn-solid" download>Download the Skill</a>
+            <a href="#" class="btn soon" onclick="return comingSoon()" aria-disabled="true">Download the Skill<span class="soon-badge">Soon</span></a>
         </div>
     </section>
 
@@ -561,7 +582,7 @@
                 <li>Conversation memory across the session</li>
                 <li>Downloadable Claude Skill included</li>
             </ul>
-            <a href="/frontend.html" class="btn btn-solid" style="width: 100%;">Take Your Seat</a>
+            <a href="#" class="btn soon" style="width: 100%;" onclick="return comingSoon()" aria-disabled="true">Take Your Seat<span class="soon-badge">Soon</span></a>
         </div>
     </section>
 
@@ -571,6 +592,21 @@
     </footer>
 
     <script>
+        function comingSoon() {
+            let t = document.getElementById('soon-toast');
+            if (!t) {
+                t = document.createElement('div');
+                t.id = 'soon-toast';
+                t.style.cssText = 'position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:var(--gold);color:var(--ink);font-weight:700;font-size:.82rem;letter-spacing:.05em;padding:11px 22px;border-radius:6px;z-index:120;transition:opacity .3s;';
+                document.body.appendChild(t);
+            }
+            t.textContent = 'Coming soon — stay tuned.';
+            t.style.opacity = '1';
+            clearTimeout(t._h);
+            t._h = setTimeout(() => { t.style.opacity = '0'; }, 2200);
+            return false;
+        }
+
         const PANEL_GROUPS = {
             sales: { title: 'Sales & Prospecting', sub: 'FSBO and expired scripts, cold-call structure, door-knocking systems, listing-appointment prequalification — tonality included.', experts: [
                 ['Ryan Serhant', 'Luxury sales & branding', 'CEO of SERHANT. and star of Owning Manhattan, built his business on relentless follow-up (the "Three F\'s") and selling the improved life, not the square footage.'],

@@ -277,7 +277,8 @@ My question/request: {query if query else 'Review this and give me your take —
         messages.append({"role": "user", "content": user_content})
 
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",  # Free, fast, and powerful
+            model="openai/gpt-oss-120b",  # Free, fast, and powerful (llama-3.3-70b was decommissioned by Groq 2026-08)
+            reasoning_effort="low",
             messages=messages,
             max_tokens=1200,
             temperature=0.7
@@ -299,6 +300,108 @@ def _groq_client() -> Optional["Groq"]:
     if not key or not GROQ_AVAILABLE:
         return None
     return Groq(api_key=key)
+
+
+# ── Free-tier lane chain ─────────────────────────────────────────────────────
+# Every lane is a FREE tier with no payment method attached: hitting a limit
+# returns 429 and we roll to the next lane — running out can never bill anyone.
+# Keys come from env vars first (Render), falling back to the local key files
+# for dev machines. Order = quality first, then capacity.
+def _lane_key(env_name: str, file_name: str) -> Optional[str]:
+    key = os.getenv(env_name)
+    if key:
+        return key.strip()
+    try:
+        p = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), file_name)
+        with open(p) as f:
+            k = f.read().strip()
+            return k or None
+    except OSError:
+        return None
+
+
+_GEMINI_OPENAI = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+AI_LANES = [
+    # Free lanes first, in quality order. Cerebras LAST: since their 2026-07
+    # billing change it burns prepaid credits from the first token (no free
+    # allowance — the console's 1M/day figures are rate caps, not free quota),
+    # so it only serves when every genuinely-free lane is dry.
+    {"name": "groq", "url": "https://api.groq.com/openai/v1/chat/completions",
+     "env": "GROQ_API_KEY", "file": ".env", "model": "openai/gpt-oss-120b"},
+    {"name": "gemini-flash", "url": _GEMINI_OPENAI,
+     "env": "GEMINI_API_KEY", "file": "GEMINI_KEY.txt", "model": "gemini-2.5-flash"},
+    {"name": "gemini-lite", "url": _GEMINI_OPENAI,
+     "env": "GEMINI_API_KEY", "file": "GEMINI_KEY.txt", "model": "gemini-2.5-flash-lite"},
+    {"name": "cerebras", "url": "https://api.cerebras.ai/v1/chat/completions",
+     "env": "CEREBRAS_API_KEY", "file": "CEREBRAS_KEY.txt", "model": "gpt-oss-120b"},
+]
+
+
+def _lane_secret(lane: dict) -> Optional[str]:
+    if lane["env"] == "GROQ_API_KEY" and lane["file"] == ".env":
+        key = os.getenv("GROQ_API_KEY")
+        if key:
+            return key.strip()
+        # dev fallback: pull GROQ_API_KEY= out of the repo .env
+        try:
+            p = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env")
+            with open(p) as f:
+                for line in f:
+                    if line.startswith("GROQ_API_KEY="):
+                        return line.split("=", 1)[1].strip()
+        except OSError:
+            pass
+        return None
+    return _lane_key(lane["env"], lane["file"])
+
+
+def ai_chat_json(prompt: str, max_tokens: int = 1300, temperature: float = 0.7):
+    """Run the prompt down the free-tier lanes in order; first success wins.
+    Returns (parsed_json_dict, lane_name). Raises RuntimeError when every
+    configured lane is rate-limited or failing — the caller shows 'busy'."""
+    import json as _json
+    import requests as _rq
+    last_err = None
+    for lane in AI_LANES:
+        key = _lane_secret(lane)
+        if not key:
+            continue
+        payload = {
+            "model": lane["model"],
+            "messages": [{"role": "user", "content": prompt}],
+            "max_tokens": max_tokens,
+            "temperature": temperature,
+            "reasoning_effort": "low",
+            "response_format": {"type": "json_object"},
+        }
+        for attempt in ("with-effort", "plain"):
+            try:
+                r = _rq.post(lane["url"], timeout=60,
+                             headers={"Authorization": f"Bearer {key}",
+                                      "Content-Type": "application/json"},
+                             json=payload)
+                if r.status_code == 429:
+                    last_err = f"{lane['name']}: rate-limited"
+                    break                       # this lane is dry — next lane
+                if r.status_code == 400 and attempt == "with-effort":
+                    payload.pop("reasoning_effort", None)
+                    continue                    # retry this lane without the knob
+                r.raise_for_status()
+                content = r.json()["choices"][0]["message"].get("content") or ""
+                out = _json.loads(content)
+                if not isinstance(out, dict):
+                    raise ValueError("non-object JSON")
+                return out, lane["name"]
+            except Exception as e:              # noqa: BLE001 — any lane failure rolls to the next
+                last_err = f"{lane['name']}: {e}"
+                break
+    raise RuntimeError(last_err or "no AI lane configured")
+
+
+# Shared rewrite cache: the first agent to tailor a given script for a given
+# market pays the tokens; everyone after gets it free and instant.
+_REWRITE_CACHE: dict = {}
+_REWRITE_CACHE_MAX = 5000
 
 
 def ocr_pdf_with_groq_vision(file_path: str, max_pages: int = 8) -> str:
@@ -530,7 +633,8 @@ Respond ONLY with JSON:
         if client is None:
             raise RuntimeError("no client")
         r = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="openai/gpt-oss-120b",
+            reasoning_effort="low",
             messages=[{"role": "user", "content": prompt}],
             max_tokens=3000,
             temperature=0.85,
@@ -612,7 +716,8 @@ Respond with ONLY a JSON object (no markdown, no commentary) with exactly these 
         if client is None:
             raise RuntimeError("no client")
         r = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="openai/gpt-oss-120b",
+            reasoning_effort="low",
             messages=[{"role": "user", "content": prompt}],
             max_tokens=900,
             temperature=0.8,
@@ -716,22 +821,25 @@ ORIGINAL SCRIPT:
 
 Respond with ONLY a JSON object: {{"script": "the rewritten script", "why": "one short sentence naming the specific frameworks, signature phrases, or market numbers this version leans on - e.g. 'Leans on his 3 F's framework and the 30-day re-list stat.' NEVER start with 'I rewrote/changed/transformed' or describe the act of editing - name what's IN the script, not what you did to it."}}"""
 
+    # shared cache first: same script + market + voice = same rewrite for everyone
+    import hashlib
+    import json as _json
+    ck = hashlib.sha256(_json.dumps(
+        [script, channel, m, voice.get("id") or voice.get("name")],
+        sort_keys=True, default=str).encode()).hexdigest()
+    hit = _REWRITE_CACHE.get(ck)
+    if hit:
+        return {"status": "success", "script": hit["script"], "why": hit["why"], "cached": True}
+
     try:
-        client = _groq_client()
-        if client is None:
-            raise RuntimeError("no client")
-        r = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=900,
-            temperature=0.7,
-            response_format={"type": "json_object"},
-        )
-        import json as _json
-        out = _json.loads(r.choices[0].message.content)
+        out, lane = ai_chat_json(prompt, max_tokens=1300, temperature=0.7)
         if not out.get("script"):
             raise RuntimeError("empty rewrite")
-        return {"status": "success", "script": out["script"], "why": reword_why(out.get("why", ""))}
+        result = {"script": out["script"], "why": reword_why(out.get("why", ""))}
+        if len(_REWRITE_CACHE) >= _REWRITE_CACHE_MAX:
+            _REWRITE_CACHE.pop(next(iter(_REWRITE_CACHE)))
+        _REWRITE_CACHE[ck] = result
+        return {"status": "success", "script": result["script"], "why": result["why"], "lane": lane}
     except Exception as e:
         print(f"localize-script error: {e}")
         return {"status": "error", "error": "The localizer is busy - try again in a few seconds."}
@@ -806,23 +914,12 @@ Respond with ONLY a JSON object:
 {{"scripts": [{{"channel": "call|voicemail|text|email", "title": "short specific title", "body": "the script"}}]}}"""
 
     try:
-        client = _groq_client()
-        if client is None:
-            raise RuntimeError("no client")
-        r = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=2200,
-            temperature=0.8,
-            response_format={"type": "json_object"},
-        )
-        import json as _json
-        out = _json.loads(r.choices[0].message.content)
+        out, lane = ai_chat_json(prompt, max_tokens=2600, temperature=0.8)
         scripts = [s for s in (out.get("scripts") or [])
                    if s.get("body") and s.get("channel") in ("call", "voicemail", "text", "email")]
         if not scripts:
             raise RuntimeError("empty generation")
-        return {"status": "success", "scripts": scripts, "advisor": adv_label}
+        return {"status": "success", "scripts": scripts, "advisor": adv_label, "lane": lane}
     except Exception as e:
         print(f"generate-scripts error: {e}")
         return {"status": "error", "error": "The script engine is busy - try again in a few seconds."}
@@ -849,7 +946,8 @@ async def diag():
         client = _groq_client()
         if client:
             r = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
+                model="openai/gpt-oss-120b",
+                reasoning_effort="low",
                 messages=[{"role": "user", "content": "say ok"}],
                 max_tokens=4,
             )

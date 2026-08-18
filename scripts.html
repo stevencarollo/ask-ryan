@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Script Vault — The Roundtable</title>
+<script src="/auth.js"></script>
+<script>RTAuth.guard();</script>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--gold:#C9A85C;--gold-bright:#E5C87E;--ink:#0B0B0D;--charcoal:#131316;--line:rgba(201,168,92,.25);--ivory:#F5F1E8;--muted:#8E887B;--teal:#7BC4A8;}
@@ -115,6 +117,39 @@ body.hasmkt .abtn.gold{display:inline-block}
 
 #toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--gold);color:var(--ink);font-weight:700;font-size:.82em;letter-spacing:.05em;padding:11px 22px;border-radius:6px;transition:transform .25s;z-index:80}
 #toast.on{transform:translateX(-50%) translateY(0)}
+
+/* Agent signature bar + merge fields */
+.profbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 14px;padding:9px 14px;background:rgba(201,168,92,.06);border:1px solid var(--line);border-radius:8px;font-size:.86em;color:var(--ivory)}
+.profbar b{color:var(--gold-bright)}
+.profbar .pedit{background:none;border:1px solid var(--line);color:var(--gold);font-size:.86em;padding:4px 12px;border-radius:6px}
+.profbar .pedit:hover{background:var(--gold);color:var(--ink)}
+.pfields{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pfields input{background:var(--charcoal);border:1px solid var(--line);border-radius:6px;color:var(--ivory);font-family:'Inter',sans-serif;font-size:.92em;padding:7px 11px;min-width:170px}
+.pfields input:focus{border-color:var(--gold);outline:none}
+.pfields .go{padding:7px 16px;font-size:.86em}
+.mf{color:var(--gold-bright);font-weight:600}
+
+/* Lead list upload */
+.lead-controls{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.lead-controls input[type=file]{color:var(--muted);font-size:.86em;max-width:300px}
+.lead-controls input[type=file]::file-selector-button{background:var(--gold);color:var(--ink);border:none;border-radius:6px;padding:8px 14px;font-weight:700;font-size:.95em;cursor:pointer;margin-right:10px}
+.lead-controls label{display:flex;gap:7px;align-items:center;font-size:.86em;color:var(--ivory);cursor:pointer}
+.lead-sum{font-size:.84em;color:var(--muted);margin:4px 0 10px;line-height:1.7}
+.lead-sum b{color:var(--gold-bright)}
+#leadSearch{width:100%;background:var(--charcoal);border:1px solid var(--line);border-radius:8px;color:var(--ivory);font-family:'Inter',sans-serif;font-size:.92em;padding:9px 13px;margin-bottom:9px}
+#leadSearch:focus{border-color:var(--gold);outline:none}
+.lead-rows{max-height:290px;overflow:auto;border:1px solid var(--line);border-radius:8px;display:none}
+.lead-rows.on{display:block}
+.lead-row{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:none;border:none;border-bottom:1px solid rgba(201,168,92,.1);color:var(--ivory);padding:9px 13px;font-size:.87em;cursor:pointer}
+.lead-row:hover{background:rgba(201,168,92,.08)}
+.lead-row.on{background:rgba(201,168,92,.14)}
+.lead-row .ln{font-weight:600;min-width:150px}
+.lead-row .la{color:var(--muted);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lead-row .lt{font-size:.82em;color:var(--gold);border:1px solid var(--line);border-radius:999px;padding:1px 9px;white-space:nowrap}
+.leadbanner{position:sticky;top:58px;z-index:40;display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:0 clamp(16px,4vw,54px) 6px;padding:10px 16px;background:rgba(19,19,22,.96);border:1px solid var(--gold);border-radius:10px;font-size:.88em;color:var(--ivory);backdrop-filter:blur(8px)}
+.leadbanner b{color:var(--gold-bright)}
+.leadbanner .lb-x{margin-left:auto;background:none;border:1px solid var(--line);color:var(--muted);border-radius:6px;padding:4px 12px;font-size:.9em}
+.leadbanner .lb-x:hover{color:var(--ink);background:var(--gold)}
 </style></head>
 <body>
 <nav class="topbar">
@@ -122,15 +157,25 @@ body.hasmkt .abtn.gold{display:inline-block}
     <a class="brand-mini" href="/"><span>The Roundtable</span></a>
   </div>
   <div class="nav-right" style="display:flex;gap:9px;align-items:center">
-    <a class="nav-btn" href="/frontend.html">Coaching Chat</a>
-    <a class="nav-btn" href="/podcast-studio.html">Podcasts</a>
-    <a class="nav-btn" href="/flyer-studio.html">Flyer Studio</a>
+    <a class="nav-btn" href="#" style="opacity:.38;cursor:not-allowed" onclick="toast('Coming soon — stay tuned.');return false;" aria-disabled="true">Coaching Chat · Soon</a>
+    <a class="nav-btn" href="#" style="opacity:.38;cursor:not-allowed" onclick="toast('Coming soon — stay tuned.');return false;" aria-disabled="true">Podcasts · Soon</a>
+    <a class="nav-btn" href="#" style="opacity:.38;cursor:not-allowed" onclick="toast('Coming soon — stay tuned.');return false;" aria-disabled="true">Flyer Studio · Soon</a>
+    <a class="nav-btn" href="#" onclick="RTAuth.signOut();return false;">Sign Out</a>
   </div>
 </nav>
 
 <section class="loc">
   <h1>Script Vault</h1>
   <p class="tag">274 call, voicemail, text, and email scripts from all 34 advisors — at least four per format for every lead type, each written in the voice of the coach who owns that specialty. Set your market and every script tailors live to your farm's numbers from this week's Altos Research data. Want a different voice? Build your own Roundtable below.</p>
+  <div class="profbar" id="profbar">
+    <span id="profTxt"></span>
+    <button class="pedit" id="profEdit">Edit</button>
+    <span class="pfields" id="profFields" style="display:none">
+      <input id="pfName" placeholder="Your name" autocomplete="name">
+      <input id="pfBrok" placeholder="Brokerage (optional)" autocomplete="organization">
+      <button class="go" id="pfSave">Save</button>
+    </span>
+  </div>
   <div class="locbar" id="locbar">
     <input id="locq" list="citylist" placeholder="Type a ZIP or city in LA or Orange County — e.g. 90277 or Irvine" autocomplete="off">
     <datalist id="citylist"></datalist>
@@ -170,9 +215,23 @@ body.hasmkt .abtn.gold{display:inline-block}
       <span class="ct-status" id="ctStatus"></span>
     </div>
   </details>
+  <details class="custom-topic" id="leadPanel">
+    <summary>📇 My Lead List — upload your leads and every script fills itself, lead by lead</summary>
+    <div class="ct-body">
+      <div class="lead-controls">
+        <input type="file" id="leadFile" accept=".csv,.xlsx,.xls">
+        <label><input type="checkbox" id="leadUseName" checked> Address each script to the lead by name</label>
+        <button class="clr" id="leadClear" style="display:none">✕ Clear list</button>
+      </div>
+      <div class="lead-sum" id="leadSum">Upload an Excel or CSV of your leads (name, address, lead type — plus phone/email if you have them). Each lead's type picks the right scripts automatically: NOD leads get the Pre-Foreclosure library, probate leads get Probate, expireds get Expired. Your file never leaves this browser.</div>
+      <input id="leadSearch" placeholder="Search your leads…" style="display:none">
+      <div class="lead-rows" id="leadRows"></div>
+    </div>
+  </details>
   <div class="locerr" id="locerr"></div>
   <div class="mkt" id="mkt"></div>
 </section>
+<div class="leadbanner" id="leadBanner" style="display:none"></div>
 
 <section class="filters">
   <input class="search" id="q" placeholder="Search scripts, advisors, situations…">
@@ -187,6 +246,281 @@ body.hasmkt .abtn.gold{display:inline-block}
 <script src="/scripts_data.js?v=3"></script>
 <script>
 const API_URL = 'https://ask-ryan-nb3w.onrender.com';
+
+/* wake the free-tier backend while the member is still browsing, so the
+   first Tailor click never hits a cold server */
+fetch(API_URL + '/').catch(()=>{});
+
+/* ===== Agent personalization: {Agent} / {Brokerage} merge fields =====
+   Scripts are written with {Agent} and {Brokerage} tokens; they fill in
+   automatically from the member's account profile. */
+let PROFILE = Object.assign({}, RTAuth.session() || {}, RTAuth.profile());
+
+/* library bodies use {{Agent}}/{{Brokerage}}; AI rewrites sometimes come back
+   single-braced — match both, doubles first */
+function rxTok(names){
+  const alts = names.map(n => '\\{\\{' + n + '\\}\\}').concat(names.map(n => '\\{' + n + '\\}'));
+  return new RegExp(alts.join('|'), 'g');
+}
+const RX_AGENT = rxTok(['Agent Name', 'Agent']);
+const RX_BROK  = rxTok(['Brokerage']);
+const RX_OWNER = rxTok(['Owner', 'Name']);
+const RX_ADDR  = rxTok(['Address']);
+const RX_STREET= rxTok(['Street']);
+const RX_CITY  = rxTok(['City']);
+const RX_HOOD  = rxTok(['Neighborhood']);
+
+/* every merge value active right now: agent profile + the selected lead */
+function mergePairs(){
+  const p = [];
+  if (PROFILE.name) p.push([RX_AGENT, PROFILE.name]);
+  if (PROFILE.brokerage) p.push([RX_BROK, PROFILE.brokerage]);
+  const L = ACTIVE_LEAD;
+  if (L){
+    if (L.first && document.getElementById('leadUseName').checked) p.push([RX_OWNER, L.first]);
+    if (L.address){
+      p.push([RX_ADDR, L.address]);
+      p.push([RX_STREET, L.address.replace(/^[\d\-]+\s+/, '').replace(/,.*$/, '')]);
+    }
+    if (L.city){ p.push([RX_CITY, L.city]); p.push([RX_HOOD, L.city]); }
+    else if (MARKET){ p.push([RX_HOOD, MARKET.name.replace(/\s+\d{5}$/, '')]); }
+  }
+  return p;
+}
+function fillPlain(t){
+  let out = t;
+  for (const [rx, v] of mergePairs()) out = out.replace(rx, v);
+  return out;
+}
+function fillHTML(t){                    // escape first, then decorate the filled fields
+  let out = esc(t);
+  for (const [rx, v] of mergePairs()) out = out.replace(rx, '<span class="mf">' + esc(v) + '</span>');
+  return out;
+}
+
+/* ---- open a script in the agent's own email / texting app ---- */
+function mailtoURL(i){
+  const s = SCRIPTS[i];
+  let txt = fillPlain(s.local || s.body), subject = '', body = txt;
+  const m = txt.match(/^Subject:\s*(.+)\r?\n+([\s\S]*)$/);
+  if (m){ subject = m[1].trim(); body = m[2].trim(); }
+  const to = (ACTIVE_LEAD && ACTIVE_LEAD.email) ? encodeURIComponent(ACTIVE_LEAD.email) : '';
+  return 'mailto:' + to + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+}
+function smsURL(i){
+  const s = SCRIPTS[i];
+  const body = fillPlain(s.local || s.body);
+  const to = (ACTIVE_LEAD && ACTIVE_LEAD.phone) ? encodeURIComponent(String(ACTIVE_LEAD.phone).replace(/[^+\d]/g, '')) : '';
+  return 'sms:' + to + '?&body=' + encodeURIComponent(body);
+}
+function openInEmail(i){ location.href = mailtoURL(i); }
+function openInText(i){ location.href = smsURL(i); }
+
+function syncProf(){
+  const t = document.getElementById('profTxt');
+  if (PROFILE.name){
+    t.innerHTML = '✒ Scripts signed as <b>' + esc(PROFILE.name) + '</b>' +
+      (PROFILE.brokerage ? ' · <b>' + esc(PROFILE.brokerage) + '</b>' : '') +
+      ' — every {Agent} and {Brokerage} fills in automatically.';
+  } else {
+    t.textContent = '✒ Add your name and every script signs itself automatically.';
+  }
+}
+document.getElementById('profEdit').onclick = ()=>{
+  const f = document.getElementById('profFields');
+  const open = f.style.display !== 'none';
+  f.style.display = open ? 'none' : 'flex';
+  if (!open){
+    document.getElementById('pfName').value = PROFILE.name || '';
+    document.getElementById('pfBrok').value = PROFILE.brokerage || '';
+    document.getElementById('pfName').focus();
+  }
+};
+document.getElementById('pfSave').onclick = ()=>{
+  const name = document.getElementById('pfName').value.trim();
+  const brokerage = document.getElementById('pfBrok').value.trim();
+  RTAuth.saveProfile({name, brokerage});
+  if (name) PROFILE.name = name;
+  if (brokerage) PROFILE.brokerage = brokerage;
+  document.getElementById('profFields').style.display = 'none';
+  syncProf(); render();
+  toast(name ? 'Scripts now signed as ' + name : 'Profile saved');
+};
+
+/* ===== Lead list: upload once, every script fills itself per lead =====
+   Parsing happens 100% in the browser (SheetJS for .xlsx, native for .csv);
+   the file is never uploaded anywhere. */
+let LEADS = [];
+let ACTIVE_LEAD = null;
+
+function mapTopic(t){
+  const s = String(t || '').toLowerCase();
+  if (/expired|withdrawn|cancel/.test(s)) return 'expired';
+  if (/fsbo|by owner/.test(s)) return 'fsbo';
+  if (/tax/.test(s)) return 'tax';
+  if (/nod|default|foreclos|lates|delinq/.test(s)) return 'nod';
+  if (/probate|aod|affidavit|heir|estate|inherit|death|deceased|trust/.test(s)) return 'probate';
+  if (/divorce|dissolution/.test(s)) return 'divorce';
+  if (/absentee|investor|out.of.state|non.?owner|rental|tenant/.test(s)) return 'absentee';
+  if (/luxur|high.end/.test(s)) return 'luxury';
+  if (/commercial|multifam|apartment|cre/.test(s)) return 'cre';
+  if (/sphere|referral|past.client|soi/.test(s)) return 'soi';
+  return 'circle';                       // neighbors/farm default
+}
+function topicName(tid){ const t = TOPICS.find(t => t[0] === tid); return t ? t[1] : tid; }
+
+function normH(h){ return String(h || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); }
+function pickCol(hs, cands){
+  for (const c of cands){ const i = hs.indexOf(c); if (i > -1) return i; }
+  for (const c of cands){ const i = hs.findIndex(h => h.includes(c)); if (i > -1) return i; }
+  return -1;
+}
+
+function leadsFromRows(rows){
+  if (!rows.length) return [];
+  const hs = rows[0].map(normH);
+  const cFirst = pickCol(hs, ['owner 1 first name', 'first name', 'owner first name', 'first']);
+  const cLast  = pickCol(hs, ['owner 1 last name', 'last name', 'owner last name', 'last']);
+  const cFull  = pickCol(hs, ['owner name', 'full name', 'owner 1', 'owner', 'name', 'contact']);
+  const cAddr  = pickCol(hs, ['property address', 'situs address', 'site address', 'street address', 'address', 'situs']);
+  const cCity  = pickCol(hs, ['property city', 'situs city', 'site city', 'city']);
+  const cType  = pickCol(hs, ['lead type', 'list type', 'lead source', 'list', 'type', 'category', 'source']);
+  const cPhone = pickCol(hs, ['cell 1', 'cell', 'mobile', 'phone 1', 'phone', 'cell phone']);
+  const cMail  = pickCol(hs, ['email 1', 'email', 'email address']);
+  const out = [];
+  for (const r of rows.slice(1)){
+    if (!r || !r.some(v => String(v || '').trim())) continue;
+    let name = '';
+    if (cFirst > -1 || cLast > -1)
+      name = [r[cFirst], r[cLast]].map(v => String(v || '').trim()).filter(Boolean).join(' ');
+    if (!name && cFull > -1) name = String(r[cFull] || '').trim();
+    const type = cType > -1 ? String(r[cType] || '').trim() : '';
+    out.push({
+      name: name || '(no name)',
+      first: (name.split(/\s+/)[0] || '').replace(/[^A-Za-z'\-].*$/, ''),
+      address: cAddr > -1 ? String(r[cAddr] || '').trim() : '',
+      city: cCity > -1 ? String(r[cCity] || '').trim() : '',
+      type: type,
+      topic: mapTopic(type),
+      phone: cPhone > -1 ? String(r[cPhone] || '').trim() : '',
+      email: cMail > -1 ? String(r[cMail] || '').trim() : ''
+    });
+    if (out.length >= 2000) break;       // keep localStorage happy
+  }
+  return out;
+}
+
+function parseCSV(text){
+  const rows = [[]]; let cell = '', inQ = false;
+  for (let i = 0; i < text.length; i++){
+    const ch = text[i];
+    if (inQ){
+      if (ch === '"'){ if (text[i+1] === '"'){ cell += '"'; i++; } else inQ = false; }
+      else cell += ch;
+    } else if (ch === '"') inQ = true;
+    else if (ch === ','){ rows[rows.length-1].push(cell); cell = ''; }
+    else if (ch === '\n' || ch === '\r'){
+      if (cell !== '' || rows[rows.length-1].length){ rows[rows.length-1].push(cell); cell = ''; rows.push([]); }
+      if (ch === '\r' && text[i+1] === '\n') i++;
+    } else cell += ch;
+  }
+  if (cell !== '' || rows[rows.length-1].length) rows[rows.length-1].push(cell);
+  return rows.filter(r => r.length && r.some(v => String(v).trim()));
+}
+
+function loadSheetJS(){
+  if (window.XLSX) return Promise.resolve();
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = '/xlsx.full.min.js'; s.onload = res; s.onerror = rej;
+    document.head.appendChild(s);
+  });
+}
+
+document.getElementById('leadFile').addEventListener('change', async (ev) => {
+  const f = ev.target.files[0];
+  if (!f) return;
+  const sum = document.getElementById('leadSum');
+  sum.innerHTML = 'Reading <b>' + esc(f.name) + '</b>…';
+  try{
+    let rows;
+    if (/\.csv$/i.test(f.name)){
+      rows = parseCSV(await f.text());
+    } else {
+      await loadSheetJS();
+      const wb = XLSX.read(await f.arrayBuffer(), {type: 'array'});
+      rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1, raw: false, defval: ''});
+    }
+    LEADS = leadsFromRows(rows);
+    if (!LEADS.length){ sum.textContent = 'No leads found — make sure row 1 has headers like Name / Address / Lead Type.'; return; }
+    try{ localStorage.setItem('rt_leads', JSON.stringify(LEADS)); }catch(e){}
+    renderLeads();
+    toast(LEADS.length + ' leads loaded — tap one and its scripts are ready');
+  } catch(e){
+    sum.textContent = 'Couldn’t read that file — export it as .xlsx or .csv and try again.';
+  }
+});
+
+function renderLeads(){
+  const box = document.getElementById('leadRows');
+  const sum = document.getElementById('leadSum');
+  const q = (document.getElementById('leadSearch').value || '').toLowerCase();
+  const counts = {};
+  LEADS.forEach(l => counts[l.topic] = (counts[l.topic] || 0) + 1);
+  sum.innerHTML = '<b>' + LEADS.length + ' leads</b> · ' +
+    Object.entries(counts).map(([t, n]) => n + ' ' + topicName(t)).join(' · ') +
+    ' — tap a lead and every script below fills in for them.';
+  document.getElementById('leadSearch').style.display = 'block';
+  document.getElementById('leadClear').style.display = '';
+  box.classList.add('on');
+  box.innerHTML = '';
+  LEADS.forEach((l, idx) => {
+    if (q && !(l.name + ' ' + l.address + ' ' + l.type).toLowerCase().includes(q)) return;
+    const b = document.createElement('button');
+    b.className = 'lead-row' + (ACTIVE_LEAD === l ? ' on' : '');
+    b.innerHTML = '<span class="ln">' + esc(l.name) + '</span><span class="la">' + esc(l.address) + '</span>' +
+      '<span class="lt">' + esc(l.type || topicName(l.topic)) + '</span>';
+    b.onclick = () => activateLead(idx);
+    box.appendChild(b);
+  });
+}
+document.getElementById('leadSearch').addEventListener('input', renderLeads);
+
+function activateLead(idx){
+  ACTIVE_LEAD = LEADS[idx];
+  tFilter = ACTIVE_LEAD.topic;
+  buildTopicChips();
+  const bn = document.getElementById('leadBanner');
+  const L = ACTIVE_LEAD;
+  bn.innerHTML = '📇 Scripts filled for <b>' + esc(L.name) + '</b>' +
+    (L.address ? ' · ' + esc(L.address) : '') +
+    ' · ' + esc(topicName(L.topic)) +
+    (L.phone ? ' · 📱 ' + esc(L.phone) : '') +
+    (L.email ? ' · ✉ ' + esc(L.email) : '') +
+    '<button class="lb-x" onclick="clearLead()">✕ Done with this lead</button>';
+  bn.style.display = 'flex';
+  renderLeads(); render();
+  document.querySelector('.filters').scrollIntoView({behavior: 'smooth'});
+}
+function clearLead(){
+  ACTIVE_LEAD = null;
+  document.getElementById('leadBanner').style.display = 'none';
+  renderLeads(); render();
+}
+document.getElementById('leadClear').onclick = () => {
+  LEADS = []; clearLead();
+  localStorage.removeItem('rt_leads');
+  document.getElementById('leadRows').classList.remove('on');
+  document.getElementById('leadSearch').style.display = 'none';
+  document.getElementById('leadClear').style.display = 'none';
+  document.getElementById('leadFile').value = '';
+  document.getElementById('leadSum').textContent = 'Lead list cleared.';
+};
+document.getElementById('leadUseName').addEventListener('change', render);
+try{
+  const saved = JSON.parse(localStorage.getItem('rt_leads'));
+  if (Array.isArray(saved) && saved.length){ LEADS = saved; renderLeads(); }
+}catch(e){}
 
 /* TOPICS + SCRIPTS load from scripts_data.js */
 
@@ -229,10 +563,12 @@ function render(){
         <div class="top"><span class="ctag ${s.ch}">${CH_LABEL[s.ch]}</span><span class="lchip">Localized</span><span class="pchip">✦ Re-voicing…</span></div>
         <h3>${s.title}</h3>
         <div class="adv">${advLabel(s)}</div>
-        <pre>${esc(s.local || s.body)}</pre>
+        <pre>${fillHTML(s.local || s.body)}</pre>
         <div class="why">${s.why ? '🎯 ' + esc(s.why) : ''}</div>
         <div class="acts">
           <button class="abtn" onclick="copyScript(${s.i})">Copy</button>
+          ${s.ch === 'email' ? `<button class="abtn" onclick="openInEmail(${s.i})" title="Opens your email app with subject + body filled in">✉ Open in Email</button>` : ''}
+          ${s.ch === 'text' ? `<button class="abtn" onclick="openInText(${s.i})" title="Opens your texting app with the message filled in">💬 Open in Messages</button>` : ''}
           <button class="abtn gold" id="loc${s.i}" onclick="tailor(${s.i},true)">${goldLabel()}</button>
           <button class="abtn rev" onclick="revert(${s.i})">Revert</button>
         </div>`;
@@ -256,7 +592,7 @@ function updateCard(i){
   const s = SCRIPTS[i];
   const card = document.querySelector(`.card[data-i="${i}"]`);
   if (!card) return;
-  card.querySelector('pre').innerHTML = esc(s.local || s.body);
+  card.querySelector('pre').innerHTML = fillHTML(s.local || s.body);
   card.querySelector('.why').innerHTML = s.why ? '🎯 ' + esc(s.why) : '';
   card.querySelector('.adv').textContent = advLabel(s);
   card.classList.toggle('localized', !!s.local);
@@ -357,7 +693,7 @@ function cacheKey(i){ return i + '|' + (VOICE ? VOICE.id : '') + '|' + (MARKET ?
 
 /* visibility scanner: any unconverted card near the viewport joins the queue */
 function scanVisible(){
-  if (!VOICE) return;
+  if (!VOICE && !MARKET) return;
   const H = innerHeight + 160;
   document.querySelectorAll('.card').forEach(card => {
     const i = Number(card.dataset.i);
@@ -493,8 +829,8 @@ document.getElementById('ctGo').onclick = async () => {
 /* copy */
 function copyScript(i){
   const s = SCRIPTS[i];
-  navigator.clipboard.writeText(s.local || s.body);
-  toast('Script copied');
+  navigator.clipboard.writeText(fillPlain(s.local || s.body));
+  toast('Script copied' + (PROFILE.name ? ' — signed as ' + PROFILE.name : ''));
 }
 function toast(msg){
   const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('on');
@@ -509,6 +845,12 @@ fetch('/market_local.json').then(r=>r.json()).then(d=>{
   Object.keys(d.cities).sort().forEach(c=>{
     const o=document.createElement('option'); o.value=title(c); dl.appendChild(o);
   });
+  // remember the member's market between visits — no retyping
+  const saved = localStorage.getItem('rt_market');
+  if (saved && !MARKET){
+    document.getElementById('locq').value = saved;
+    setMarket(true);
+  }
 }).catch(()=>{});
 
 function title(s){ return s.toLowerCase().replace(/\b\w/g, m=>m.toUpperCase()); }
@@ -548,10 +890,11 @@ function tempLabel(mai){
   return ['🧊 Buyer\'s market','chip temp'];
 }
 
-document.getElementById('locgo').onclick = setMarket;
+document.getElementById('locgo').onclick = ()=>setMarket();
 document.getElementById('locq').addEventListener('keydown', e=>{ if(e.key==='Enter') setMarket(); });
 document.getElementById('locclr').onclick = ()=>{
   MARKET = null; voiceEpoch++; AUTOQ.length = 0;
+  localStorage.removeItem('rt_market');
   syncGold(); syncCtLocal();
   document.getElementById('mkt').classList.remove('on');
   document.getElementById('locbar').classList.remove('set');
@@ -560,7 +903,7 @@ document.getElementById('locclr').onclick = ()=>{
   render();
 };
 
-function setMarket(){
+function setMarket(restoring){
   const err = document.getElementById('locerr');
   err.style.display='none';
   const q = document.getElementById('locq').value;
@@ -589,9 +932,11 @@ function setMarket(){
     ${m.rent?`<span class="chip">Median rent <b>$${f(m.rent)}/mo</b></span>`:''}
     <span class="upd">Altos Research weekly data · updated ${MD.updated}</span>`;
   mk.classList.add('on');
+  localStorage.setItem('rt_market', q.trim());
   SCRIPTS.forEach(s=>{delete s.local; delete s.why; delete s.voicedBy; delete s.preOnly;});
   render();
-  toast(`Scripts ready to tailor to ${m.name}`);
+  toast(restoring ? `Welcome back — scripts tailoring to ${m.name}` : `Scripts tailoring to ${m.name} as you scroll`);
+  scanVisible();                        // start converting what's on screen right away
 }
 
 async function tailor(i, manual){
@@ -621,6 +966,7 @@ function revert(i){
   updateCard(i);
 }
 
+syncProf();
 render();
 </script>
 </body>

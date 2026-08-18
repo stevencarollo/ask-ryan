@@ -18,3 +18,5 @@ NLM_KEY_ONLY.txt
 RENDER_API_KEY.txt
 voices_build*.log
 GEMINI_KEY.txt
+logs/
+CEREBRAS_KEY.txt

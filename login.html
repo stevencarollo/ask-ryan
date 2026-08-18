@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Access — The Roundtable</title>
+    <meta name="robots" content="noindex">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #0B0B0D;
+            --charcoal: #131316;
+            --surface: #1A1A1E;
+            --line: rgba(201, 168, 92, 0.22);
+            --gold: #C9A85C;
+            --gold-bright: #E5C87E;
+            --ivory: #F5F1E8;
+            --body: #C9C4B8;
+            --muted: #8E887B;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--ink); color: var(--body); line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+            padding: 40px 20px 60px;
+        }
+        body::before {
+            content: ''; position: fixed; inset: 0; pointer-events: none;
+            background: radial-gradient(ellipse 60% 45% at 50% -5%, rgba(201, 168, 92, 0.14), transparent 65%);
+        }
+        a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+            outline: 2px solid var(--gold-bright); outline-offset: 2px; border-radius: 3px;
+        }
+        .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; margin: 18px 0 8px; }
+        .brand svg { width: 40px; height: 40px; }
+        .brand-name {
+            font-family: 'Cinzel', serif; font-size: 1.35rem; font-weight: 600;
+            letter-spacing: 0.12em; color: var(--ivory); text-transform: uppercase;
+        }
+        .access-kicker {
+            color: var(--gold); font-size: 0.72rem; font-weight: 600;
+            letter-spacing: 0.32em; text-transform: uppercase; margin-bottom: 34px;
+        }
+        .card {
+            position: relative; width: 100%; max-width: 460px;
+            background: var(--charcoal); border: 1px solid var(--line); border-radius: 4px;
+            padding: 34px clamp(24px, 5vw, 40px) 38px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+        }
+        .tabs { display: flex; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+        .tab {
+            flex: 1; background: none; border: none; cursor: pointer;
+            font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600;
+            letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted);
+            padding: 12px 4px; border-bottom: 2px solid transparent; margin-bottom: -1px;
+            transition: color 0.2s ease, border-color 0.2s ease;
+        }
+        .tab:hover { color: var(--gold-bright); }
+        .tab.active { color: var(--gold-bright); border-bottom-color: var(--gold); }
+        .pane { display: none; }
+        .pane.active { display: block; }
+        label {
+            display: block; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.14em;
+            text-transform: uppercase; color: var(--muted); margin: 18px 0 7px;
+        }
+        label .opt { text-transform: none; letter-spacing: 0.02em; font-weight: 400; }
+        input, textarea {
+            width: 100%; background: var(--surface); border: 1px solid var(--line);
+            border-radius: 3px; color: var(--ivory); font-family: 'Inter', sans-serif;
+            font-size: 0.95rem; padding: 13px 15px; transition: border-color 0.2s ease;
+        }
+        input::placeholder, textarea::placeholder { color: var(--muted); opacity: 0.7; }
+        input:focus, textarea:focus { border-color: var(--gold); outline: none; }
+        .code-input { letter-spacing: 0.25em; text-transform: uppercase; font-weight: 600; }
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; width: 100%;
+            padding: 15px 20px; margin-top: 26px; border-radius: 2px; cursor: pointer;
+            font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 600;
+            letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none;
+            border: 1px solid var(--gold); background: var(--gold); color: var(--ink);
+            transition: background-color 0.25s ease, box-shadow 0.25s ease;
+            min-height: 48px;
+        }
+        .btn:hover { background: var(--gold-bright); box-shadow: 0 8px 40px rgba(201, 168, 92, 0.3); }
+        .btn:disabled { opacity: 0.55; cursor: wait; box-shadow: none; }
+        .btn-ghost { background: transparent; color: var(--gold); margin-top: 14px; }
+        .btn-ghost:hover { background: var(--gold); color: var(--ink); }
+        .msg {
+            display: none; margin-top: 20px; padding: 13px 16px; border-radius: 3px;
+            font-size: 0.88rem; line-height: 1.5;
+        }
+        .msg.on { display: block; }
+        .msg.err { background: rgba(178, 58, 58, 0.12); border: 1px solid rgba(178, 58, 58, 0.4); color: #E8A9A9; }
+        .msg.ok { background: rgba(201, 168, 92, 0.1); border: 1px solid var(--line); color: var(--gold-bright); }
+        .fine {
+            font-size: 0.8rem; color: var(--muted); margin-top: 22px; text-align: center;
+        }
+        .fine a { color: var(--gold); text-decoration: none; }
+        .fine a:hover { color: var(--gold-bright); }
+        .divider {
+            display: flex; align-items: center; gap: 14px; margin: 26px 0 4px;
+            color: var(--muted); font-size: 0.7rem; font-weight: 600;
+            letter-spacing: 0.2em; text-transform: uppercase;
+        }
+        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+        .access-note {
+            width: 100%; max-width: 460px; margin-top: 26px; text-align: center;
+            font-size: 0.78rem; color: var(--muted);
+        }
+        .access-note strong { color: var(--body); font-weight: 500; }
+        .success-panel { text-align: center; padding: 18px 0 6px; }
+        .success-panel h2 {
+            font-family: 'Cinzel', serif; font-weight: 600; font-size: 1.45rem;
+            color: var(--ivory); margin-bottom: 14px;
+        }
+        .success-panel p { font-size: 0.92rem; margin-bottom: 6px; }
+    </style>
+</head>
+<body>
+    <a class="brand" href="/login.html" aria-label="The Roundtable">
+        <svg viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+                <linearGradient id="rtLogoGrad" x1="0" y1="0" x2="34" y2="34" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#E5C87E"/><stop offset="1" stop-color="#C9A85C"/>
+                </linearGradient>
+            </defs>
+            <circle cx="17" cy="17" r="15.3" stroke="url(#rtLogoGrad)" stroke-width="1.3"/>
+            <circle cx="17" cy="17" r="11.6" stroke="url(#rtLogoGrad)" stroke-width="0.6" opacity="0.4"/>
+            <circle cx="17" cy="17" r="3.4" fill="url(#rtLogoGrad)"/>
+            <circle cx="17" cy="6.6" r="1.55" fill="url(#rtLogoGrad)"/><circle cx="27.4" cy="17" r="1.55" fill="url(#rtLogoGrad)"/>
+            <circle cx="17" cy="27.4" r="1.55" fill="url(#rtLogoGrad)"/><circle cx="6.6" cy="17" r="1.55" fill="url(#rtLogoGrad)"/>
+            <circle cx="24.36" cy="9.64" r="1.4" fill="url(#rtLogoGrad)" opacity="0.85"/><circle cx="24.36" cy="24.36" r="1.4" fill="url(#rtLogoGrad)" opacity="0.85"/>
+            <circle cx="9.64" cy="24.36" r="1.4" fill="url(#rtLogoGrad)" opacity="0.85"/><circle cx="9.64" cy="9.64" r="1.4" fill="url(#rtLogoGrad)" opacity="0.85"/>
+        </svg>
+        <span class="brand-name">The Roundtable</span>
+    </a>
+    <span class="access-kicker">Members Only</span>
+
+    <div class="card">
+        <div class="tabs" role="tablist">
+            <button class="tab active" id="tab-signin" role="tab" aria-selected="true" onclick="showPane('signin')">Sign In</button>
+            <button class="tab" id="tab-create" role="tab" aria-selected="false" onclick="showPane('create')">Create Account</button>
+        </div>
+
+        <!-- SIGN IN -->
+        <div class="pane active" id="pane-signin" role="tabpanel">
+            <form id="form-signin" novalidate>
+                <label for="si-email">Email</label>
+                <input type="email" id="si-email" placeholder="you@brokerage.com" autocomplete="email" required>
+                <label for="si-code">Activation Code</label>
+                <input type="text" id="si-code" class="code-input" placeholder="ENTER CODE" autocomplete="off" required>
+                <label for="si-name">Your Name <span class="opt">(personalizes your scripts)</span></label>
+                <input type="text" id="si-name" placeholder="Jane Agent" autocomplete="name">
+                <label for="si-brokerage">Brokerage <span class="opt">(optional)</span></label>
+                <input type="text" id="si-brokerage" placeholder="Compass, KW, eXp…" autocomplete="organization">
+                <button type="submit" class="btn">Unlock Access</button>
+            </form>
+            <div class="msg err" id="signin-err"></div>
+            <p class="fine">Your code unlocks <strong>5 days</strong> of access. No code? <a href="#" onclick="showPane('create');return false;">Create an account</a> and request one.</p>
+        </div>
+
+        <!-- CREATE ACCOUNT -->
+        <div class="pane" id="pane-create" role="tabpanel">
+            <form id="form-create" novalidate>
+                <label for="ca-name">Full Name</label>
+                <input type="text" id="ca-name" placeholder="Jane Agent" autocomplete="name" required>
+                <label for="ca-email">Email</label>
+                <input type="email" id="ca-email" placeholder="you@brokerage.com" autocomplete="email" required>
+                <label for="ca-phone">Phone</label>
+                <input type="tel" id="ca-phone" placeholder="(310) 555-0100" autocomplete="tel" required>
+                <label for="ca-brokerage">Brokerage <span class="opt">(optional)</span></label>
+                <input type="text" id="ca-brokerage" placeholder="Compass, KW, eXp…" autocomplete="organization">
+                <label for="ca-code">Promo Code <span class="opt">(instant access if you have one)</span></label>
+                <input type="text" id="ca-code" class="code-input" placeholder="PROMO CODE" autocomplete="off">
+                <button type="submit" class="btn" id="ca-submit">Create Account</button>
+            </form>
+            <div class="divider">No promo code?</div>
+            <button class="btn btn-ghost" id="ca-request">Request Access</button>
+            <div class="msg err" id="create-err"></div>
+            <div class="msg ok" id="create-ok"></div>
+        </div>
+
+        <!-- REQUEST SENT -->
+        <div class="pane" id="pane-sent" role="tabpanel">
+            <div class="success-panel">
+                <h2>Request Received</h2>
+                <p>Your access request has been submitted for approval.</p>
+                <p class="fine">Once approved, your activation code will be emailed to you. Come back and sign in — the code is good for 5 days of access.</p>
+                <button class="btn btn-ghost" onclick="showPane('signin')">Back to Sign In</button>
+            </div>
+        </div>
+    </div>
+
+    <p class="access-note">Current member access includes <strong>The Panel</strong>, <strong>Capabilities</strong> &amp; the <strong>Script Vault</strong>. Podcasts, Flyer Studio &amp; the Claude Skill are coming soon.</p>
+
+    <script src="/auth.js"></script>
+    <script>
+        // Already signed in? Straight to the site.
+        if (RTAuth.session()) location.replace('/');
+
+        if (new URLSearchParams(location.search).get('expired')) {
+            const e = document.getElementById('signin-err');
+            e.textContent = 'Your 5-day access has expired. Enter a new activation code to continue.';
+            e.classList.add('on');
+        }
+
+        function showPane(which) {
+            ['signin', 'create', 'sent'].forEach(k => {
+                const pane = document.getElementById('pane-' + k);
+                const tab = document.getElementById('tab-' + k);
+                pane.classList.toggle('active', k === which);
+                if (tab) {
+                    tab.classList.toggle('active', k === which);
+                    tab.setAttribute('aria-selected', k === which ? 'true' : 'false');
+                }
+            });
+        }
+
+        function flash(id, text) {
+            const el = document.getElementById(id);
+            if (text) { el.textContent = text; el.classList.add('on'); }
+            else el.classList.remove('on');
+        }
+
+        // ---- Sign in with activation code ----
+        document.getElementById('form-signin').addEventListener('submit', async (ev) => {
+            ev.preventDefault();
+            flash('signin-err');
+            const email = document.getElementById('si-email').value.trim();
+            const code = document.getElementById('si-code').value.trim();
+            const name = document.getElementById('si-name').value.trim();
+            const brokerage = document.getElementById('si-brokerage').value.trim();
+            if (!email || !code) return flash('signin-err', 'Enter your email and activation code.');
+            if (await RTAuth.redeem(code, { email, name, brokerage })) location.href = '/';
+            else flash('signin-err', 'That activation code isn’t valid. Check it and try again, or request access below.');
+        });
+
+        // ---- Create account (promo code = instant access) ----
+        function collectProfile() {
+            return {
+                name: document.getElementById('ca-name').value.trim(),
+                email: document.getElementById('ca-email').value.trim(),
+                phone: document.getElementById('ca-phone').value.trim(),
+                brokerage: document.getElementById('ca-brokerage').value.trim()
+            };
+        }
+        function validProfile(p, requireAll) {
+            if (!p.name || !p.email) return false;
+            if (requireAll && !p.phone) return false;
+            return /.+@.+\..+/.test(p.email);
+        }
+
+        document.getElementById('form-create').addEventListener('submit', async (ev) => {
+            ev.preventDefault();
+            flash('create-err'); flash('create-ok');
+            const p = collectProfile();
+            const code = document.getElementById('ca-code').value.trim();
+            if (!validProfile(p, true)) return flash('create-err', 'Fill in your name, email, and phone.');
+            if (!code) return flash('create-err', 'No promo code entered — use "Request Access" below and we’ll review your request.');
+            if (await RTAuth.redeem(code, p)) location.href = '/';
+            else flash('create-err', 'That promo code isn’t valid. Double-check it, or request access below.');
+        });
+
+        // ---- Request access (no code) → emails southbaydaily@gmail.com ----
+        document.getElementById('ca-request').addEventListener('click', async () => {
+            flash('create-err'); flash('create-ok');
+            const p = collectProfile();
+            if (!validProfile(p, true)) return flash('create-err', 'Fill in your name, email, and phone so we can approve you.');
+            const btn = document.getElementById('ca-request');
+            btn.disabled = true; btn.textContent = 'Sending…';
+            try {
+                const res = await fetch('https://formsubmit.co/ajax/southbaydaily@gmail.com', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({
+                        _subject: 'Roundtable Access Request — ' + p.name,
+                        Name: p.name, Email: p.email, Phone: p.phone,
+                        Brokerage: p.brokerage || '(none given)',
+                        Requested: new Date().toLocaleString()
+                    })
+                });
+                if (!res.ok) throw new Error('send failed');
+                showPane('sent');
+            } catch (e) {
+                // Fallback: open a pre-filled email instead
+                const body = encodeURIComponent(
+                    'Roundtable access request\n\nName: ' + p.name + '\nEmail: ' + p.email +
+                    '\nPhone: ' + p.phone + '\nBrokerage: ' + (p.brokerage || '(none)'));
+                location.href = 'mailto:southbaydaily@gmail.com?subject=' +
+                    encodeURIComponent('Roundtable Access Request — ' + p.name) + '&body=' + body;
+                showPane('sent');
+            } finally {
+                btn.disabled = false; btn.textContent = 'Request Access';
+            }
+        });
+    </script>
+</body>
+</html>
