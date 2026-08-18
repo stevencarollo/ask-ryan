@@ -33,7 +33,16 @@ nav.topbar{display:flex;justify-content:space-between;align-items:center;gap:10p
 .loc h1{font-family:'Cinzel',serif;font-size:clamp(1.5em,3.4vw,2.2em);color:var(--ivory);letter-spacing:.04em}
 .loc .tag{color:var(--muted);margin:6px 0 16px;font-size:.95em;line-height:1.55;max-width:760px}
 .locbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--charcoal);border:1px solid var(--line);border-radius:10px;padding:14px}
-.locbar input{flex:1 1 240px;min-width:0;padding:12px 14px;background:var(--ink);border:1px solid var(--line);border-radius:6px;color:var(--ivory);font-size:1em}
+.ac-wrap{position:relative;flex:1 1 240px;min-width:0}
+.locbar input{width:100%;padding:12px 14px;background:var(--ink);border:1px solid var(--line);border-radius:6px;color:var(--ivory);font-size:1em}
+.ac-list{display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:60;background:var(--charcoal);border:1px solid var(--gold);border-radius:10px;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.55);max-height:300px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.ac-list.on{display:block}
+.ac-row{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:none;border-bottom:1px solid rgba(201,168,92,.1);color:var(--ivory);padding:13px 15px;font-size:.95em;cursor:pointer;min-height:48px}
+.ac-row:last-child{border-bottom:none}
+.ac-row:hover,.ac-row.sel{background:rgba(201,168,92,.12)}
+.ac-row .ac-zip{color:var(--gold);font-weight:700;min-width:52px}
+.ac-row .ac-city{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ac-row .ac-tag{font-size:.72em;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 .locbar .go{padding:12px 22px;background:linear-gradient(135deg,var(--gold) 0%,#B8964A 100%);color:var(--ink);border:none;border-radius:6px;font-weight:700;font-size:.82em;letter-spacing:.1em;text-transform:uppercase}
 .locbar .go:hover{background:var(--gold-bright)}
 .locbar .clr{padding:12px 14px;background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:6px;font-size:.78em;letter-spacing:.06em;text-transform:uppercase;display:none}
@@ -271,8 +280,10 @@ body.hasmkt .abtn.gold{display:inline-block}
     <summary id="marketSum">📍 Market — not set · tap to localize your scripts</summary>
     <div class="ct-body">
       <div class="locbar" id="locbar">
-        <input id="locq" list="citylist" placeholder="Type a ZIP or city in LA or Orange County — e.g. 90277 or Irvine" autocomplete="off">
-        <datalist id="citylist"></datalist>
+        <div class="ac-wrap">
+          <input id="locq" placeholder="City or ZIP — Torrance or 90277" autocomplete="off" autocapitalize="words" enterkeyhint="go">
+          <div class="ac-list" id="acList"></div>
+        </div>
         <button class="go" id="locgo">Set My Market</button>
         <button class="clr" id="locclr">✕ Clear</button>
       </div>
@@ -1141,13 +1152,12 @@ function toast(msg){
 }
 
 /* ============ LOCALIZER ============ */
-let MD = null;
+let MD = null, SUGGEST = [];
 fetch('/market_local.json').then(r=>r.json()).then(d=>{
   MD = d;
-  const dl = document.getElementById('citylist');
-  Object.keys(d.cities).sort().forEach(c=>{
-    const o=document.createElement('option'); o.value=title(c); dl.appendChild(o);
-  });
+  // one flat suggestion list: cities first, then ZIPs
+  SUGGEST = Object.keys(d.cities).sort().map(c => ({q: title(c), city: title(c), zip: null}))
+    .concat(Object.keys(d.zips).sort().map(z => ({q: z, city: d.zips[z].c, zip: z})));
   // remember the member's market between visits — no retyping
   const saved = localStorage.getItem('rt_market');
   if (saved && !MARKET){
@@ -1155,6 +1165,76 @@ fetch('/market_local.json').then(r=>r.json()).then(d=>{
     setMarket(true);
   }
 }).catch(()=>{});
+
+/* ---- custom autocomplete: tap a suggestion = market set, one gesture ---- */
+const acList = document.getElementById('acList');
+const locqEl = document.getElementById('locq');
+let acSel = -1;
+
+function recentMarkets(){
+  try{ return JSON.parse(localStorage.getItem('rt_recent_markets')) || []; }catch(e){ return []; }
+}
+function rememberMarket(q){
+  const r = [q].concat(recentMarkets().filter(x => x.toLowerCase() !== q.toLowerCase())).slice(0, 3);
+  localStorage.setItem('rt_recent_markets', JSON.stringify(r));
+}
+
+function acMatches(q){
+  if (!q){
+    return recentMarkets().map(m => {
+      const z = /^\d{5}$/.test(m) && MD && MD.zips[m];
+      return {q: m, city: z ? z.c : m, zip: z ? m : null, recent: true};
+    });
+  }
+  const s = q.toLowerCase();
+  const starts = [], contains = [];
+  for (const e of SUGGEST){
+    const hay = (e.zip ? e.zip + ' ' + e.city : e.city).toLowerCase();
+    if (hay.startsWith(s) || (e.zip && e.city.toLowerCase().startsWith(s) && starts.length < 8)) starts.push(e);
+    else if (hay.includes(s)) contains.push(e);
+    if (starts.length >= 8) break;
+  }
+  return starts.concat(contains).slice(0, 8);
+}
+
+function acRender(){
+  const q = locqEl.value.trim();
+  const rows = acMatches(q);
+  acSel = -1;
+  if (!rows.length){ acList.classList.remove('on'); acList.innerHTML = ''; return; }
+  acList.innerHTML = '';
+  rows.forEach((e, idx) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'ac-row';
+    b.innerHTML = (e.zip ? '<span class="ac-zip">' + e.zip + '</span>' : '') +
+      '<span class="ac-city">' + esc(e.city) + '</span>' +
+      '<span class="ac-tag">' + (e.recent ? 'recent' : e.zip ? 'zip' : 'city') + '</span>';
+    // mousedown beats the input's blur, so one tap works on mobile
+    b.addEventListener('mousedown', (ev) => { ev.preventDefault(); acPick(e.q); });
+    acList.appendChild(b);
+  });
+  acList.classList.add('on');
+}
+function acPick(q){
+  locqEl.value = q;
+  acHide();
+  setMarket();
+  locqEl.blur();                       // drop the keyboard on mobile
+}
+function acHide(){ acList.classList.remove('on'); }
+
+locqEl.addEventListener('input', acRender);
+locqEl.addEventListener('focus', acRender);
+locqEl.addEventListener('blur', () => setTimeout(acHide, 150));
+locqEl.addEventListener('keydown', (e) => {
+  const rows = acList.querySelectorAll('.ac-row');
+  if (e.key === 'ArrowDown' && rows.length){ e.preventDefault(); acSel = Math.min(acSel + 1, rows.length - 1); }
+  else if (e.key === 'ArrowUp' && rows.length){ e.preventDefault(); acSel = Math.max(acSel - 1, 0); }
+  else if (e.key === 'Escape'){ acHide(); return; }
+  else return;
+  rows.forEach((r, i) => r.classList.toggle('sel', i === acSel));
+  if (acSel > -1) rows[acSel].scrollIntoView({block: 'nearest'});
+});
 
 function title(s){ return s.toLowerCase().replace(/\b\w/g, m=>m.toUpperCase()); }
 
@@ -1194,7 +1274,14 @@ function tempLabel(mai){
 }
 
 document.getElementById('locgo').onclick = ()=>setMarket();
-document.getElementById('locq').addEventListener('keydown', e=>{ if(e.key==='Enter') setMarket(); });
+document.getElementById('locq').addEventListener('keydown', e=>{
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  const sel = acList.querySelector('.ac-row.sel .ac-city');
+  const selZip = acList.querySelector('.ac-row.sel .ac-zip');
+  if (sel) acPick(selZip ? selZip.textContent : sel.textContent);
+  else { acHide(); setMarket(); document.getElementById('locq').blur(); }
+});
 document.getElementById('locclr').onclick = ()=>{
   MARKET = null; voiceEpoch++; AUTOQ.length = 0;
   localStorage.removeItem('rt_market');
@@ -1237,6 +1324,7 @@ function setMarket(restoring){
     <span class="upd">Altos Research weekly data · updated ${MD.updated}</span>`;
   mk.classList.add('on');
   localStorage.setItem('rt_market', q.trim());
+  rememberMarket(q.trim());
   SCRIPTS.forEach(s=>{delete s.local; delete s.why; delete s.voicedBy; delete s.preOnly;});
   render();
   syncSetupSum();
