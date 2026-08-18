@@ -328,6 +328,9 @@ function mergePairs(){
   const p = [];
   if (PROFILE.name) p.push([RX_AGENT, PROFILE.name]);
   if (PROFILE.brokerage) p.push([RX_BROK, PROFILE.brokerage]);
+  // spoken city: the lead's own city wins; otherwise the localized market
+  // ("Torrance 90503" -> "Torrance" — a ZIP never reads naturally out loud)
+  const mktCity = MARKET ? MARKET.name.replace(/\s+\d{5}$/, '') : null;
   const L = ACTIVE_LEAD;
   if (L){
     if (L.first && document.getElementById('leadUseName').checked) p.push([RX_OWNER, L.first]);
@@ -335,9 +338,9 @@ function mergePairs(){
       p.push([RX_ADDR, L.address]);
       p.push([RX_STREET, L.address.replace(/^[\d\-]+\s+/, '').replace(/,.*$/, '')]);
     }
-    if (L.city){ p.push([RX_CITY, L.city]); p.push([RX_HOOD, L.city]); }
-    else if (MARKET){ p.push([RX_HOOD, MARKET.name.replace(/\s+\d{5}$/, '')]); }
   }
+  const city = (L && L.city) || mktCity;
+  if (city){ p.push([RX_CITY, city]); p.push([RX_HOOD, city]); }
   return p;
 }
 function fillPlain(t){
