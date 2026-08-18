@@ -142,6 +142,10 @@ body.hasmkt .abtn.gold{display:inline-block}
 .lead-controls label{display:flex;gap:7px;align-items:center;font-size:.86em;color:var(--ivory);cursor:pointer}
 .lead-sum{font-size:.84em;color:var(--muted);margin:4px 0 10px;line-height:1.7}
 .lead-sum b{color:var(--gold-bright)}
+.lead-subject{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:2px 0 12px;padding:10px 13px;background:rgba(201,168,92,.08);border:1px solid var(--gold);border-radius:8px}
+.lead-subject label{font-size:.78em;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-bright)}
+.lead-subject select{padding:9px 32px 9px 12px;background:var(--ink);border:1px solid var(--line);border-radius:6px;color:var(--ivory);font-family:'Inter',sans-serif;font-size:.9em;appearance:none;-webkit-appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23C9A85C' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.lead-subject .ls-note{font-size:.76em;color:var(--muted);flex:1 1 200px;line-height:1.4}
 #leadSearch{width:100%;background:var(--charcoal);border:1px solid var(--line);border-radius:8px;color:var(--ivory);font-family:'Inter',sans-serif;font-size:.92em;padding:9px 13px;margin-bottom:9px}
 #leadSearch:focus{border-color:var(--gold);outline:none}
 .lead-rows{max-height:290px;overflow:auto;border:1px solid var(--line);border-radius:8px;display:none}
@@ -296,6 +300,11 @@ body.hasmkt .abtn.gold{display:inline-block}
         <button class="clr" id="leadClear" style="display:none">✕ Clear list</button>
       </div>
       <div class="lead-sum" id="leadSum">Upload an Excel or CSV of your leads (name, address, lead type — plus phone/email if you have them). Each lead's type picks the right scripts automatically: NOD leads get the Pre-Foreclosure library, probate leads get Probate, expireds get Expired. Your file never leaves this browser.</div>
+      <div class="lead-subject" id="leadSubject" style="display:none">
+        <label for="lsSel">What is this list?</label>
+        <select id="lsSel"></select>
+        <span class="ls-note" id="lsNote"></span>
+      </div>
       <input id="leadSearch" placeholder="Search your leads…" style="display:none">
       <div class="lead-rows" id="leadRows"></div>
     </div>
@@ -445,9 +454,10 @@ function mapTopic(t){
   if (/luxur|high.end/.test(s)) return 'luxury';
   if (/commercial|multifam|apartment|cre/.test(s)) return 'cre';
   if (/sphere|referral|past.client|soi/.test(s)) return 'soi';
-  return 'circle';                       // neighbors/farm default
+  if (/farm|circle|neighbor|just (listed|sold)|geo/.test(s)) return 'circle';
+  return null;                           // unrecognized — the list-subject picker decides
 }
-function topicName(tid){ const t = TOPICS.find(t => t[0] === tid); return t ? t[1] : tid; }
+function topicName(tid){ if (!tid) return 'Unassigned'; const t = TOPICS.find(t => t[0] === tid); return t ? t[1] : tid; }
 
 function normH(h){ return String(h || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); }
 function pickCol(hs, cands){
@@ -481,7 +491,8 @@ function leadsFromRows(rows){
       address: cAddr > -1 ? String(r[cAddr] || '').trim() : '',
       city: cCity > -1 ? String(r[cCity] || '').trim() : '',
       type: type,
-      topic: mapTopic(type),
+      topic: mapTopic(type),               // null = row didn't say; picker fills it
+      rowSure: mapTopic(type) !== null,
       phone: cPhone > -1 ? String(r[cPhone] || '').trim() : '',
       email: cMail > -1 ? String(r[cMail] || '').trim() : ''
     });
@@ -517,6 +528,54 @@ function loadSheetJS(){
   });
 }
 
+/* ---- list-subject picker: detect, then confirm ----
+   Rows with a recognized Type keep it; the picker assigns everything else.
+   The filename is used as a free hint ("AOD Heir Master.xlsx" -> Probate). */
+(function(){
+  const sel = document.getElementById('lsSel');
+  const def = document.createElement('option');
+  def.value = ''; def.textContent = '— choose the lead type —';
+  sel.appendChild(def);
+  for (const [tid, tname] of TOPICS){
+    const o = document.createElement('option'); o.value = tid; o.textContent = tname;
+    sel.appendChild(o);
+  }
+  sel.onchange = () => {
+    if (!sel.value) return;
+    let n = 0;
+    LEADS.forEach(l => { if (!l.rowSure){ l.topic = sel.value; n++; } });
+    try{ localStorage.setItem('rt_leads', JSON.stringify(LEADS)); }catch(e){}
+    renderLeads();
+    toast(n + ' lead' + (n === 1 ? '' : 's') + ' set to ' + topicName(sel.value));
+  };
+})();
+
+function syncSubjectPicker(fileNameHint){
+  const box = document.getElementById('leadSubject');
+  const sel = document.getElementById('lsSel');
+  const note = document.getElementById('lsNote');
+  const unsure = LEADS.filter(l => !l.rowSure);
+  if (!LEADS.length || !unsure.length){ box.style.display = 'none'; return; }
+  box.style.display = 'flex';
+  const sure = LEADS.length - unsure.length;
+  const unassigned = LEADS.filter(l => !l.topic).length;
+  // filename hint fills the picker (and the leads) once, but stays changeable
+  if (fileNameHint && unassigned){
+    const hint = mapTopic(fileNameHint);
+    if (hint){
+      sel.value = hint;
+      LEADS.forEach(l => { if (!l.rowSure) l.topic = hint; });
+      note.textContent = 'Guessed "' + topicName(hint) + '" from the file name — change it here if that\'s wrong.';
+      try{ localStorage.setItem('rt_leads', JSON.stringify(LEADS)); }catch(e){}
+      return;
+    }
+  }
+  sel.value = (unsure[0] && unsure[0].topic) || '';
+  note.textContent = sure
+    ? sure + ' leads carried their own Lead Type; this sets the other ' + unsure.length + '.'
+    : 'Pick what these leads are so each one opens the right script library.';
+}
+
 document.getElementById('leadFile').addEventListener('change', async (ev) => {
   const f = ev.target.files[0];
   if (!f) return;
@@ -533,6 +592,7 @@ document.getElementById('leadFile').addEventListener('change', async (ev) => {
     }
     LEADS = leadsFromRows(rows);
     if (!LEADS.length){ sum.textContent = 'No leads found — make sure row 1 has headers like Name / Address / Lead Type.'; return; }
+    syncSubjectPicker(f.name);
     try{ localStorage.setItem('rt_leads', JSON.stringify(LEADS)); }catch(e){}
     renderLeads();
     toast(LEADS.length + ' leads loaded — tap one and its scripts are ready');
@@ -567,6 +627,12 @@ function renderLeads(){
 document.getElementById('leadSearch').addEventListener('input', renderLeads);
 
 function activateLead(idx){
+  if (!LEADS[idx].topic){
+    document.getElementById('leadSubject').style.display = 'flex';
+    document.getElementById('lsSel').focus();
+    toast('Tell me what this list is first — pick the lead type above');
+    return;
+  }
   ACTIVE_LEAD = LEADS[idx];
   tFilter = ACTIVE_LEAD.topic;
   buildTopicChips();
@@ -599,7 +665,7 @@ document.getElementById('leadClear').onclick = () => {
 document.getElementById('leadUseName').addEventListener('change', render);
 try{
   const saved = JSON.parse(localStorage.getItem('rt_leads'));
-  if (Array.isArray(saved) && saved.length){ LEADS = saved; renderLeads(); }
+  if (Array.isArray(saved) && saved.length){ LEADS = saved; renderLeads(); syncSubjectPicker(null); }
 }catch(e){}
 
 /* TOPICS + SCRIPTS load from scripts_data.js */
