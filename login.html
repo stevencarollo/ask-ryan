@@ -168,7 +168,7 @@
             <div class="msg err" id="signin-err"></div>
             <p class="fine">
                 No activation code? <a onclick="showPane('request')">Request access</a><br>
-                Code stopped working? <a onclick="startChallenge()">Ask for a 5-day extension</a>
+                Code stopped working? <a onclick="startChallenge()">Ask for a 7-day extension</a>
             </p>
         </div>
 
@@ -197,7 +197,7 @@
 
         <!-- EXTENSION CHALLENGE -->
         <div class="pane" id="pane-challenge">
-            <div class="pane-title">One question stands between you and 5 more days.</div>
+            <div class="pane-title">One question stands between you and 7 more days.</div>
             <p class="pane-sub">Answer truthfully. The table is watching.</p>
             <div class="big-q">True or False:<br>A round table is actually round.</div>
             <div class="tf-row">
@@ -211,7 +211,7 @@
         <div class="pane" id="pane-verdict">
             <div class="pane-title">Correct.</div>
             <p class="pane-sub">As its name suggests, a round table has no head — everyone who sits there has equal status, unlike conventional rectangular tables where participants order themselves according to rank.</p>
-            <p class="pane-sub">You understand the table. Five more days are yours.</p>
+            <p class="pane-sub">You understand the table. Seven more days are yours.</p>
             <button class="btn" onclick="claimExtension()">Take Your Seat</button>
         </div>
 
@@ -249,7 +249,7 @@
             <div class="success-panel">
                 <h2>Request Received</h2>
                 <p>Your access request has been submitted for approval.</p>
-                <p class="fine">Once approved, your activation code will be emailed to you. Come back and sign in — the code is good for 5 days of access.</p>
+                <p class="fine">Once approved, your activation code will be emailed to you. Come back and sign in — the code is good for 7 days of access.</p>
                 <button class="btn btn-ghost" onclick="showPane('signin')">Back to Sign In</button>
             </div>
         </div>
@@ -268,7 +268,7 @@
 
         if (new URLSearchParams(location.search).get('expired')) {
             const e = document.getElementById('signin-err');
-            e.textContent = 'Your 5-day access has expired. Enter your activation code to continue — or ask for an extension below.';
+            e.textContent = 'Your 7-day access has expired. Enter your activation code to continue — or ask for an extension below.';
             e.classList.add('on');
         }
 
@@ -295,7 +295,7 @@
 
             const hashOK = await RTAuth.redeem(code, { email });
             if (!hashOK) {
-                return flash('signin-err', 'That code isn’t valid. Check for typos — or if your code was revoked, use "Ask for a 5-day extension" below.');
+                return flash('signin-err', 'That code isn’t valid. Check for typos — or if your code was revoked, use "Ask for a 7-day extension" below.');
             }
             // valid code: known member goes straight in; first-timers finish sign-up
             pendingEmail = email; pendingCode = code;

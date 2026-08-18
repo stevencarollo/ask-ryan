@@ -5,7 +5,7 @@
  */
 (function () {
     const CODE_HASH = '3b0708577e23db56a440e7212e0fbfdebe8912bc6e2469c90ec6b70ffaa95edb';
-    const ACCESS_DAYS = 5;
+    const ACCESS_DAYS = 7;
     const KEY = 'rt_access';
 
     async function sha256(str) {
@@ -62,7 +62,7 @@
             }
             localStorage.setItem('rt_profile', JSON.stringify(merged));
         },
-        /* mercy path: start a 5-day session without a code (extension challenge) */
+        /* mercy path: start a 7-day session without a code (extension challenge) */
         grant(profile) {
             localStorage.setItem(KEY, JSON.stringify(Object.assign({}, profile || {}, { activatedAt: Date.now(), ext: true })));
             this.saveProfile(profile);
