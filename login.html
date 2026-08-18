@@ -3,6 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0B0B0D">
+<link rel="apple-touch-icon" href="/icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Roundtable">
+<script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
     <title>Member Access — The Roundtable</title>
     <meta name="robots" content="noindex">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -204,8 +211,13 @@
 
     <script src="/auth.js"></script>
     <script>
+        // where to land after sign-in (guard passes ?next=/scripts.html etc.)
+        function nextDest(){
+            const n = new URLSearchParams(location.search).get('next') || '/';
+            return (n.startsWith('/') && !n.startsWith('//') && n !== '/login.html') ? n : '/';
+        }
         // Already signed in? Straight to the site.
-        if (RTAuth.session()) location.replace('/');
+        if (RTAuth.session()) location.replace(nextDest());
 
         if (new URLSearchParams(location.search).get('expired')) {
             const e = document.getElementById('signin-err');
@@ -240,7 +252,7 @@
             const name = document.getElementById('si-name').value.trim();
             const brokerage = document.getElementById('si-brokerage').value.trim();
             if (!email || !code) return flash('signin-err', 'Enter your email and activation code.');
-            if (await RTAuth.redeem(code, { email, name, brokerage })) location.href = '/';
+            if (await RTAuth.redeem(code, { email, name, brokerage })) location.href = nextDest();
             else flash('signin-err', 'That activation code isn’t valid. Check it and try again, or request access below.');
         });
 
@@ -266,7 +278,7 @@
             const code = document.getElementById('ca-code').value.trim();
             if (!validProfile(p, true)) return flash('create-err', 'Fill in your name, email, and phone.');
             if (!code) return flash('create-err', 'No promo code entered — use "Request Access" below and we’ll review your request.');
-            if (await RTAuth.redeem(code, p)) location.href = '/';
+            if (await RTAuth.redeem(code, p)) location.href = nextDest();
             else flash('create-err', 'That promo code isn’t valid. Double-check it, or request access below.');
         });
 

@@ -68,8 +68,10 @@
         },
         guard() {
             if (!this.session()) {
-                const q = this.expired() ? '?expired=1' : '';
-                location.replace('/login.html' + q);
+                const p = new URLSearchParams();
+                if (this.expired()) p.set('expired', '1');
+                p.set('next', location.pathname);
+                location.replace('/login.html?' + p.toString());
             }
         }
     };
