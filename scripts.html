@@ -100,6 +100,22 @@ nav.topbar{display:flex;justify-content:space-between;align-items:center;gap:10p
 .fchip{padding:7px 14px;border-radius:20px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:.76em;font-weight:600;letter-spacing:.05em;transition:all .15s}
 .fchip:hover{color:var(--gold-bright);border-color:var(--gold)}
 .fchip.on{background:var(--gold);color:var(--ink);border-color:var(--gold)}
+
+/* filter menus: tap to open, checkboxes to pick — no sideways swiping */
+.fmenus{display:flex;gap:10px;flex-wrap:wrap}
+.fmenu-wrap{position:relative;flex:0 1 auto;min-width:200px}
+.fmenu-btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;background:var(--charcoal);border:1px solid var(--line);border-radius:8px;color:var(--ivory);font-size:.88em;font-weight:600;min-height:48px;text-align:left}
+.fmenu-btn:hover{border-color:var(--gold)}
+.fmenu-btn.filtered{border-color:var(--gold);color:var(--gold-bright)}
+.fmenu-btn .car{color:var(--gold);transition:transform .15s}
+.fmenu-btn.open .car{transform:rotate(180deg)}
+.fmenu{display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:55;min-width:100%;width:max-content;max-width:min(320px,90vw);background:var(--charcoal);border:1px solid var(--gold);border-radius:10px;box-shadow:0 18px 50px rgba(0,0,0,.55);max-height:340px;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 0}
+.fmenu.on{display:block}
+.fm-row{display:flex;align-items:center;gap:12px;padding:12px 16px;font-size:.9em;color:var(--ivory);cursor:pointer;min-height:46px;border-bottom:1px solid rgba(201,168,92,.08)}
+.fm-row:last-child{border-bottom:none}
+.fm-row:hover{background:rgba(201,168,92,.1)}
+.fm-row input{accent-color:var(--gold);width:19px;height:19px;flex:0 0 auto;cursor:pointer}
+.fm-row.fm-all{font-weight:700;color:var(--gold-bright)}
 .search{width:100%;max-width:380px;padding:10px 14px;background:var(--charcoal);border:1px solid var(--line);border-radius:6px;color:var(--ivory);font-size:.92em}
 
 /* ===== Library ===== */
@@ -199,10 +215,10 @@ body.hasmkt .abtn.gold{display:inline-block}
   .locbar input{width:100%;font-size:16px;padding:13px 14px}
   .locbar .go,.locbar .clr{width:100%;min-height:48px;font-size:.88em}
 
-  /* filter chips: one swipeable row each instead of a 500px wall */
-  .chips{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:6px;scrollbar-width:none}
-  .chips::-webkit-scrollbar{display:none}
-  .fchip{flex:0 0 auto;padding:10px 16px;font-size:.82em;min-height:40px}
+  /* filter menus: stacked full-width buttons; menus expand in place */
+  .fmenu-wrap{flex:1 1 100%;min-width:0}
+  .fmenu{position:static;width:100%;max-width:100%;margin-top:6px;box-shadow:none}
+  .fm-row{min-height:50px;font-size:.95em}
   .search{max-width:100%;font-size:16px;padding:12px 14px}
 
   /* cards: bigger text + real touch targets */
@@ -342,8 +358,16 @@ body.hasmkt .abtn.gold{display:inline-block}
 
 <section class="filters">
   <input class="search" id="q" placeholder="Search scripts, advisors, situations…">
-  <div class="chips" id="chChips"></div>
-  <div class="chips" id="tChips"></div>
+  <div class="fmenus">
+    <div class="fmenu-wrap">
+      <button class="fmenu-btn" id="chBtn" onclick="toggleMenu('ch')">📞 Formats: All <span class="car">▾</span></button>
+      <div class="fmenu" id="chMenu"></div>
+    </div>
+    <div class="fmenu-wrap">
+      <button class="fmenu-btn" id="tBtn" onclick="toggleMenu('t')">🗂 Topics: All <span class="car">▾</span></button>
+      <div class="fmenu" id="tMenu"></div>
+    </div>
+  </div>
 </section>
 
 <main class="lib" id="lib"></main>
@@ -704,7 +728,7 @@ function activateLead(idx){
     return;
   }
   ACTIVE_LEAD = LEADS[idx];
-  tFilter = ACTIVE_LEAD.topic;
+  tSel = new Set([ACTIVE_LEAD.topic]);
   buildTopicChips();
   const bn = document.getElementById('leadBanner');
   const L = ACTIVE_LEAD;
@@ -742,7 +766,7 @@ try{
 
 /* ============ RENDER ============ */
 const CH_LABEL = {call:"Call Script", vm:"Voicemail", text:"Text / DM", email:"Email"};
-let chFilter = "all", tFilter = "all", MARKET = null, VOICE = null, SPANISH = false;
+let chSel = new Set(), tSel = new Set(), MARKET = null, VOICE = null, SPANISH = false;   // empty set = All
 let langAsked = false;   // ask once per session; the chip stays for flipping
 
 function isBilingual(vid){
@@ -804,9 +828,9 @@ function render(){
   lib.innerHTML = '';
   let shown = 0;
   for (const [tid, tname, tdesc] of TOPICS){
-    if (tFilter !== 'all' && tFilter !== tid) continue;
+    if (tSel.size && !tSel.has(tid)) continue;
     const items = SCRIPTS.map((s,i)=>({...s,i})).filter(s => s.t===tid
-      && (chFilter==='all' || s.ch===chFilter)
+      && (!chSel.size || chSel.has(s.ch))
       && (!q || (s.title+' '+s.adv+' '+s.body+' '+tname).toLowerCase().includes(q)));
     if (!items.length) continue;
     const sec = document.createElement('section');
@@ -862,21 +886,75 @@ function updateCard(i){
 function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
 
 /* filters */
-const chWrap = document.getElementById('chChips');
-[["all","All Formats"],["call","📞 Call"],["vm","🎙 Voicemail"],["text","💬 Text"],["email","✉️ Email"]].forEach(([v,l])=>{
-  const b=document.createElement('button'); b.className='fchip'+(v==='all'?' on':''); b.textContent=l;
-  b.onclick=()=>{chFilter=v;[...chWrap.children].forEach(c=>c.classList.remove('on'));b.classList.add('on');render();};
-  chWrap.appendChild(b);
-});
-const tWrap = document.getElementById('tChips');
-function buildTopicChips(){
-  tWrap.innerHTML='';
-  [["all","All Topics"],...TOPICS.map(t=>[t[0],t[1]])].forEach(([v,l])=>{
-    const b=document.createElement('button'); b.className='fchip'+(v===tFilter?' on':''); b.textContent=l;
-    b.onclick=()=>{tFilter=v;[...tWrap.children].forEach(c=>c.classList.remove('on'));b.classList.add('on');render();};
-    tWrap.appendChild(b);
-  });
+/* ---- filter menus: checkbox multi-select, empty set = All ---- */
+const CH_OPTS = [["call","📞 Call Scripts"],["vm","🎙 Voicemails"],["text","💬 Texts / DMs"],["email","✉️ Emails"]];
+
+function toggleMenu(which){
+  const menu = document.getElementById(which + 'Menu');
+  const btn = document.getElementById(which + 'Btn');
+  const other = which === 'ch' ? 't' : 'ch';
+  document.getElementById(other + 'Menu').classList.remove('on');
+  document.getElementById(other + 'Btn').classList.remove('open');
+  menu.classList.toggle('on');
+  btn.classList.toggle('open', menu.classList.contains('on'));
 }
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.fmenu-wrap')){
+    document.querySelectorAll('.fmenu').forEach(m => m.classList.remove('on'));
+    document.querySelectorAll('.fmenu-btn').forEach(b => b.classList.remove('open'));
+  }
+});
+
+function syncFilterBtns(){
+  const chBtn = document.getElementById('chBtn');
+  const tBtn = document.getElementById('tBtn');
+  const chNames = CH_OPTS.filter(([v]) => chSel.has(v)).map(([,l]) => l.replace(/^\S+\s/, ''));
+  chBtn.innerHTML = '📞 Formats: ' + (chSel.size ? (chNames.length <= 2 ? chNames.join(' + ') : chSel.size + ' selected') : 'All') + ' <span class="car">▾</span>';
+  chBtn.classList.toggle('filtered', !!chSel.size);
+  const tNames = TOPICS.filter(t => tSel.has(t[0])).map(t => t[1]);
+  tBtn.innerHTML = '🗂 Topics: ' + (tSel.size ? (tNames.length === 1 ? tNames[0] : tSel.size + ' selected') : 'All') + ' <span class="car">▾</span>';
+  tBtn.classList.toggle('filtered', !!tSel.size);
+}
+
+function menuRow(label, checked, isAll, onchange){
+  const row = document.createElement('label');
+  row.className = 'fm-row' + (isAll ? ' fm-all' : '');
+  const cb = document.createElement('input');
+  cb.type = 'checkbox'; cb.checked = checked;
+  cb.addEventListener('change', onchange);
+  row.appendChild(cb);
+  const span = document.createElement('span'); span.textContent = label;
+  row.appendChild(span);
+  return row;
+}
+
+function buildFormatMenu(){
+  const m = document.getElementById('chMenu');
+  m.innerHTML = '';
+  m.appendChild(menuRow('All formats', chSel.size === 0, true, () => { chSel.clear(); buildFormatMenu(); syncFilterBtns(); render(); }));
+  for (const [v, l] of CH_OPTS){
+    m.appendChild(menuRow(l, chSel.has(v), false, () => {
+      chSel.has(v) ? chSel.delete(v) : chSel.add(v);
+      if (chSel.size === CH_OPTS.length) chSel.clear();   // everything picked = All
+      buildFormatMenu(); syncFilterBtns(); render();
+    }));
+  }
+}
+
+function buildTopicChips(){   // name kept — every call site rebuilds the topic menu
+  const m = document.getElementById('tMenu');
+  m.innerHTML = '';
+  m.appendChild(menuRow('All topics', tSel.size === 0, true, () => { tSel.clear(); buildTopicChips(); syncFilterBtns(); render(); }));
+  for (const [tid, tname] of TOPICS){
+    m.appendChild(menuRow(tname, tSel.has(tid), false, () => {
+      tSel.has(tid) ? tSel.delete(tid) : tSel.add(tid);
+      if (tSel.size === TOPICS.length) tSel.clear();
+      buildTopicChips(); syncFilterBtns(); render();
+    }));
+  }
+  syncFilterBtns();
+}
+buildFormatMenu();
 buildTopicChips();
 document.getElementById('q').addEventListener('input', render);
 
@@ -1126,9 +1204,8 @@ document.getElementById('ctGo').onclick = async () => {
       SCRIPTS.push({t:tid, ch: s.channel === 'voicemail' ? 'vm' : s.channel,
         adv: d.advisor || 'The Roundtable Panel', title: s.title || 'Custom Script', body: s.body});
     }
-    tFilter = tid; chFilter = 'all';
-    buildTopicChips();
-    document.querySelectorAll('#chChips .fchip').forEach((c,i)=>c.classList.toggle('on', i===0));
+    tSel = new Set([tid]); chSel.clear();
+    buildFormatMenu(); buildTopicChips();
     render();
     const first = document.querySelector('.topic');
     if (first) first.scrollIntoView({behavior:'smooth'});
