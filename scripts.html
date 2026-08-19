@@ -116,6 +116,8 @@ nav.topbar{display:flex;justify-content:space-between;align-items:center;gap:10p
 .fm-row:hover{background:rgba(201,168,92,.1)}
 .fm-row input{accent-color:var(--gold);width:19px;height:19px;flex:0 0 auto;cursor:pointer}
 .fm-row.fm-all{font-weight:700;color:var(--gold-bright)}
+.fav-btn{flex:0 1 auto;min-width:150px;justify-content:center;color:var(--gold)}
+.fav-btn.on{background:var(--gold);color:var(--ink);border-color:var(--gold);font-weight:800}
 .search{width:100%;max-width:380px;padding:10px 14px;background:var(--charcoal);border:1px solid var(--line);border-radius:6px;color:var(--ivory);font-size:.92em}
 
 /* ===== Library ===== */
@@ -179,6 +181,13 @@ body.hasmkt .abtn.gold{display:inline-block}
 .lead-subject label{font-size:.78em;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-bright)}
 .lead-subject select{padding:9px 32px 9px 12px;background:var(--ink);border:1px solid var(--line);border-radius:6px;color:var(--ivory);font-family:'Inter',sans-serif;font-size:.9em;appearance:none;-webkit-appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23C9A85C' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
 .lead-subject .ls-note{font-size:.76em;color:var(--muted);flex:1 1 200px;line-height:1.4}
+.xp{margin-top:14px;padding:13px 15px;background:rgba(201,168,92,.06);border:1px solid var(--gold);border-radius:10px}
+.xp-title{font-size:.9em;font-weight:700;color:var(--gold-bright);margin-bottom:9px}
+.xp-chans{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:11px}
+.xp-chans label{display:inline-flex;align-items:center;gap:7px;font-size:.86em;color:var(--ivory);cursor:pointer;min-height:36px}
+.xp-chans input{accent-color:var(--gold);width:18px;height:18px;cursor:pointer}
+.xp .go{padding:12px 20px}
+.xp-note{display:block;margin-top:9px;font-size:.76em;color:var(--muted);line-height:1.5}
 #leadSearch{width:100%;background:var(--charcoal);border:1px solid var(--line);border-radius:8px;color:var(--ivory);font-family:'Inter',sans-serif;font-size:.92em;padding:9px 13px;margin-bottom:9px}
 #leadSearch:focus{border-color:var(--gold);outline:none}
 .lead-rows{max-height:290px;overflow:auto;border:1px solid var(--line);border-radius:8px;display:none}
@@ -351,6 +360,17 @@ body.hasmkt .abtn.gold{display:inline-block}
       </div>
       <input id="leadSearch" placeholder="Search your leads…" style="display:none">
       <div class="lead-rows" id="leadRows"></div>
+      <div class="xp" id="leadExport" style="display:none">
+        <div class="xp-title">📥 Get your file back — scripts written in, lead by lead</div>
+        <div class="xp-chans">
+          <label><input type="checkbox" class="xp-ch" value="call" checked> 📞 Call</label>
+          <label><input type="checkbox" class="xp-ch" value="vm" checked> 🎙 Voicemail</label>
+          <label><input type="checkbox" class="xp-ch" value="text" checked> 💬 Text</label>
+          <label><input type="checkbox" class="xp-ch" value="email" checked> ✉️ Email</label>
+        </div>
+        <button class="go" id="xpGo">📥 Download Excel with Scripts</button>
+        <span class="xp-note">Your original file, untouched, plus one script column per format — each lead's script matches their lead type and fills in their name, address, and your details automatically. Set a market and tailor first if you want the market-tailored versions in the file.</span>
+      </div>
     </div>
   </details>
 </section>
@@ -367,6 +387,7 @@ body.hasmkt .abtn.gold{display:inline-block}
       <button class="fmenu-btn" id="tBtn" onclick="toggleMenu('t')">🗂 Topics: All <span class="car">▾</span></button>
       <div class="fmenu" id="tMenu"></div>
     </div>
+    <button class="fmenu-btn fav-btn" id="favBtn" onclick="toggleFavView()">★ Favorites</button>
   </div>
 </section>
 
@@ -408,8 +429,9 @@ const RX_STREET= rxTok(['Street']);
 const RX_CITY  = rxTok(['City']);
 const RX_HOOD  = rxTok(['Neighborhood']);
 
-/* every merge value active right now: agent profile + the selected lead */
-function mergePairs(){
+/* every merge value active right now: agent profile + a lead
+   (defaults to the selected lead; export passes each lead explicitly) */
+function mergePairs(L = ACTIVE_LEAD){
   const p = [];
   if (PROFILE.name) p.push([RX_AGENT, PROFILE.name]);
   if (PROFILE.brokerage) p.push([RX_BROK, PROFILE.brokerage]);
@@ -417,7 +439,6 @@ function mergePairs(){
   // spoken city: the lead's own city wins; otherwise the localized market
   // ("Torrance 90503" -> "Torrance" — a ZIP never reads naturally out loud)
   const mktCity = MARKET ? MARKET.name.replace(/\s+\d{5}$/, '') : null;
-  const L = ACTIVE_LEAD;
   if (L){
     if (L.first && document.getElementById('leadUseName').checked) p.push([RX_OWNER, L.first]);
     if (L.address){
@@ -429,9 +450,9 @@ function mergePairs(){
   if (city){ p.push([RX_CITY, city]); p.push([RX_HOOD, city]); }
   return p;
 }
-function fillPlain(t){
+function fillPlain(t, lead){
   let out = t;
-  for (const [rx, v] of mergePairs()) out = out.replace(rx, v);
+  for (const [rx, v] of mergePairs(lead === undefined ? ACTIVE_LEAD : lead)) out = out.replace(rx, v);
   return out;
 }
 function fillHTML(t){                    // escape first, then decorate the filled fields
@@ -535,6 +556,58 @@ document.getElementById('pfSave').onclick = ()=>{
    the file is never uploaded anywhere. */
 let LEADS = [];
 let ACTIVE_LEAD = null;
+let RAW = null;                       // the uploaded file's rows, returned on export
+try{ RAW = JSON.parse(localStorage.getItem('rt_leads_raw')); }catch(e){}
+
+/* ---- export: hand the agent their own file back with scripts written in ---- */
+async function exportLeadScripts(){
+  const chans = [...document.querySelectorAll('.xp-ch:checked')].map(c => c.value);
+  if (!chans.length) return toast('Pick at least one script format first');
+  if (!LEADS.length) return;
+  const unassigned = LEADS.filter(l => !l.topic).length;
+  if (unassigned === LEADS.length){
+    document.getElementById('leadSubject').style.display = 'flex';
+    return toast('Tell me what this list is first — pick the lead type above');
+  }
+  const btn = document.getElementById('xpGo');
+  btn.disabled = true; btn.textContent = 'Writing your file…';
+  try{
+    await loadSheetJS();
+    const CH_COL = {call: 'Call Script', vm: 'Voicemail Script', text: 'Text Script', email: 'Email Script'};
+    const scriptFor = (lead, ch) => {
+      if (!lead.topic) return '';
+      const s = SCRIPTS.find(s => s.t === lead.topic && s.ch === ch);
+      return s ? fillPlain(s.local || s.body, lead) : '';
+    };
+    let aoa;
+    if (RAW && RAW.rows && RAW.rows.length){
+      const byIdx = {};
+      LEADS.forEach(l => { if (l.srcIdx !== undefined) byIdx[l.srcIdx] = l; });
+      aoa = [RAW.rows[0].concat(chans.map(c => CH_COL[c]))];
+      RAW.rows.slice(1).forEach((r, i) => {
+        const lead = byIdx[i];
+        aoa.push(r.concat(chans.map(c => lead ? scriptFor(lead, c) : '')));
+      });
+    } else {
+      // raw file wasn't kept (restored session / large file) — clean rebuild
+      aoa = [['Name', 'Address', 'City', 'Lead Type', 'Phone', 'Email'].concat(chans.map(c => CH_COL[c]))];
+      LEADS.forEach(l => aoa.push([l.name, l.address, l.city, l.type || topicName(l.topic), l.phone, l.email]
+        .concat(chans.map(c => scriptFor(l, c)))));
+    }
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    const nOrig = aoa[0].length - chans.length;
+    ws['!cols'] = aoa[0].map((_, i) => ({wch: i < nOrig ? 18 : 90}));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Leads + Scripts');
+    const base = (RAW && RAW.name ? RAW.name.replace(/\.(xlsx|xls|csv)$/i, '') : 'My Leads');
+    XLSX.writeFile(wb, base + ' - with scripts.xlsx');
+    toast('Your file is downloading — scripts written for ' + (LEADS.length - unassigned) + ' leads' +
+          (unassigned ? ' (' + unassigned + ' unassigned left blank)' : ''));
+  } catch(e){
+    toast('Something hiccuped building the file — try again');
+  }
+  btn.disabled = false; btn.textContent = '📥 Download Excel with Scripts';
+}
 
 function mapTopic(t){
   const s = String(t || '').toLowerCase();
@@ -572,7 +645,9 @@ function leadsFromRows(rows){
   const cPhone = pickCol(hs, ['cell 1', 'cell', 'mobile', 'phone 1', 'phone', 'cell phone']);
   const cMail  = pickCol(hs, ['email 1', 'email', 'email address']);
   const out = [];
+  let srcIdx = -1;
   for (const r of rows.slice(1)){
+    srcIdx++;
     if (!r || !r.some(v => String(v || '').trim())) continue;
     let name = '';
     if (cFirst > -1 || cLast > -1)
@@ -588,7 +663,8 @@ function leadsFromRows(rows){
       topic: mapTopic(type),               // null = row didn't say; picker fills it
       rowSure: mapTopic(type) !== null,
       phone: cPhone > -1 ? String(r[cPhone] || '').trim() : '',
-      email: cMail > -1 ? String(r[cMail] || '').trim() : ''
+      email: cMail > -1 ? String(r[cMail] || '').trim() : '',
+      srcIdx: srcIdx
     });
     if (out.length >= 2000) break;       // keep localStorage happy
   }
@@ -686,6 +762,8 @@ document.getElementById('leadFile').addEventListener('change', async (ev) => {
     }
     LEADS = leadsFromRows(rows);
     if (!LEADS.length){ sum.textContent = 'No leads found — make sure row 1 has headers like Name / Address / Lead Type.'; return; }
+    RAW = {name: f.name, rows: rows};
+    try{ localStorage.setItem('rt_leads_raw', JSON.stringify(RAW)); }catch(e){}  // big files: memory only
     syncSubjectPicker(f.name);
     try{ localStorage.setItem('rt_leads', JSON.stringify(LEADS)); }catch(e){}
     renderLeads();
@@ -706,6 +784,7 @@ function renderLeads(){
     ' — tap a lead and every script below fills in for them.';
   document.getElementById('leadSearch').style.display = 'block';
   document.getElementById('leadClear').style.display = '';
+  document.getElementById('leadExport').style.display = 'block';
   box.classList.add('on');
   box.innerHTML = '';
   LEADS.forEach((l, idx) => {
@@ -747,9 +826,12 @@ function clearLead(){
   document.getElementById('leadBanner').style.display = 'none';
   renderLeads(); render();
 }
+document.getElementById('xpGo').onclick = exportLeadScripts;
 document.getElementById('leadClear').onclick = () => {
-  LEADS = []; clearLead();
+  LEADS = []; RAW = null; clearLead();
   localStorage.removeItem('rt_leads');
+  localStorage.removeItem('rt_leads_raw');
+  document.getElementById('leadExport').style.display = 'none';
   document.getElementById('leadRows').classList.remove('on');
   document.getElementById('leadSearch').style.display = 'none';
   document.getElementById('leadClear').style.display = 'none';
@@ -830,6 +912,7 @@ function render(){
   for (const [tid, tname, tdesc] of TOPICS){
     if (tSel.size && !tSel.has(tid)) continue;
     const items = SCRIPTS.map((s,i)=>({...s,i})).filter(s => s.t===tid
+      && (!FAVONLY || PICKS.has(skey(s)))
       && (!chSel.size || chSel.has(s.ch))
       && (!q || (s.title+' '+s.adv+' '+s.body+' '+tname).toLowerCase().includes(q)));
     if (!items.length) continue;
@@ -843,7 +926,7 @@ function render(){
       card.dataset.i = s.i;
       card.className = 'card' + (s.local ? ' localized' : '');
       card.innerHTML = `
-        <div class="top"><span class="ctag ${s.ch}">${CH_LABEL[s.ch]}</span><span class="lchip">Localized</span><span class="pchip">✦ Re-voicing…</span><button class="pick${PICKS.has(skey(s)) ? ' on' : ''}" onclick="togglePick(${s.i})" title="Pick this script to tailor">${PICKS.has(skey(s)) ? '★' : '☆'}</button></div>
+        <div class="top"><span class="ctag ${s.ch}">${CH_LABEL[s.ch]}</span><span class="lchip">Localized</span><span class="pchip">✦ Re-voicing…</span><button class="pick${PICKS.has(skey(s)) ? ' on' : ''}" onclick="togglePick(${s.i})" title="Save to favorites — the gold button tailors your favorites">${PICKS.has(skey(s)) ? '★' : '☆'}</button></div>
         <h3>${s.title}</h3>
         <div class="adv">${advLabel(s)}</div>
         <pre>${fillHTML(s.local || s.body)}</pre>
@@ -1036,13 +1119,26 @@ function cacheKey(i){ return i + '|' + (VOICE ? VOICE.id : '') + '|' + (MARKET ?
 let PICKS = new Set();
 try{ PICKS = new Set(JSON.parse(localStorage.getItem('rt_picks')) || []); }catch(e){}
 
+let FAVONLY = false;
+function toggleFavView(){
+  if (!FAVONLY && !PICKS.size) return toast('Tap the ☆ on any script to save it to your favorites');
+  FAVONLY = !FAVONLY;
+  syncFavBtn(); render();
+}
+function syncFavBtn(){
+  const b = document.getElementById('favBtn');
+  b.textContent = '★ Favorites' + (PICKS.size ? ' (' + PICKS.size + ')' : '');
+  b.classList.toggle('on', FAVONLY);
+}
 function togglePick(i){
   const k = skey(SCRIPTS[i]);
   if (PICKS.has(k)) PICKS.delete(k); else PICKS.add(k);
   localStorage.setItem('rt_picks', JSON.stringify([...PICKS]));
   const card = document.querySelector(`.card[data-i="${i}"] .pick`);
   if (card){ card.classList.toggle('on', PICKS.has(k)); card.textContent = PICKS.has(k) ? '★' : '☆'; }
-  syncPickGo();
+  syncPickGo(); syncFavBtn();
+  if (FAVONLY && !PICKS.has(k)) render();      // unstarred while viewing favorites
+  if (FAVONLY && !PICKS.size){ FAVONLY = false; syncFavBtn(); render(); }
 }
 function pickedIndexes(){
   return SCRIPTS.map((s, i) => PICKS.has(skey(s)) ? i : -1).filter(i => i > -1);
@@ -1438,6 +1534,7 @@ function revert(i){
 syncProf();
 render();
 syncSetupSum();
+syncFavBtn();
 </script>
 </body>
 </html>
