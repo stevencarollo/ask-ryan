@@ -318,30 +318,28 @@
 
             const btn = ev.target.querySelector('.btn');
             btn.disabled = true; btn.textContent = 'Unlocking…';
-            const hashOK = await RTAuth.redeem(code, { email });
-            if (!hashOK) {
+            // different member on this device — start their profile clean first
+            const prev = RTAuth.profile();
+            if (prev && prev.email && prev.email.toLowerCase() !== email.toLowerCase()) {
+                localStorage.removeItem('rt_profile');
+            }
+            const res = await RTAuth.redeem(code, { email });
+            if (!res) {
                 btn.disabled = false; btn.textContent = 'Unlock Access';
-                return flash('signin-err', 'That code isn’t valid. Check for typos — or if your code was revoked, use "Ask for a 7-day extension" below.');
+                return flash('signin-err', 'That code isn’t valid or has been revoked. Check for typos — or use "Ask for a 7-day extension" below.');
             }
             pendingEmail = email; pendingCode = code;
 
-            // known on this device → straight in
-            const p = RTAuth.profile();
-            const localKnown = p && p.name && p.email && p.email.toLowerCase() === email.toLowerCase();
-            if (localKnown) { serverSave(email, code, p); return location.href = nextDest(); }
+            // owner code → straight to the dashboard
+            if (res.admin) return location.href = '/admin.html';
 
-            // new email on this device — check the member registry (their account
-            // may live on another device); fresh profile store either way
-            if (p && p.email && p.email.toLowerCase() !== email.toLowerCase()) {
-                localStorage.removeItem('rt_profile');
-            }
-            btn.textContent = 'Looking you up…';
-            const res = await serverLookup(email, code);
-            if (res.status === 'found' && res.profile && res.profile.name) {
-                RTAuth.saveProfile(res.profile);
+            // known member (this device or the registry) → straight in
+            const p = RTAuth.profile();
+            if (p && p.name && p.email && p.email.toLowerCase() === email.toLowerCase()) {
+                serverSave(email, code, p);
                 return location.href = nextDest();
             }
-            // genuinely new (or registry unreachable) → full sign-up
+            // genuinely new → full sign-up
             btn.disabled = false; btn.textContent = 'Unlock Access';
             showPane('profile');
             document.getElementById('pr-name').focus();

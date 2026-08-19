@@ -3,7 +3,7 @@ Simplified demo server - Ryan Serhant Response Tool
 Shows the actual API endpoints and response format without external dependencies
 """
 
-from fastapi import FastAPI, UploadFile, File, Form
+from fastapi import FastAPI, UploadFile, File, Form, Request
 from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -420,12 +420,246 @@ def _member_store():
 
 def _code_ok(code: str) -> bool:
     import hashlib
-    return hashlib.sha256((code or "").strip().upper().encode()).hexdigest() == RT_CODE_HASH
+    if hashlib.sha256((code or "").strip().upper().encode()).hexdigest() == RT_CODE_HASH:
+        return True
+    try:
+        return _active_code(code) is not None
+    except Exception:
+        return False
 
 
 def _member_path(email: str) -> str:
     import urllib.parse
     return urllib.parse.quote(email.strip().lower(), safe="") + ".json"
+
+
+# ── Access control: codes, logins, overrides, usage (all in the private bucket) ──
+CODES_PATH = "_codes.json"        # {CODE: {label, days(null=never expires), max_tailors, revoked, admin, created}}
+LOGINS_PATH = "_logins.json"      # rolling list of sign-in events (capped)
+OVERRIDES_PATH = "_overrides.json"  # {email: {revoked, max_tailors, extended_days}}
+USAGE_PATH = "_usage.json"        # {email: {month, tailors}}
+ADMIN_EMAIL = "southbaydaily@gmail.com"
+
+
+def _store_get(path):
+    store = _member_store()
+    if not store:
+        return None
+    import requests as _rq
+    url, key = store
+    try:
+        r = _rq.get(f"{url}/storage/v1/object/{_MEMBER_BUCKET}/{path}",
+                    headers={"Authorization": f"Bearer {key}"}, timeout=15)
+        return r.json() if r.status_code == 200 else None
+    except Exception:
+        return None
+
+
+def _store_put(path, obj):
+    store = _member_store()
+    if not store:
+        return False
+    import json as _json
+    import requests as _rq
+    url, key = store
+    try:
+        r = _rq.post(f"{url}/storage/v1/object/{_MEMBER_BUCKET}/{path}",
+                     headers={"Authorization": f"Bearer {key}",
+                              "Content-Type": "application/json", "x-upsert": "true"},
+                     data=_json.dumps(obj), timeout=15)
+        return r.status_code in (200, 201)
+    except Exception:
+        return False
+
+
+def _get_codes():
+    return _store_get(CODES_PATH) or {}
+
+
+def _active_code(code: str):
+    """Return the code record if the code exists and isn't revoked."""
+    c = _get_codes().get((code or "").strip().upper())
+    return c if (c and not c.get("revoked")) else None
+
+
+def _is_admin(email: str, code: str) -> bool:
+    c = _active_code(code)
+    return bool(c and c.get("admin") and (email or "").strip().lower() == ADMIN_EMAIL)
+
+
+def _geo_from_ip(ip: str) -> dict:
+    if not ip or ip.startswith(("127.", "10.", "192.168.")):
+        return {}
+    import requests as _rq
+    try:
+        r = _rq.get(f"https://ipwho.is/{ip}", timeout=4)
+        d = r.json()
+        if d.get("success"):
+            return {"city": d.get("city"), "region": d.get("region"), "country": d.get("country_code")}
+    except Exception:
+        pass
+    return {}
+
+
+def _log_signin(email, code, ip, device):
+    from datetime import datetime as _dt
+    logins = _store_get(LOGINS_PATH) or []
+    if not isinstance(logins, list):
+        logins = []
+    logins.append(dict({"email": (email or "").lower(), "code": (code or "").upper(),
+                        "ts": _dt.utcnow().isoformat() + "Z", "ip": ip, "device": device},
+                       **_geo_from_ip(ip)))
+    _store_put(LOGINS_PATH, logins[-2000:])
+
+
+def _member_gate(email: str):
+    """None = allowed; else 'revoked' or 'limit'."""
+    if not email:
+        return None
+    from datetime import datetime as _dt
+    ov = (_store_get(OVERRIDES_PATH) or {}).get(email.strip().lower()) or {}
+    if ov.get("revoked"):
+        return "revoked"
+    cap = ov.get("max_tailors")
+    if cap:
+        u = (_store_get(USAGE_PATH) or {}).get(email.strip().lower()) or {}
+        if u.get("month") == _dt.utcnow().strftime("%Y-%m") and u.get("tailors", 0) >= cap:
+            return "limit"
+    return None
+
+
+def _bump_usage(email: str):
+    if not email:
+        return
+    from datetime import datetime as _dt
+    usage = _store_get(USAGE_PATH) or {}
+    month = _dt.utcnow().strftime("%Y-%m")
+    u = usage.get(email.strip().lower()) or {}
+    if u.get("month") != month:
+        u = {"month": month, "tailors": 0}
+    u["tailors"] = u.get("tailors", 0) + 1
+    usage[email.strip().lower()] = u
+    _store_put(USAGE_PATH, usage)
+
+
+@app.post("/api/auth/signin")
+async def auth_signin(data: dict, request: "Request"):
+    """Server-side sign-in: validates the code against the code store, logs the
+    visit (ip -> geo, device), returns session length + any stored profile."""
+    email = (data.get("email") or "").strip().lower()
+    code = (data.get("code") or "").strip().upper()
+    device = "mobile" if data.get("device") == "mobile" else "desktop"
+    c = _active_code(code)
+    if not c:
+        return {"ok": False, "reason": "bad_code"}
+    admin = bool(c.get("admin")) and email == ADMIN_EMAIL
+    if c.get("admin") and not admin:
+        return {"ok": False, "reason": "bad_code"}   # admin code only works with the owner email
+    ov = (_store_get(OVERRIDES_PATH) or {}).get(email) or {}
+    if ov.get("revoked") and not admin:
+        return {"ok": False, "reason": "revoked"}
+    ip = (request.headers.get("x-forwarded-for", "").split(",")[0].strip()
+          or (request.client.host if request.client else ""))
+    _log_signin(email, code, ip, device)
+    days = c.get("days", 7)
+    if ov.get("extended_days"):
+        days = (days or 0) + ov["extended_days"] if days is not None else None
+    profile = None
+    store = _member_store()
+    if store and email:
+        import requests as _rq
+        url, key = store
+        try:
+            r = _rq.get(f"{url}/storage/v1/object/{_MEMBER_BUCKET}/{_member_path(email)}",
+                        headers={"Authorization": f"Bearer {key}"}, timeout=10)
+            if r.status_code == 200:
+                profile = r.json()
+        except Exception:
+            pass
+    return {"ok": True, "admin": admin, "days": days, "profile": profile,
+            "max_tailors": ov.get("max_tailors") or c.get("max_tailors")}
+
+
+@app.post("/api/admin/overview")
+async def admin_overview(data: dict):
+    if not _is_admin(data.get("adminEmail"), data.get("adminCode")):
+        return {"status": "denied"}
+    store = _member_store()
+    members = []
+    if store:
+        import requests as _rq
+        url, key = store
+        try:
+            r = _rq.post(f"{url}/storage/v1/object/list/{_MEMBER_BUCKET}",
+                         headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+                         json={"prefix": "", "limit": 500}, timeout=20)
+            names = [o["name"] for o in r.json() if o.get("name", "").endswith(".json")
+                     and not o["name"].startswith("_")]
+            for n in names[:300]:
+                try:
+                    pr = _rq.get(f"{url}/storage/v1/object/{_MEMBER_BUCKET}/{n}",
+                                 headers={"Authorization": f"Bearer {key}"}, timeout=10)
+                    if pr.status_code == 200:
+                        members.append(pr.json())
+                except Exception:
+                    pass
+        except Exception:
+            pass
+    return {"status": "ok",
+            "codes": _get_codes(),
+            "members": members,
+            "logins": (_store_get(LOGINS_PATH) or [])[-500:],
+            "overrides": _store_get(OVERRIDES_PATH) or {},
+            "usage": _store_get(USAGE_PATH) or {}}
+
+
+@app.post("/api/admin/code")
+async def admin_code(data: dict):
+    if not _is_admin(data.get("adminEmail"), data.get("adminCode")):
+        return {"status": "denied"}
+    code = (data.get("code") or "").strip().upper()
+    if not code or len(code) > 40:
+        return {"status": "error", "error": "bad code"}
+    codes = _get_codes()
+    if data.get("delete"):
+        codes.pop(code, None)
+    else:
+        from datetime import datetime as _dt
+        rec = codes.get(code) or {"created": _dt.utcnow().isoformat() + "Z"}
+        if "label" in data:
+            rec["label"] = str(data.get("label") or "")[:80]
+        if "days" in data:
+            rec["days"] = data["days"] if data["days"] is None else max(1, int(data["days"]))
+        if "max_tailors" in data:
+            rec["max_tailors"] = data["max_tailors"] and int(data["max_tailors"]) or None
+        if "revoked" in data:
+            rec["revoked"] = bool(data["revoked"])
+        codes[code] = rec
+    ok = _store_put(CODES_PATH, codes)
+    return {"status": "ok" if ok else "error", "codes": codes}
+
+
+@app.post("/api/admin/member")
+async def admin_member(data: dict):
+    if not _is_admin(data.get("adminEmail"), data.get("adminCode")):
+        return {"status": "denied"}
+    email = (data.get("email") or "").strip().lower()
+    if not email:
+        return {"status": "error"}
+    ov = _store_get(OVERRIDES_PATH) or {}
+    rec = ov.get(email) or {}
+    action = data.get("action")
+    if action == "revoke":
+        rec["revoked"] = True
+    elif action == "restore":
+        rec["revoked"] = False
+    elif action == "extend":
+        rec["extended_days"] = (rec.get("extended_days") or 0) + int(data.get("days") or 7)
+    elif action == "quota":
+        rec["max_tailors"] = data.get("max_tailors") and int(data["max_tailors"]) or None
+    ov[email] = rec
+    ok = _store_put(OVERRIDES_PATH, ov)
+    return {"status": "ok" if ok else "error", "overrides": ov}
 
 
 @app.get("/api/member")
@@ -905,6 +1139,13 @@ ORIGINAL SCRIPT:
 
 Respond with ONLY a JSON object: {{"script": "the rewritten script", "why": "one short sentence naming the specific frameworks, signature phrases, or market numbers this version leans on - e.g. 'Leans on his 3 F's framework and the 30-day re-list stat.' NEVER start with 'I rewrote/changed/transformed' or describe the act of editing - name what's IN the script, not what you did to it."}}"""
 
+    member_email = ((data.get("member") or {}).get("email") or "").strip().lower()
+    gate = _member_gate(member_email)
+    if gate == "revoked":
+        return {"status": "error", "error": "Your access has been paused - contact the site owner."}
+    if gate == "limit":
+        return {"status": "error", "error": "You've reached this month's tailoring limit - contact the site owner for more."}
+
     # shared cache first: same script + market + voice = same rewrite for everyone
     import hashlib
     import json as _json
@@ -923,6 +1164,7 @@ Respond with ONLY a JSON object: {{"script": "the rewritten script", "why": "one
         if len(_REWRITE_CACHE) >= _REWRITE_CACHE_MAX:
             _REWRITE_CACHE.pop(next(iter(_REWRITE_CACHE)))
         _REWRITE_CACHE[ck] = result
+        _bump_usage(member_email)
         return {"status": "success", "script": result["script"], "why": result["why"], "lane": lane}
     except Exception as e:
         print(f"localize-script error: {e}")
@@ -944,6 +1186,12 @@ async def generate_scripts(data: dict):
     lang = data.get("lang") or "en"
     if not niche or not channels:
         return {"status": "error", "error": "niche and at least one script type required"}
+    member_email = ((data.get("member") or {}).get("email") or "").strip().lower()
+    gate = _member_gate(member_email)
+    if gate == "revoked":
+        return {"status": "error", "error": "Your access has been paused - contact the site owner."}
+    if gate == "limit":
+        return {"status": "error", "error": "You've reached this month's limit - contact the site owner for more."}
 
     if voice.get("name"):
         e = EXPERTS.get(voice.get("id") or "", {})

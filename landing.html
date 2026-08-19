@@ -395,10 +395,10 @@
             <a href="#panel">The Panel</a>
             <a href="#capabilities">Capabilities</a>
             <a href="/scripts.html">Script Vault</a>
-            <a href="#" class="soon" onclick="return comingSoon()" aria-disabled="true">Podcasts<span class="soon-badge">Soon</span></a>
-            <a href="#" class="soon" onclick="return comingSoon()" aria-disabled="true">Flyer Studio<span class="soon-badge">Soon</span></a>
-            <a href="#" class="soon" onclick="return comingSoon()" aria-disabled="true">Claude Skill<span class="soon-badge">Soon</span></a>
-            <a href="#" class="btn nav-cta soon" onclick="return comingSoon()" aria-disabled="true">Enter<span class="soon-badge">Soon</span></a>
+            <a href="#" class="soon" onclick="return comingSoon('/podcast-studio.html')" aria-disabled="true">Podcasts<span class="soon-badge">Soon</span></a>
+            <a href="#" class="soon" onclick="return comingSoon('/flyer-studio.html')" aria-disabled="true">Flyer Studio<span class="soon-badge">Soon</span></a>
+            <a href="#" class="soon" onclick="return comingSoon('#skill')" aria-disabled="true">Claude Skill<span class="soon-badge">Soon</span></a>
+            <a href="#" class="btn nav-cta soon" onclick="return comingSoon('/frontend.html')" aria-disabled="true">Enter<span class="soon-badge">Soon</span></a>
             <a href="#" class="nav-signout" onclick="RTAuth.signOut();return false;">Sign Out</a>
         </div>
     </nav>
@@ -409,7 +409,7 @@
         <p class="hero-sub">Choose the advisors at your table — prospecting scripts, negotiation psychology, luxury staging, commercial underwriting, probate process, creative finance — and get one clear answer. In English o en español.</p>
         <div class="hero-ctas">
             <a href="#panel" class="btn btn-solid">Meet the Panel</a>
-            <a href="#" class="btn btn-ghost soon" onclick="return comingSoon()" aria-disabled="true">Take a Seat<span class="soon-badge">Soon</span></a>
+            <a href="#" class="btn btn-ghost soon" onclick="return comingSoon('/frontend.html')" aria-disabled="true">Take a Seat<span class="soon-badge">Soon</span></a>
         </div>
         <div class="hero-stats" role="list">
             <div class="stat" role="listitem"><div class="stat-n">34</div><div class="stat-l">Advisors</div></div>
@@ -595,7 +595,7 @@
             <h2>Take the panel with you.</h2>
             <p class="section-sub">Download The Roundtable as a Claude Skill. Any agent with Claude gets the full 34-advisor panel inside their own Claude — no website needed.</p>
             <div class="code-snippet">roundtable-skill.zip → unzip into ~/.claude/skills/</div>
-            <a href="#" class="btn soon" onclick="return comingSoon()" aria-disabled="true">Download the Skill<span class="soon-badge">Soon</span></a>
+            <a href="#" class="btn soon" onclick="return comingSoon('/roundtable-skill.zip')" aria-disabled="true">Download the Skill<span class="soon-badge">Soon</span></a>
         </div>
     </section>
 
@@ -614,7 +614,7 @@
                 <li>Conversation memory across the session</li>
                 <li>Downloadable Claude Skill included</li>
             </ul>
-            <a href="#" class="btn soon" style="width: 100%;" onclick="return comingSoon()" aria-disabled="true">Take Your Seat<span class="soon-badge">Soon</span></a>
+            <a href="#" class="btn soon" style="width: 100%;" onclick="return comingSoon('/frontend.html')" aria-disabled="true">Take Your Seat<span class="soon-badge">Soon</span></a>
         </div>
     </section>
 
@@ -635,7 +635,8 @@
             document.querySelector('.nav-burger').setAttribute('aria-expanded', 'false');
         });
 
-        function comingSoon() {
+        function comingSoon(dest) {
+            if (localStorage.getItem('rt_admin') && dest) { location.href = dest; return false; }
             let t = document.getElementById('soon-toast');
             if (!t) {
                 t = document.createElement('div');

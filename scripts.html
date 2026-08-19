@@ -1226,6 +1226,7 @@ async function rewriteOne(i, epoch){
       dom:MARKET.dom, cut:MARKET.cut, inv:MARKET.inv, mai:MARKET.mai, rent:MARKET.rent};
     if (VOICE) payload.voice = {id:VOICE.id, name:VOICE.n};
     if (SPANISH) payload.lang = 'es';
+    if (PROFILE.email) payload.member = {email: PROFILE.email};
     const key = cacheKey(i);
     const r = await fetch(API_URL + '/api/localize-script', {
       method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
@@ -1285,6 +1286,7 @@ document.getElementById('ctGo').onclick = async () => {
     const payload = {niche, channels};
     if (v) payload.voice = {id:v.id, name:v.n};
     if (SPANISH && v && isBilingual(v.id)) payload.lang = 'es';
+    if (PROFILE.email) payload.member = {email: PROFILE.email};
     if (document.getElementById('ctLocal').checked && MARKET)
       payload.market = {name:MARKET.name, p:MARKET.p, dom:MARKET.dom, cut:MARKET.cut, inv:MARKET.inv, mai:MARKET.mai, rent:MARKET.rent};
     const r = await fetch(API_URL + '/api/generate-scripts', {

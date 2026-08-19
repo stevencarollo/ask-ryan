@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Round Table — Owner Dashboard</title>
+<meta name="robots" content="noindex">
+<script src="/auth.js"></script>
+<script>
+  // owner only: needs a live session with the admin flag
+  if (!RTAuth.session() || !RTAuth.isAdmin()) location.replace('/login.html?next=%2Fadmin.html');
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#C9A85C;--gold-bright:#E5C87E;--ink:#0B0B0D;--charcoal:#131316;--line:rgba(201,168,92,.25);--ivory:#F5F1E8;--muted:#8E887B;--teal:#7BC4A8;--red:#D97A7A}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:radial-gradient(ellipse 70% 50% at 50% -10%,rgba(201,168,92,.12),transparent 60%),var(--ink);color:var(--ivory);min-height:100vh;padding-bottom:80px}
+nav{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px clamp(14px,3vw,30px);border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,11,13,.9);backdrop-filter:blur(12px);z-index:40}
+.brand{font-family:'Cinzel',serif;font-size:1.05em;font-weight:600;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;text-decoration:none}
+.nav-a{display:flex;gap:9px;flex-wrap:wrap}
+.nbtn{padding:9px 15px;font-size:.78em;font-weight:600;letter-spacing:.06em;background:transparent;color:var(--gold);border:1px solid var(--line);border-radius:6px;text-decoration:none;cursor:pointer;min-height:40px;display:inline-flex;align-items:center}
+.nbtn:hover{background:var(--gold);color:var(--ink)}
+main{max-width:1180px;margin:0 auto;padding:22px clamp(14px,3vw,28px)}
+h1{font-family:'Cinzel',serif;font-size:1.5em;letter-spacing:.05em;margin-bottom:4px}
+.sub{color:var(--muted);font-size:.86em;margin-bottom:20px}
+.stats{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px}
+.stat{flex:1 1 140px;background:var(--charcoal);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.stat .n{font-family:'Cinzel',serif;font-size:1.6em;color:var(--gold-bright)}
+.stat .l{font-size:.7em;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:3px}
+section{margin-top:30px}
+h2{font-family:'Cinzel',serif;font-size:1.05em;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:12px}
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:.84em;min-width:720px}
+th{background:rgba(201,168,92,.08);color:var(--gold);text-align:left;padding:10px 12px;font-size:.82em;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+td{padding:10px 12px;border-top:1px solid rgba(201,168,92,.1);vertical-align:middle}
+tr:hover td{background:rgba(201,168,92,.04)}
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.82em;font-weight:700;border:1px solid var(--line)}
+.pill.ok{color:var(--teal);border-color:rgba(123,196,168,.5)}
+.pill.bad{color:var(--red);border-color:rgba(217,122,122,.5)}
+.pill.inf{color:var(--gold-bright);border-color:var(--gold)}
+.act{display:inline-flex;align-items:center;padding:6px 11px;margin:2px 3px 2px 0;font-size:.86em;font-weight:600;background:transparent;color:var(--gold);border:1px solid var(--line);border-radius:6px;cursor:pointer;min-height:34px}
+.act:hover{background:var(--gold);color:var(--ink)}
+.act.danger{color:var(--red);border-color:rgba(217,122,122,.4)}
+.act.danger:hover{background:var(--red);color:var(--ink)}
+.newcode{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;background:var(--charcoal);border:1px solid var(--gold);border-radius:10px;padding:14px;margin-bottom:14px}
+.nc-f{display:flex;flex-direction:column;gap:5px}
+.nc-f label{font-size:.68em;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
+.nc-f input{padding:11px 13px;background:var(--ink);border:1px solid var(--line);border-radius:6px;color:var(--ivory);font-family:'Inter',sans-serif;font-size:16px;min-width:130px}
+.go{padding:12px 20px;background:linear-gradient(135deg,var(--gold) 0%,#B8964A 100%);color:var(--ink);border:none;border-radius:6px;font-weight:800;font-size:.84em;letter-spacing:.06em;cursor:pointer;min-height:46px}
+.go:hover{background:var(--gold-bright)}
+.muted{color:var(--muted)}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(90px);background:var(--gold);color:var(--ink);font-weight:800;font-size:.84em;padding:11px 22px;border-radius:8px;transition:transform .25s;z-index:90}
+#toast.on{transform:translateX(-50%) translateY(0)}
+@media(max-width:720px){ .newcode{flex-direction:column;align-items:stretch} .nc-f input{width:100%} }
+</style></head>
+<body>
+<nav>
+  <a class="brand" href="/admin.html">⚜ Owner Dashboard</a>
+  <div class="nav-a">
+    <a class="nbtn" href="/">Site</a>
+    <a class="nbtn" href="/scripts.html">Vault</a>
+    <a class="nbtn" href="/frontend.html">Coaching Chat</a>
+    <a class="nbtn" href="/podcast-studio.html">Podcasts</a>
+    <a class="nbtn" href="/flyer-studio.html">Flyers</a>
+    <button class="nbtn" onclick="RTAuth.signOut()">Sign Out</button>
+  </div>
+</nav>
+<main>
+  <h1>The Round Table — Control Room</h1>
+  <div class="sub">Codes, members, and every sign-in — refreshed live from the registry. Extensions and revocations take effect at each member's next sign-in; script limits apply immediately.</div>
+  <div class="stats" id="stats"></div>
+
+  <section>
+    <h2>Access Codes</h2>
+    <div class="newcode">
+      <div class="nc-f"><label>New code</label><input id="ncCode" placeholder="e.g. 90250VIP" maxlength="24"></div>
+      <div class="nc-f"><label>Label</label><input id="ncLabel" placeholder="Who's it for?"></div>
+      <div class="nc-f"><label>Days (blank = never expires)</label><input id="ncDays" type="number" min="1" placeholder="∞"></div>
+      <div class="nc-f"><label>Monthly script limit (blank = none)</label><input id="ncMax" type="number" min="1" placeholder="unlimited"></div>
+      <button class="go" onclick="createCode()">+ Create Code</button>
+    </div>
+    <div class="tblwrap"><table id="codesTbl"></table></div>
+  </section>
+
+  <section>
+    <h2>Members</h2>
+    <div class="tblwrap"><table id="memTbl"></table></div>
+  </section>
+
+  <section>
+    <h2>Recent Sign-Ins</h2>
+    <div class="tblwrap"><table id="logTbl"></table></div>
+  </section>
+</main>
+<div id="toast"></div>
+
+<script>
+const API = 'https://ask-ryan-nb3w.onrender.com';
+const ADMIN = { adminEmail: 'southbaydaily@gmail.com', adminCode: localStorage.getItem('rt_code') || 'KOBE' };
+let DATA = null;
+
+function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),2400); }
+function esc(s){ const d=document.createElement('div'); d.textContent=String(s==null?'':s); return d.innerHTML; }
+function fmtTs(ts){ if(!ts) return '—'; const d=new Date(ts); return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); }
+
+async function api(path, body){
+  const r = await fetch(API + path, {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(Object.assign({}, ADMIN, body || {}))});
+  return r.json();
+}
+
+async function load(){
+  document.getElementById('stats').innerHTML = '<div class="stat"><div class="n">…</div><div class="l">Loading registry</div></div>';
+  const d = await api('/api/admin/overview');
+  if (d.status !== 'ok'){ toast('Access denied — sign in again with your admin code'); return RTAuth.signOut(); }
+  DATA = d;
+  const logins = d.logins || [];
+  const week = Date.now() - 7*864e5;
+  const emails = new Set(logins.map(l => l.email).filter(Boolean));
+  (d.members || []).forEach(m => m.email && emails.add(m.email.toLowerCase()));
+  document.getElementById('stats').innerHTML = [
+    [emails.size, 'Members seen'],
+    [logins.filter(l => new Date(l.ts).getTime() > week).length, 'Sign-ins · 7 days'],
+    [Object.keys(d.codes || {}).filter(c => !d.codes[c].revoked).length, 'Active codes'],
+    [Object.values(d.usage || {}).reduce((a, u) => a + (u.tailors || 0), 0), 'Scripts tailored · month'],
+  ].map(([n, l]) => `<div class="stat"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
+  renderCodes(); renderMembers(); renderLogins();
+}
+
+function renderCodes(){
+  const rows = Object.entries(DATA.codes || {}).map(([code, c]) => `
+    <tr>
+      <td><b style="color:var(--gold-bright);letter-spacing:.08em">${esc(code)}</b>${c.admin ? ' <span class="pill inf">admin</span>' : ''}</td>
+      <td>${esc(c.label || '')}</td>
+      <td>${c.days === null ? '<span class="pill inf">∞ never expires</span>' : (c.days || 7) + ' days'}</td>
+      <td>${c.max_tailors ? c.max_tailors + '/mo' : '<span class="muted">unlimited</span>'}</td>
+      <td>${c.revoked ? '<span class="pill bad">revoked</span>' : '<span class="pill ok">active</span>'}</td>
+      <td>${c.admin ? '<span class="muted">—</span>' : `
+        <button class="act ${c.revoked ? '' : 'danger'}" onclick="setCode('${esc(code)}',{revoked:${!c.revoked}})">${c.revoked ? 'Restore' : 'Revoke'}</button>
+        <button class="act danger" onclick="if(confirm('Delete code ${esc(code)} permanently?'))setCode('${esc(code)}',{delete:true})">Delete</button>`}
+      </td>
+    </tr>`).join('');
+  document.getElementById('codesTbl').innerHTML =
+    '<tr><th>Code</th><th>Label</th><th>Access</th><th>Script limit</th><th>Status</th><th>Actions</th></tr>' + rows;
+}
+
+function memberRow(email){
+  const logs = (DATA.logins || []).filter(l => l.email === email);
+  const last = logs[logs.length - 1];
+  const ov = (DATA.overrides || {})[email] || {};
+  const u = (DATA.usage || {})[email];
+  const prof = (DATA.members || []).find(m => (m.email || '').toLowerCase() === email) || {};
+  return {email, name: prof.name || '', logins: logs.length, last, ov, tailors: u ? u.tailors : 0};
+}
+
+function renderMembers(){
+  const emails = new Set((DATA.logins || []).map(l => l.email).filter(Boolean));
+  (DATA.members || []).forEach(m => m.email && emails.add(m.email.toLowerCase()));
+  emails.delete('southbaydaily@gmail.com');
+  const rows = [...emails].sort().map(memberRow).map(m => `
+    <tr>
+      <td><b>${esc(m.email)}</b>${m.name ? '<br><span class="muted">' + esc(m.name) + '</span>' : ''}</td>
+      <td>${m.logins}</td>
+      <td>${m.last ? fmtTs(m.last.ts) : '—'}</td>
+      <td>${m.last ? esc([m.last.city, m.last.region].filter(Boolean).join(', ') || '—') : '—'}</td>
+      <td>${m.last ? (m.last.device === 'mobile' ? '📱 mobile' : '💻 desktop') : '—'}</td>
+      <td>${m.tailors}${m.ov.max_tailors ? ' / ' + m.ov.max_tailors : ''}</td>
+      <td>${m.ov.revoked ? '<span class="pill bad">revoked</span>' : '<span class="pill ok">active</span>'}${m.ov.extended_days ? ' <span class="pill inf">+' + m.ov.extended_days + 'd</span>' : ''}</td>
+      <td>
+        <button class="act" onclick="member('${esc(m.email)}','extend',{days:7})">+7d</button>
+        <button class="act" onclick="member('${esc(m.email)}','extend',{days:30})">+30d</button>
+        <button class="act" onclick="setQuota('${esc(m.email)}',${m.ov.max_tailors || 'null'})">Limit</button>
+        <button class="act ${m.ov.revoked ? '' : 'danger'}" onclick="member('${esc(m.email)}','${m.ov.revoked ? 'restore' : 'revoke'}')">${m.ov.revoked ? 'Restore' : 'Revoke'}</button>
+      </td>
+    </tr>`).join('');
+  document.getElementById('memTbl').innerHTML =
+    '<tr><th>Member</th><th>Sign-ins</th><th>Last sign-in</th><th>Location</th><th>Device</th><th>Scripts · mo</th><th>Status</th><th>Actions</th></tr>' +
+    (rows || '<tr><td colspan="8" class="muted">No member sign-ins yet.</td></tr>');
+}
+
+function renderLogins(){
+  const rows = (DATA.logins || []).slice(-60).reverse().map(l => `
+    <tr>
+      <td>${fmtTs(l.ts)}</td>
+      <td>${esc(l.email || '—')}</td>
+      <td>${esc(l.code || '')}</td>
+      <td>${esc([l.city, l.region, l.country].filter(Boolean).join(', ') || '—')}</td>
+      <td>${l.device === 'mobile' ? '📱' : '💻'}</td>
+    </tr>`).join('');
+  document.getElementById('logTbl').innerHTML =
+    '<tr><th>When</th><th>Email</th><th>Code</th><th>Location</th><th>Device</th></tr>' +
+    (rows || '<tr><td colspan="5" class="muted">No sign-ins logged yet.</td></tr>');
+}
+
+async function createCode(){
+  const code = document.getElementById('ncCode').value.trim().toUpperCase();
+  if (!code) return toast('Type the code first');
+  const days = document.getElementById('ncDays').value;
+  const max = document.getElementById('ncMax').value;
+  const d = await api('/api/admin/code', {code,
+    label: document.getElementById('ncLabel').value.trim(),
+    days: days ? parseInt(days, 10) : null,
+    max_tailors: max ? parseInt(max, 10) : null});
+  if (d.status === 'ok'){ toast('Code ' + code + ' is live'); ['ncCode','ncLabel','ncDays','ncMax'].forEach(id => document.getElementById(id).value = ''); load(); }
+  else toast('Couldn’t save the code — try again');
+}
+async function setCode(code, patch){
+  const d = await api('/api/admin/code', Object.assign({code}, patch));
+  toast(d.status === 'ok' ? 'Updated ' + code : 'Update failed'); load();
+}
+async function member(email, action, extra){
+  const d = await api('/api/admin/member', Object.assign({email, action}, extra || {}));
+  toast(d.status === 'ok' ? 'Updated ' + email : 'Update failed'); load();
+}
+function setQuota(email, current){
+  const v = prompt('Monthly script limit for ' + email + ' (blank = unlimited):', current || '');
+  if (v === null) return;
+  member(email, 'quota', {max_tailors: v.trim() ? parseInt(v, 10) : null});
+}
+load();
+</script>
+</body>
+</html>
