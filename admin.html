@@ -75,7 +75,7 @@ tr:hover td{background:rgba(201,168,92,.04)}
   <section>
     <h2>Access Codes</h2>
     <div class="newcode">
-      <div class="nc-f"><label>New code</label><input id="ncCode" placeholder="RT-7K4M-Q2XP" maxlength="24"></div>
+      <div class="nc-f"><label>New code</label><input id="ncCode" placeholder="BEACON417" maxlength="24"></div>
       <button class="act" style="min-height:46px" onclick="genCode()">🎲 Generate</button>
       <div class="nc-f"><label>Label</label><input id="ncLabel" placeholder="Who's it for?"></div>
       <div class="nc-f"><label>Days (blank = never expires)</label><input id="ncDays" type="number" min="1" placeholder="∞"></div>
@@ -83,7 +83,7 @@ tr:hover td{background:rgba(201,168,92,.04)}
       <button class="go" onclick="createCode()">+ Create Code</button>
     </div>
     <div class="tblwrap"><table id="codesTbl"></table></div>
-    <div class="sub" style="margin:10px 0 0">Member codes are checked against an always-on list, so sign-in works even when the AI server is asleep. <b>Random codes are safest</b> — a short memorable code (like a ZIP) is easier for an outsider to guess. Your admin code is never published: it is verified here on the server only.
+    <div class="sub" style="margin:10px 0 0">Member codes are checked against an always-on list, so sign-in works even when the AI server is asleep. Generated codes are easy to say on the phone; a guessed code only gets someone into the script library, and you will see them appear below with their location — revoke and they are out. Your admin code is never published: it is verified here on the server only.
       <button class="act" style="margin-left:8px" onclick="resync()">↻ Resync door</button></div>
   </section>
 
@@ -197,10 +197,14 @@ function renderLogins(){
     (rows || '<tr><td colspan="5" class="muted">No sign-ins logged yet.</td></tr>');
 }
 
+/* short, say-it-over-the-phone codes: one word + three digits (BEACON417) */
+const CODE_WORDS = ['BEACON','HARBOR','SUMMIT','ANCHOR','COMPASS','MANOR','HAVEN','RIDGE',
+  'VISTA','CREST','SHORE','COVE','PIER','GATE','ATLAS','ESCROW','DEED','KEYSTONE',
+  'MARINA','ORCHARD','MESA','CANYON','BRIDGE','LANTERN','QUARRY','TERRACE'];
 function genCode(){
-  const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';   // no look-alikes
-  const pick = n => Array.from(crypto.getRandomValues(new Uint8Array(n))).map(b => A[b % A.length]).join('');
-  document.getElementById('ncCode').value = 'RT-' + pick(4) + '-' + pick(4);
+  const r = crypto.getRandomValues(new Uint32Array(2));
+  const word = CODE_WORDS[r[0] % CODE_WORDS.length];
+  document.getElementById('ncCode').value = word + (100 + (r[1] % 900));
   document.getElementById('ncLabel').focus();
 }
 async function resync(){
