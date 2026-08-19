@@ -476,6 +476,44 @@ def _get_codes():
     return _store_get(CODES_PATH) or {}
 
 
+PUBLIC_BUCKET = "rt-pub"
+PUBLIC_CODES = "codes.json"
+
+
+def _publish_public_codes(codes):
+    """Publish MEMBER code hashes to a public, always-on object so the login
+    page can open the door without waking this server. Admin codes are NEVER
+    published - they stay server-validated only (a short admin code plus a
+    known owner email would otherwise be brute-forceable offline)."""
+    import hashlib
+    import json as _json
+    import requests as _rq
+    store = _member_store()
+    if not store:
+        return False
+    url, key = store
+    pub = {}
+    for code, rec in (codes or {}).items():
+        if rec.get("admin"):
+            continue
+        pub[hashlib.sha256(code.upper().encode()).hexdigest()] = {
+            "d": rec.get("days", 7), "r": bool(rec.get("revoked"))}
+    hdr = {"apikey": key, "Authorization": f"Bearer {key}", "Content-Type": "application/json"}
+    try:
+        _rq.post(f"{url}/storage/v1/bucket", headers=hdr, timeout=15,
+                 json={"id": PUBLIC_BUCKET, "name": PUBLIC_BUCKET, "public": True})   # 409 if it exists: fine
+    except Exception:
+        pass
+    try:
+        r = _rq.post(f"{url}/storage/v1/object/{PUBLIC_BUCKET}/{PUBLIC_CODES}",
+                     headers=dict(hdr, **{"x-upsert": "true", "cache-control": "max-age=30"}),
+                     data=_json.dumps(pub), timeout=15)
+        return r.status_code in (200, 201)
+    except Exception as e:  # noqa: BLE001
+        print(f"publish public codes failed: {e}")
+        return False
+
+
 def _active_code(code: str):
     """Return the code record if the code exists and isn't revoked."""
     c = _get_codes().get((code or "").strip().upper())
@@ -636,7 +674,17 @@ async def admin_code(data: dict):
             rec["revoked"] = bool(data["revoked"])
         codes[code] = rec
     ok = _store_put(CODES_PATH, codes)
+    if ok:
+        _publish_public_codes(codes)      # keep the always-on door in sync
     return {"status": "ok" if ok else "error", "codes": codes}
+
+
+@app.post("/api/admin/resync")
+async def admin_resync(data: dict):
+    if not _is_admin(data.get("adminEmail"), data.get("adminCode")):
+        return {"status": "denied"}
+    ok = _publish_public_codes(_get_codes())
+    return {"status": "ok" if ok else "error"}
 
 
 @app.post("/api/admin/member")

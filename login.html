@@ -325,9 +325,14 @@
                 localStorage.removeItem('rt_profile');
             }
             const res = await RTAuth.redeem(code, { email });
-            if (!res) {
+            if (!res.ok) {
                 btn.disabled = false; btn.textContent = 'Unlock Access';
-                return flash('signin-err', 'That code isn’t valid or has been revoked. Check for typos — or use "Ask for a 7-day extension" below.');
+                const msg = res.reason === 'revoked'
+                    ? 'This code has been turned off. Ask for a 7-day extension below, or request a new code.'
+                    : res.reason === 'unverified'
+                    ? 'We couldn’t confirm that code just now — double-check it for typos, and if it’s right, tap Unlock again in a few seconds. If it keeps happening that’s on us: email southbaydaily@gmail.com and we’ll get you in.'
+                    : 'That code isn’t valid — check for typos. If it used to work, use "Ask for a 7-day extension" below.';
+                return flash('signin-err', msg);
             }
             pendingEmail = email; pendingCode = code;
 

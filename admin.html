@@ -75,13 +75,16 @@ tr:hover td{background:rgba(201,168,92,.04)}
   <section>
     <h2>Access Codes</h2>
     <div class="newcode">
-      <div class="nc-f"><label>New code</label><input id="ncCode" placeholder="e.g. 90250VIP" maxlength="24"></div>
+      <div class="nc-f"><label>New code</label><input id="ncCode" placeholder="RT-7K4M-Q2XP" maxlength="24"></div>
+      <button class="act" style="min-height:46px" onclick="genCode()">🎲 Generate</button>
       <div class="nc-f"><label>Label</label><input id="ncLabel" placeholder="Who's it for?"></div>
       <div class="nc-f"><label>Days (blank = never expires)</label><input id="ncDays" type="number" min="1" placeholder="∞"></div>
       <div class="nc-f"><label>Monthly script limit (blank = none)</label><input id="ncMax" type="number" min="1" placeholder="unlimited"></div>
       <button class="go" onclick="createCode()">+ Create Code</button>
     </div>
     <div class="tblwrap"><table id="codesTbl"></table></div>
+    <div class="sub" style="margin:10px 0 0">Member codes are checked against an always-on list, so sign-in works even when the AI server is asleep. <b>Random codes are safest</b> — a short memorable code (like a ZIP) is easier for an outsider to guess. Your admin code is never published: it is verified here on the server only.
+      <button class="act" style="margin-left:8px" onclick="resync()">↻ Resync door</button></div>
   </section>
 
   <section>
@@ -194,6 +197,16 @@ function renderLogins(){
     (rows || '<tr><td colspan="5" class="muted">No sign-ins logged yet.</td></tr>');
 }
 
+function genCode(){
+  const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';   // no look-alikes
+  const pick = n => Array.from(crypto.getRandomValues(new Uint8Array(n))).map(b => A[b % A.length]).join('');
+  document.getElementById('ncCode').value = 'RT-' + pick(4) + '-' + pick(4);
+  document.getElementById('ncLabel').focus();
+}
+async function resync(){
+  const d = await api('/api/admin/resync');
+  toast(d.status === 'ok' ? 'Door list resynced' : 'Resync failed — try again');
+}
 async function createCode(){
   const code = document.getElementById('ncCode').value.trim().toUpperCase();
   if (!code) return toast('Type the code first');
