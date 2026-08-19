@@ -572,41 +572,171 @@ async function exportLeadScripts(){
   const btn = document.getElementById('xpGo');
   btn.disabled = true; btn.textContent = 'Writing your file…';
   try{
-    await loadSheetJS();
-    const CH_COL = {call: 'Call Script', vm: 'Voicemail Script', text: 'Text Script', email: 'Email Script'};
-    const scriptFor = (lead, ch) => {
-      if (!lead.topic) return '';
-      const s = SCRIPTS.find(s => s.t === lead.topic && s.ch === ch);
-      return s ? fillPlain(s.local || s.body, lead) : '';
-    };
-    let aoa;
-    if (RAW && RAW.rows && RAW.rows.length){
-      const byIdx = {};
-      LEADS.forEach(l => { if (l.srcIdx !== undefined) byIdx[l.srcIdx] = l; });
-      aoa = [RAW.rows[0].concat(chans.map(c => CH_COL[c]))];
-      RAW.rows.slice(1).forEach((r, i) => {
-        const lead = byIdx[i];
-        aoa.push(r.concat(chans.map(c => lead ? scriptFor(lead, c) : '')));
-      });
-    } else {
-      // raw file wasn't kept (restored session / large file) — clean rebuild
-      aoa = [['Name', 'Address', 'City', 'Lead Type', 'Phone', 'Email'].concat(chans.map(c => CH_COL[c]))];
-      LEADS.forEach(l => aoa.push([l.name, l.address, l.city, l.type || topicName(l.topic), l.phone, l.email]
-        .concat(chans.map(c => scriptFor(l, c)))));
+    // per-format output columns; email gets its subject in a column of its own
+    const COLS = [];
+    for (const c of chans){
+      if (c === 'email'){ COLS.push({ch: 'email', part: 'subject', label: 'Email Subject'}); COLS.push({ch: 'email', part: 'body', label: 'Email Script'}); }
+      else COLS.push({ch: c, part: 'body', label: {call: 'Call Script', vm: 'Voicemail Script', text: 'Text Script'}[c]});
     }
-    const ws = XLSX.utils.aoa_to_sheet(aoa);
-    const nOrig = aoa[0].length - chans.length;
-    ws['!cols'] = aoa[0].map((_, i) => ({wch: i < nOrig ? 18 : 90}));
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Leads + Scripts');
-    const base = (RAW && RAW.name ? RAW.name.replace(/\.(xlsx|xls|csv)$/i, '') : 'My Leads');
-    XLSX.writeFile(wb, base + ' - with scripts.xlsx');
+    const emailParts = (txt) => {
+      const m = txt.match(/^Subject:\s*(.+)\r?\n+([\s\S]*)$/);
+      return m ? {subject: m[1].trim(), body: m[2].trim()} : {subject: '', body: txt};
+    };
+    const cellFor = (lead, col) => {
+      if (!lead || !lead.topic) return '';
+      const s = SCRIPTS.find(s => s.t === lead.topic && s.ch === col.ch);
+      if (!s) return '';
+      const filled = fillPlain(s.local || s.body, lead);
+      return col.ch === 'email' ? emailParts(filled)[col.part] : filled;
+    };
+    const byIdx = {};
+    LEADS.forEach(l => { if (l.srcIdx !== undefined) byIdx[l.srcIdx] = l; });
+    const base = (RAW && RAW.name ? RAW.name.replace(/\.(xlsx|xlsm|xls|csv)$/i, '') : 'My Leads');
+    const hdr = (RAW && RAW.hdr) || 0;
+
+    if (RAW_BUF){
+      // ===== format-preserving path: inject cells straight into the original
+      // workbook's XML — photos, styles, extra sheets stay byte-identical =====
+      await loadFflate();
+      const buf = exportViaZip(COLS, byIdx, cellFor, hdr);
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([buf], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
+      a.download = base + ' - with scripts.xlsx';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 30000);
+    } else {
+      // ===== fallback (CSV upload or restored session): rebuild, title rows kept =====
+      await loadSheetJS();
+      let aoa;
+      if (RAW && RAW.rows && RAW.rows.length){
+        aoa = RAW.rows.map((r, i) => {
+          if (i < hdr) return [...r];
+          if (i === hdr) return r.concat(COLS.map(c => c.label));
+          return r.concat(COLS.map(c => cellFor(byIdx[i - hdr - 1], c)));
+        });
+      } else {
+        aoa = [['Name', 'Address', 'City', 'Lead Type', 'Phone', 'Email'].concat(COLS.map(c => c.label))];
+        LEADS.forEach(l => aoa.push([l.name, l.address, l.city, l.type || topicName(l.topic), l.phone, l.email]
+          .concat(COLS.map(c => cellFor(l, c)))));
+      }
+      const ws = XLSX.utils.aoa_to_sheet(aoa);
+      const nOrig = aoa[hdr].length - COLS.length;
+      ws['!cols'] = aoa[hdr].map((_, i) => ({wch: i < nOrig ? 18 : 85}));
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Leads + Scripts');
+      XLSX.writeFile(wb, base + ' - with scripts.xlsx');
+    }
     toast('Your file is downloading — scripts written for ' + (LEADS.length - unassigned) + ' leads' +
           (unassigned ? ' (' + unassigned + ' unassigned left blank)' : ''));
   } catch(e){
+    console.error(e);
     toast('Something hiccuped building the file — try again');
   }
   btn.disabled = false; btn.textContent = '📥 Download Excel with Scripts';
+}
+
+/* ---- zip-level workbook surgery: append cells without re-building the file ---- */
+function colLetter(n){ let s = ''; while (n > 0){ s = String.fromCharCode(65 + ((n - 1) % 26)) + s; n = Math.floor((n - 1) / 26); } return s; }
+function xmlEsc(s){ return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+function exportViaZip(COLS, byIdx, cellFor, hdr){
+  const dec = new TextDecoder(), enc = new TextEncoder();
+  const files = fflate.unzipSync(new Uint8Array(RAW_BUF));
+
+  // resolve the first sheet's path from the workbook (fallback: sheet1)
+  let sheetPath = 'xl/worksheets/sheet1.xml';
+  try{
+    const wbXml = dec.decode(files['xl/workbook.xml']);
+    const rid = (wbXml.match(/<sheet[^>]*r:id="([^"]+)"/) || [])[1];
+    const rels = dec.decode(files['xl/_rels/workbook.xml.rels']);
+    const m = rels.match(new RegExp('<Relationship[^>]*Id="' + rid + '"[^>]*Target="([^"]+)"'));
+    if (m) sheetPath = 'xl/' + m[1].replace(/^\//, '').replace(/^xl\//, '');
+  }catch(e){}
+  let sheet = dec.decode(files[sheetPath]);
+
+  // one new cell style: wrapped, top-aligned (appended to styles.xml)
+  let sIdx = 0;
+  try{
+    let styles = dec.decode(files['xl/styles.xml']);
+    const cnt = styles.match(/<cellXfs count="(\d+)"/);
+    if (cnt){
+      sIdx = parseInt(cnt[1], 10);
+      styles = styles.replace(/<cellXfs count="\d+"/, '<cellXfs count="' + (sIdx + 1) + '"')
+        .replace('</cellXfs>', '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment wrapText="1" vertical="top"/></xf></cellXfs>');
+      files['xl/styles.xml'] = enc.encode(styles);
+    }
+  }catch(e){ sIdx = 0; }
+
+  // existing width: last used column from the dimension ref
+  const dim = sheet.match(/<dimension ref="[A-Z]+\d+:([A-Z]+)(\d+)"/);
+  let lastCol = 0;
+  if (dim){ for (const ch of dim[1]) lastCol = lastCol * 26 + (ch.charCodeAt(0) - 64); }
+  else {
+    // widest row wins
+    for (const m of sheet.matchAll(/<c r="([A-Z]+)\d+"/g)){
+      let v = 0; for (const ch of m[1]) v = v * 26 + (ch.charCodeAt(0) - 64);
+      if (v > lastCol) lastCol = v;
+    }
+  }
+
+  const hdrRowN = hdr + 1;                 // 1-based sheet row of the headers
+  const adds = {};                         // rowN -> xml to append inside that row
+  adds[hdrRowN] = COLS.map((c, i) =>
+    '<c r="' + colLetter(lastCol + 1 + i) + hdrRowN + '" t="inlineStr"><is><t xml:space="preserve">' + xmlEsc(c.label) + '</t></is></c>').join('');
+  Object.keys(byIdx).forEach(k => {
+    const rowN = hdrRowN + 1 + Number(k);
+    adds[rowN] = COLS.map((c, i) => {
+      const v = cellFor(byIdx[k], c);
+      if (!v) return '';
+      return '<c r="' + colLetter(lastCol + 1 + i) + rowN + '"' + (sIdx ? ' s="' + sIdx + '"' : '') +
+        ' t="inlineStr"><is><t xml:space="preserve">' + xmlEsc(v) + '</t></is></c>';
+    }).join('');
+  });
+
+  sheet = sheet.replace(/<row r="(\d+)"([^>]*?)(\/>|>([\s\S]*?)<\/row>)/g, (m, rn, attrs, close, inner) => {
+    const add = adds[Number(rn)];
+    if (!add) return m;
+    // widen the row's spans so Excel doesn't clip the new cells
+    attrs = attrs.replace(/spans="1:\d+"/, 'spans="1:' + (lastCol + COLS.length) + '"');
+    return '<row r="' + rn + '"' + attrs + '>' + (close === '/>' ? '' : (inner || '')) + add + '</row>';
+  });
+
+  // widths for the new columns
+  const colDefs = COLS.map((c, i) => {
+    const n = lastCol + 1 + i;
+    return '<col min="' + n + '" max="' + n + '" width="' + (c.part === 'subject' ? 42 : 85) + '" customWidth="1"/>';
+  }).join('');
+  if (sheet.includes('</cols>')) sheet = sheet.replace('</cols>', colDefs + '</cols>');
+  else sheet = sheet.replace(/(<sheetData)/, '<cols>' + colDefs + '</cols>$1');
+
+  // stretch the dimension to cover the new columns
+  if (dim) sheet = sheet.replace(/<dimension ref="([A-Z]+\d+):[A-Z]+(\d+)"/,
+    (m, a, b) => '<dimension ref="' + a + ':' + colLetter(lastCol + COLS.length) + b + '"');
+
+  files[sheetPath] = enc.encode(sheet);
+  // re-zip: keep the media stored (no point re-compressing jpegs)
+  const out = {};
+  for (const [name, data] of Object.entries(files)){
+    out[name] = /^xl\/media\//.test(name) ? [data, {level: 0}] : data;
+  }
+  return fflate.zipSync(out);
+}
+
+function loadFflate(){
+  if (window.fflate) return Promise.resolve();
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = '/fflate.min.js'; s.onload = res; s.onerror = rej;
+    document.head.appendChild(s);
+  });
+}
+function loadExcelJS(){
+  if (window.ExcelJS) return Promise.resolve();
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = '/exceljs.min.js'; s.onload = res; s.onerror = rej;
+    document.head.appendChild(s);
+  });
 }
 
 function mapTopic(t){
@@ -633,8 +763,26 @@ function pickCol(hs, cands){
   return -1;
 }
 
+/* deal sheets often carry title/byline rows above the real headers —
+   score the first rows by header-keyword hits and start from the winner */
+let LAST_HDR = 0;
+function detectHeaderRow(rows){
+  const KEYS = ['address','city','zip','owner','name','phone','cell','email','type','source','apn','street','mailing','score','grade','lead'];
+  let best = 0, bestScore = -1;
+  for (let i = 0; i < Math.min(rows.length, 10); i++){
+    const score = (rows[i] || []).reduce((a, c) => {
+      const h = normH(c);
+      return a + (h && KEYS.some(k => h.includes(k)) ? 1 : 0);
+    }, 0);
+    if (score > bestScore){ bestScore = score; best = i; }
+  }
+  return bestScore >= 2 ? best : 0;
+}
+
 function leadsFromRows(rows){
   if (!rows.length) return [];
+  LAST_HDR = detectHeaderRow(rows);
+  rows = rows.slice(LAST_HDR);
   const hs = rows[0].map(normH);
   const cFirst = pickCol(hs, ['owner 1 first name', 'first name', 'owner first name', 'first']);
   const cLast  = pickCol(hs, ['owner 1 last name', 'last name', 'owner last name', 'last']);
@@ -746,30 +894,41 @@ function syncSubjectPicker(fileNameHint){
     : 'Pick what these leads are so each one opens the right script library.';
 }
 
+let RAW_BUF = null;   // the untouched uploaded workbook — the export edits THIS in place
+
+async function processLeadFile(name, csvText, arrayBuf){
+  const sum = document.getElementById('leadSum');
+  let rows;
+  if (csvText !== null){
+    rows = parseCSV(csvText);
+    RAW_BUF = null;
+  } else {
+    await loadSheetJS();
+    const wb = XLSX.read(arrayBuf, {type: 'array'});
+    rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1, raw: false, defval: ''});
+    RAW_BUF = arrayBuf;
+  }
+  LEADS = leadsFromRows(rows);
+  if (!LEADS.length){ sum.textContent = 'No leads found — I looked for headers like Name / Address / Lead Type in the first 10 rows.'; return false; }
+  RAW = {name: name, rows: rows, hdr: LAST_HDR};
+  try{ localStorage.setItem('rt_leads_raw', JSON.stringify(RAW)); }catch(e){}  // big files: memory only
+  syncSubjectPicker(name);
+  try{ localStorage.setItem('rt_leads', JSON.stringify(LEADS)); }catch(e){}
+  renderLeads();
+  return true;
+}
+
 document.getElementById('leadFile').addEventListener('change', async (ev) => {
   const f = ev.target.files[0];
   if (!f) return;
-  const sum = document.getElementById('leadSum');
-  sum.innerHTML = 'Reading <b>' + esc(f.name) + '</b>…';
+  document.getElementById('leadSum').innerHTML = 'Reading <b>' + esc(f.name) + '</b>…';
   try{
-    let rows;
-    if (/\.csv$/i.test(f.name)){
-      rows = parseCSV(await f.text());
-    } else {
-      await loadSheetJS();
-      const wb = XLSX.read(await f.arrayBuffer(), {type: 'array'});
-      rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1, raw: false, defval: ''});
-    }
-    LEADS = leadsFromRows(rows);
-    if (!LEADS.length){ sum.textContent = 'No leads found — make sure row 1 has headers like Name / Address / Lead Type.'; return; }
-    RAW = {name: f.name, rows: rows};
-    try{ localStorage.setItem('rt_leads_raw', JSON.stringify(RAW)); }catch(e){}  // big files: memory only
-    syncSubjectPicker(f.name);
-    try{ localStorage.setItem('rt_leads', JSON.stringify(LEADS)); }catch(e){}
-    renderLeads();
-    toast(LEADS.length + ' leads loaded — tap one and its scripts are ready');
+    const ok = /\.csv$/i.test(f.name)
+      ? await processLeadFile(f.name, await f.text(), null)
+      : await processLeadFile(f.name, null, await f.arrayBuffer());
+    if (ok) toast(LEADS.length + ' leads loaded — tap one and its scripts are ready');
   } catch(e){
-    sum.textContent = 'Couldn’t read that file — export it as .xlsx or .csv and try again.';
+    document.getElementById('leadSum').textContent = 'Couldn’t read that file — export it as .xlsx or .csv and try again.';
   }
 });
 
@@ -828,7 +987,7 @@ function clearLead(){
 }
 document.getElementById('xpGo').onclick = exportLeadScripts;
 document.getElementById('leadClear').onclick = () => {
-  LEADS = []; RAW = null; clearLead();
+  LEADS = []; RAW = null; RAW_BUF = null; clearLead();
   localStorage.removeItem('rt_leads');
   localStorage.removeItem('rt_leads_raw');
   document.getElementById('leadExport').style.display = 'none';
