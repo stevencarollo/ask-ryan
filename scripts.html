@@ -369,7 +369,7 @@ body.hasmkt .abtn.gold{display:inline-block}
           <label><input type="checkbox" class="xp-ch" value="email" checked> ✉️ Email</label>
         </div>
         <button class="go" id="xpGo">📥 Download Excel with Scripts</button>
-        <span class="xp-note">Your original file, untouched, plus one script column per format — each lead's script matches their lead type and fills in their name, address, and your details automatically. Set a market and tailor first if you want the market-tailored versions in the file.</span>
+        <span class="xp-note">Your original file, untouched, plus <b>three variations of every format you pick</b> — each lead's script matches their lead type and fills in their name, address, and your details automatically. Set a market and tailor first if you want the market-tailored versions in the file.</span>
       </div>
     </div>
   </details>
@@ -572,11 +572,24 @@ async function exportLeadScripts(){
   const btn = document.getElementById('xpGo');
   btn.disabled = true; btn.textContent = 'Writing your file…';
   try{
-    // per-format output columns; email gets its subject in a column of its own
+    // three variations of every chosen format, so each lead gets options to
+    // work through instead of one take-it-or-leave-it script
+    const VARIANTS = 3;
+    const topicsInPlay = [...new Set(LEADS.filter(l => l.topic).map(l => l.topic))];
+    const availFor = ch => topicsInPlay.reduce((n, t) =>
+      Math.max(n, SCRIPTS.filter(s => s.t === t && s.ch === ch).length), 0);
+    const NAME = {call: 'Call Script', vm: 'Voicemail', text: 'Text', email: 'Email'};
     const COLS = [];
     for (const c of chans){
-      if (c === 'email'){ COLS.push({ch: 'email', part: 'subject', label: 'Email Subject'}); COLS.push({ch: 'email', part: 'body', label: 'Email Script'}); }
-      else COLS.push({ch: c, part: 'body', label: {call: 'Call Script', vm: 'Voicemail Script', text: 'Text Script'}[c]});
+      const n = Math.min(VARIANTS, availFor(c));       // never emit empty columns
+      for (let i = 0; i < n; i++){
+        if (c === 'email'){
+          COLS.push({ch: 'email', part: 'subject', idx: i, label: 'Email ' + (i+1) + ' Subject'});
+          COLS.push({ch: 'email', part: 'body', idx: i, label: 'Email ' + (i+1) + ' Script'});
+        } else {
+          COLS.push({ch: c, part: 'body', idx: i, label: NAME[c] + ' ' + (i+1)});
+        }
+      }
     }
     const emailParts = (txt) => {
       const m = txt.match(/^Subject:\s*(.+)\r?\n+([\s\S]*)$/);
@@ -584,7 +597,8 @@ async function exportLeadScripts(){
     };
     const cellFor = (lead, col) => {
       if (!lead || !lead.topic) return '';
-      const s = SCRIPTS.find(s => s.t === lead.topic && s.ch === col.ch);
+      const pool = SCRIPTS.filter(s => s.t === lead.topic && s.ch === col.ch);
+      const s = pool[col.idx || 0];
       if (!s) return '';
       const filled = fillPlain(s.local || s.body, lead);
       return col.ch === 'email' ? emailParts(filled)[col.part] : filled;
