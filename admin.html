@@ -7,8 +7,10 @@
 <meta name="robots" content="noindex">
 <script src="/auth.js"></script>
 <script>
-  // owner only: needs a live session with the admin flag
-  if (!RTAuth.session() || !RTAuth.isAdmin()) location.replace('/login.html?next=%2Fadmin.html');
+  // owner only: a signed-in non-admin goes to the site (never back to login —
+  // that ping-pongs); a signed-out visitor goes to login and returns here
+  if (RTAuth.session() && !RTAuth.isAdmin()) location.replace('/');
+  else if (!RTAuth.session()) location.replace('/login.html?next=%2Fadmin.html');
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
