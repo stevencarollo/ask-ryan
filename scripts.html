@@ -1020,6 +1020,7 @@ try{
 const CH_LABEL = {call:"Call Script", vm:"Voicemail", text:"Text / DM", email:"Email"};
 let chSel = new Set(), tSel = new Set(), MARKET = null, VOICE = null, SPANISH = false;   // empty set = All
 let langAsked = false;   // ask once per session; the chip stays for flipping
+const DEFAULT_VHINT = 'Default: each script answers in the voice of the specialty’s own expert.';
 
 function isBilingual(vid){
   const a = ADVISORS.find(a => a.id === vid);
@@ -1042,8 +1043,29 @@ function setSpanish(on){
     if (hit){ s.local = hit.script; s.why = hit.why; if (VOICE) s.voicedBy = VOICE.n; }
   });
   syncGold(); render(); syncSetupSum();
-  toast(SPANISH ? 'Los guiones tailored se escriben en español — star your picks y toca Tailor'
-                : 'Scripts back to English');
+  const hint = document.getElementById('vhint');
+  if (SPANISH){
+    hint.textContent = 'Escribiendo en español — translating what you have open now; tap Tailor on any other card, or star them and use the gold button.';
+    const n = convertVisible(8);          // saying "Sí" should PRODUCE Spanish, not just arm a setting
+    toast(n ? 'Traduciendo ' + n + ' guiones al español…' : 'Español activado — toca Tailor en cualquier guion');
+  } else {
+    hint.textContent = VOICE ? 'Scripts answer in ' + VOICE.n + "'s voice." : DEFAULT_VHINT;
+    toast('Scripts back to English');
+  }
+}
+
+/* convert the scripts the member is actually looking at (bounded) */
+function convertVisible(limit){
+  const todo = [];
+  for (const card of document.querySelectorAll('.card')){
+    const i = Number(card.dataset.i);
+    const s = SCRIPTS[i];
+    if (!s || (s.retry > 1) || AUTOQ.includes(i)) continue;
+    if (!s.local || s.preOnly) todo.push(i);
+    if (todo.length >= limit) break;
+  }
+  if (todo.length){ AUTOQ.push(...todo); pumpQueue(); }
+  return todo.length;
 }
 function syncLangControls(){
   const ask = document.getElementById('langAsk');
@@ -1249,6 +1271,12 @@ document.getElementById('q').addEventListener('input', render);
     });
     render();
     const missing = SCRIPTS.length - applied;
+    if (SPANISH){
+      document.getElementById('vhint').textContent =
+        'Escribiendo en español as ' + VOICE.n + ' — tap Tailor on a card, or star them and use the gold button.';
+      convertVisible(8);
+      return;
+    }
     document.getElementById('vhint').textContent = applied
       ? (missing
           ? `${applied} scripts switched to ${VOICE.n}'s voice instantly — star the remaining ${missing} and tap Tailor to convert them.`
