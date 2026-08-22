@@ -1026,7 +1026,17 @@ function isBilingual(vid){
   const a = ADVISORS.find(a => a.id === vid);
   return !!a && a.g === 'Español & Bilingual';
 }
-function setSpanish(on){
+/* prewritten Spanish library (built offline by scripts/build_spanish.py):
+   the whole vault in Spanish, instant, with no live AI calls */
+let ES_LIB = null;
+async function loadEsLib(){
+  if (ES_LIB) return ES_LIB;
+  try { const r = await fetch('/voices/_es.json'); ES_LIB = r.ok ? await r.json() : {}; }
+  catch(e){ ES_LIB = {}; }
+  return ES_LIB;
+}
+
+async function setSpanish(on){
   SPANISH = !!on;
   langAsked = true;
   document.getElementById('langAsk').style.display = 'none';
@@ -1037,21 +1047,38 @@ function setSpanish(on){
   // language changes what a conversion produces — reset overlays, keep caches
   voiceEpoch++; AUTOQ.length = 0;
   SCRIPTS.forEach(s => { delete s.local; delete s.why; delete s.voicedBy; delete s.preOnly; delete s.retry; });
-  // instant cache hits re-apply where we already converted in this language
+  const hint = document.getElementById('vhint');
+
+  if (SPANISH){
+    const lib = await loadEsLib();
+    let pre = 0;
+    SCRIPTS.forEach((s, i) => {
+      const hit = REVOICE_CACHE.get(cacheKey(i));
+      if (hit){ s.local = hit.script; s.why = hit.why; if (VOICE) s.voicedBy = VOICE.n; return; }
+      // prewritten Spanish covers the default voice; a chosen advisor voice
+      // still needs a live pass to be that advisor IN Spanish
+      const es = !VOICE && lib[skey(s)];
+      if (es){ s.local = es.script; s.why = ''; s.preOnly = !!MARKET; pre++; }
+    });
+    syncGold(); render(); syncSetupSum();
+    if (pre){
+      hint.textContent = 'La biblioteca completa está en español — instantáneo. Tap Tailor to weave in your market numbers.';
+      toast(pre + ' guiones en español — listos');
+    } else {
+      hint.textContent = 'Escribiendo en español — translating what you have open now; tap Tailor on any other card, or star them and use the gold button.';
+      const n = convertVisible(8);
+      toast(n ? 'Traduciendo ' + n + ' guiones al español…' : 'Español activado — toca Tailor en cualquier guion');
+    }
+    return;
+  }
+
   SCRIPTS.forEach((s, i) => {
     const hit = REVOICE_CACHE.get(cacheKey(i));
     if (hit){ s.local = hit.script; s.why = hit.why; if (VOICE) s.voicedBy = VOICE.n; }
   });
   syncGold(); render(); syncSetupSum();
-  const hint = document.getElementById('vhint');
-  if (SPANISH){
-    hint.textContent = 'Escribiendo en español — translating what you have open now; tap Tailor on any other card, or star them and use the gold button.';
-    const n = convertVisible(8);          // saying "Sí" should PRODUCE Spanish, not just arm a setting
-    toast(n ? 'Traduciendo ' + n + ' guiones al español…' : 'Español activado — toca Tailor en cualquier guion');
-  } else {
-    hint.textContent = VOICE ? 'Scripts answer in ' + VOICE.n + "'s voice." : DEFAULT_VHINT;
-    toast('Scripts back to English');
-  }
+  hint.textContent = VOICE ? 'Scripts answer in ' + VOICE.n + "'s voice." : DEFAULT_VHINT;
+  toast('Scripts back to English');
 }
 
 /* convert the scripts the member is actually looking at (bounded) */

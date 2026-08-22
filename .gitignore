@@ -21,3 +21,7 @@ GEMINI_KEY.txt
 logs/
 CEREBRAS_KEY.txt
 RENDER_ENV_TODO.txt
+scripts_data.PRE-*.js
+scripts_data.BACKUP-*.js
+scripts/regrounded*.json
+logs/

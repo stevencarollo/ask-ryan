@@ -26,98 +26,100 @@ const SCRIPTS = [
 
 /* ---------- EXPIRED ---------- */
 {t:"expired",ch:"call",adv:"Brandon Mulrenin",title:"The Diagnosis Call",body:
-`YOU: Hi, is this {{Owner}}? ... Hey {{Owner}}, my name's {{Agent}} — I'm a local agent here in {{Neighborhood}}. I noticed your home came off the market without selling... and I'm sure I'm probably the tenth agent to call, so I'll be brief.
+`YOU: Hi, is this {{Owner}}? ... Hey {{Owner}}, my name's {{Agent}} — I'm a local agent here in {{Neighborhood}}. I noticed your home recently came off the market without selling. And I'm sure I'm probably the tenth agent to reach out, so I'll be quick. (Tonality: slow, downswing ending)
 
-Would you be opposed to me asking you one question about the listing?
+I'm not even sure I could help, but would you possibly be open to just one quick question about the process?
 
 (wait — let them grant permission)
 
-When you look back at the whole process... what do YOU think stopped it from selling?
+Looking back at everything, what do YOU think ultimately kept it from selling?
 
-(listen — do not interrupt. Label what you hear:)
-"It sounds like the marketing never really showed the house at its best."
-"Seems like the price got set before anyone looked at the real comps."
+(listen — do not interrupt. Label what you hear, using strategic empathy and non-threatening language. Example responses from agent:)
+"It sounds like getting the right exposure was a real challenge."
+"Seems like the pricing strategy might have been a little off-target."
 
-Last question and I'll let you go: if you could sell it without going through what you just went through... would that even be worth a 15-minute conversation?`},
+Just one more quick thing, and I'll let you go: If you could sell it without all the frustration you just went through... would that even be worth a quick conversation to explore?`},
 {t:"expired",ch:"call",adv:"Tim & Julie Harris",title:"The Re-List Appointment Setter",body:
 `YOU: Hi {{Owner}}, this is {{Agent}} with {{Brokerage}}. Your home at {{Address}} showed up as off the market this morning — did you end up selling it, or did it just expire?
 
 (if expired:)
-I'm sorry — that's frustrating, especially after keeping it show-ready for months. Here's why I'm calling: the buyers who looked and didn't offer weren't rejecting your home, they were rejecting how it was positioned. Positioning is fixable.
+I understand that's frustrating, especially after keeping it ready for showings. The reality is, the buyers who saw your home weren't rejecting the house itself; they were rejecting the way it was presented to the market. That's always fixable.
 
-I have a 12-point plan I use specifically for homes that didn't sell the first time — it covers pricing strategy, presentation, and where the marketing actually goes. There's no obligation and I won't ask you to sign anything on the spot.
+My team and I specialize in getting listings sold that didn't sell the first time. We use a proven system for preparing and presenting homes, so we get the listing every single time. I'd like to quickly show you how our approach is different. There's no obligation.
 
-When would be the best time for me to walk you through it — today at 4, or tomorrow morning?`},
+Would today at 4, or tomorrow morning, work better for a brief call?`},
 {t:"expired",ch:"vm",adv:"Tom Ferry",title:"Expired Voicemail — The Stat Hook",body:
-`Hi {{Owner}}, this is {{Agent}} with {{Brokerage}}. I saw your home came off the market — you should know the average home that re-lists with a new strategy sells within the first 30 days, and usually closer to asking than the first attempt. I put together a short analysis of what I'd do differently at {{Address}}. No pressure — I'll email it either way. If you want the 10-minute version by phone, call me at {{Phone}}. Again, {{Agent}}, {{Phone}}.`},
+`Hi {{Owner}}, this is {{Agent}} with {{Brokerage}}. I saw your home at {{Address}} came off the market. The numbers I track show that homes like yours, when re-listed with a clear plan, often sell in under 30 days and for a stronger price. I've put together a specific plan for what I'd do differently. I'll email that over. If you'd like the 10-minute version by phone, call me at {{Phone}}. Again, {{Agent}}, {{Phone}}.`},
 {t:"expired",ch:"text",adv:"Jimmy Burgess",title:"Expired Value-First Text",body:
-`Hi {{Owner}}, {{Agent}} here — local agent in {{Neighborhood}}. Your home came off the market and I actually put together a fresh market snapshot for your street before calling anyone. Want me to send it over? No strings — it's yours either way.`},
+`Hi {{Owner}}, {{Agent}} here. Noticed your home came off market. I just put together a quick valuation update for your specific address, focusing on current comparables. Want me to send it over? It's yours, no strings.`},
 {t:"expired",ch:"email",adv:"Tim & Julie Harris",title:"Expired Follow-Up Email",body:
-`Subject: What I'd do differently at {{Address}}
+`Subject: Why {{Address}} didn't sell
 
 {{Owner}},
 
-Your home didn't sell — but it's not because buyers don't want it. In almost every expired listing I review, one of three things was off: the price story, the presentation, or where the marketing actually ran.
+Your home at {{Address}} didn't sell, and that's usually because one of the critical steps in the listing machine was missed. It's rarely the home itself. It's almost always a breakdown in the Pre-Listing Package or the Polished, Professional Presentation.
 
-I put together a one-page plan showing exactly which of the three worked against {{Address}}, and what I'd change in the first 14 days of a re-list.
-
-May I drop it off, or would you rather I email it? Either way it's yours — no listing agreement required to see it.
+I've prepared a brief Listing Evaluation showing exactly what I'd change to get it sold in the next 14 days. I'd like to drop it off, or I can email it. No listing agreement is required to see it.
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`},
 
 /* ---------- FSBO ---------- */
 {t:"fsbo",ch:"call",adv:"Brandon Mulrenin",title:"FSBO Backup-Plan Call",body:
-`YOU: Hi, I'm calling about the home for sale — is this the owner? ... Great. {{Owner}}, my name's {{Agent}}, I'm a local agent — and before you hang up, I'm NOT calling to ask for the listing.
+`YOU: Hi, I'm calling about the home for sale. Is this the owner? ... Great. {{Owner}}, this is {{Agent}}. I'm a local agent, and I'm not actually calling to ask for the listing. I was just wondering if I could ask you a couple of quick questions?
 
-Would it be ridiculous if I asked you just two questions?
+(pause for permission)
 
-One: if you sell it yourself and it goes perfectly — where are you moving to? (listen; people talk about the dream, not the house)
+YOU: First, if you sell it independently, and it goes exactly as you hope — where are you moving to next? (listen; people talk about the dream, not the house)
 
-Two: most owners I talk to sell on their own to protect their equity — is that fair for you too? (yes) Totally get it. So here's my only ask: if at some point the calls slow down and the showings turn into strangers wandering through... would you be opposed to having a backup plan already in place? No cost to have one.
+YOU: And usually, owners like yourself are looking to protect their equity by selling on their own. Is that a fair assessment for you too? (listen)
 
-I'll check in in two weeks. If it's sold by then, I'll be the first to congratulate you.`},
+YOU: I totally get that. So, here's my only thought: if at some point the calls slow down, or the showings turn into strangers just wandering through... would you possibly be open to having a sensible backup plan already in place? No cost to contemplate one.
+
+I'll check back in a couple of weeks. If it's sold by then, I'll be the first to congratulate you.`},
 {t:"fsbo",ch:"vm",adv:"Tim & Julie Harris",title:"FSBO Voicemail — The Ally",body:
-`Hi, this is {{Agent}} with {{Brokerage}} — I saw your home for sale on {{Address}}. I'm not calling to talk you out of selling it yourself. I work with buyers in {{Neighborhood}} every week, and if one of them fits your home I'd love to bring them — you'd only pay the buyer's side. Call me back at {{Phone}} and I'll tell you exactly what they're pre-approved for. {{Agent}}, {{Phone}}.`},
+`Hi, this is {{Agent}} with {{Brokerage}}. I saw your home for sale on {{Address}}. I'm not calling to talk you out of selling yourself. I work with prequalified buyers in {{Neighborhood}} every week. If I have one who is a perfect fit, I'd like to bring them by — you'd only pay the buyer's side. Call me at {{Phone}} and I'll share what they're approved for and their desire to write an offer. {{Agent}}, {{Phone}}.`},
 {t:"fsbo",ch:"text",adv:"Ricky Carruth",title:"FSBO Zero-Pressure Text",body:
-`Hey {{Owner}}, this is {{Agent}}, local agent in {{Neighborhood}}. Saw the house is for sale by owner — good for you honestly. No pitch here: if you ever want a free second opinion on pricing or an offer review, I'm around. How's the traffic been so far?`},
+`Hey {{Owner}}, this is {{Agent}} from {{Neighborhood}}. Saw your house is for sale. I wanted to reach out and offer to help you for free with anything – pricing, offers, whatever you need. How's traffic been?`},
 {t:"fsbo",ch:"email",adv:"Jimmy Burgess",title:"FSBO Toolkit Email",body:
-`Subject: Free FSBO toolkit for {{Address}} (no catch)
+`Subject: Market Insights for {{Address}}
 
 Hi {{Owner}},
 
-Selling on your own is completely doable — most owners just get stuck on the same three things: pricing to the newest comps, qualifying buyers before they walk in, and the disclosure paperwork.
+Many owners selling on their own find the biggest challenges are pinpointing a precise value, pre-qualifying buyers, and handling the necessary paperwork. 
 
-I put together a FSBO toolkit that covers all three: a live comp report for {{Neighborhood}}, a buyer pre-qualification checklist, and the state disclosure list. It's free. I send it because some owners eventually want help, and I'd rather be the agent who was useful than the one who pestered you.
+I've put together a specific resource for {{Neighborhood}} that addresses these: a current comp report, a checklist for buyer qualification, and the state disclosure rundown. It's a quick way to get clarity. 
 
-Want me to send it over?
+My goal is to provide useful information upfront. Let me know if you'd like me to send it over.
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`},
 
 /* ---------- CIRCLE ---------- */
 {t:"circle",ch:"call",adv:"Ricky Carruth",title:"Just Sold Circle Call",body:
-`YOU: Hey, is this {{Owner}}? This is {{Agent}} with {{Brokerage}} — I'm a local agent, and no, you're not in trouble! (smile — they can hear it)
+`YOU: Hey, is this {{Owner}}? This is {{Agent}} with {{Brokerage}}. How are you doing today?
 
-I just sold a home around the corner from you on {{Street}}, and every time that happens the neighbors' home values move. I'm calling everyone on the block to share the number — do you want to know what it went for?
+(pause for their response)
 
-(tell them — be generous, no gatekeeping)
+Great. I'm calling because I just helped a family sell their place right around the corner from you on {{Street}}. When a home sells, it always impacts the values nearby, so I'm just letting the neighbors know what it went for. Do you want to hear the number?
 
-That's the market talking. Quick question and I'll let you go: do you have any plans to make a move in the next year or two, or are you staying put?
+(tell them the price – no gatekeeping, just give the info)
 
-(staying:) Love it. I'll keep you posted when the numbers change on your street — you'll always know what your home is worth on my watch.`},
+That's the market talking right now. Listen, I'm not calling to push anything. It's not about the deal, it's about the relationship. Quick question, and I'll let you go: any thoughts about making a move in the next year or two, or are you comfortable staying put?
+
+(staying:) Perfect. I'll just keep you updated on your street's activity. You'll always know what your home is worth on my watch.`},
 {t:"circle",ch:"vm",adv:"Tom Ferry",title:"Just Listed Voicemail",body:
-`Hi {{Owner}}, {{Agent}} with {{Brokerage}}. We just listed a home near you at {{Address}}, and showings start this weekend. Two reasons for the call: one, if you know anyone who's been waiting to get into {{Neighborhood}}, this is their shot. Two, the listing sets a fresh comp for your own value — I'm happy to tell you what it means for your home, free, no strings. {{Phone}}. Talk soon.`},
+`Hi {{Owner}}, {{Agent}} with {{Brokerage}}. Just listed a home near you at {{Address}}, showings begin this weekend. Two quick points: First, if you know anyone ready to buy in {{Neighborhood}}, this is their chance. Second, this listing just shifted the market data for your home's value. I can share exactly what that means for your property, no cost. Call me at {{Phone}}. Thanks.`},
 {t:"circle",ch:"text",adv:"Glennda Baker",title:"Neighborhood Story Text",body:
-`{{Owner}}, quick story: the house on {{Street}} got 6 offers in 5 days. The one that won wasn't the highest — it was the cleanest. That's what's happening in {{Neighborhood}} right now. If you ever wonder what YOUR house would do in this market, I'll tell you the real number — not the Zillow one. — {{Agent}}`},
+`{{Owner}}, quick story, bless your heart: the house on {{Street}} got 6 offers in 5 days. But honey, the one that won wasn't the highest — it was the cleanest. That's the real truth in {{Neighborhood}}. If you're ever curious what your house would truly bring, I'll tell you the honest number, not some internet guess. — {{Agent}}`},
 {t:"circle",ch:"email",adv:"Gary Keller",title:"Neighborhood Market Update Email",body:
-`Subject: {{Neighborhood}}: what sold, for what, and why it matters
+`Subject: {{Neighborhood}}: What sold, for what, and what it means for you
 
 Hi {{Owner}},
 
-Once a month I send neighbors a two-minute read on the {{Neighborhood}} market — the homes that sold, what they went for, and what it means for your equity. No fluff, just the numbers I'd want if I lived on your street.
+Every month, I share the hard numbers on the {{Neighborhood}} market — the homes that sold, their price, and the impact on your equity. No fluff, just the facts I'd want if I lived on your street.
 
-This month's highlight: {{Street}} closed above list after one weekend — inventory is thin enough that prepared sellers are naming their terms.
+This month's highlight: {{Street}} closed above list after one weekend. Inventory is thin, so prepared sellers are naming their terms.
 
-If you'd like a private annual equity review (most homeowners have no idea how much theirs has grown), just reply "equity" and I'll put one together — takes me an hour, costs you nothing.
+Most homeowners don't know their current equity. If you want to know your number, reply "equity." I'll build you a private annual review. It takes me an hour, costs you nothing.
 
 {{Agent}} · {{Brokerage}}`},
 
@@ -132,9 +134,9 @@ And listen — you know how I build my business: I work by referral. So if a fri
 
 (close with THEM:) Great catching up. Give my best to {{Family Member}}.`},
 {t:"soi",ch:"vm",adv:"Gary Keller",title:"Annual Equity Review Voicemail",body:
-`Hi {{Name}}, it's {{Agent}}. Every year I do a quick equity review for the people in my circle — what your home's worth now, what you owe, and what that gap could do for you. Most people are sitting on more than they think. Takes me an hour to build, takes you five minutes to read. Want yours? Call or text me at {{Phone}} and I'll have it to you this week.`},
+`Hi {{Name}}, it's {{Agent}}. Every year, I do a financial snapshot for the people in my world — what your home's worth, what you owe, and the wealth that gap represents. Most homeowners are sitting on more than they think. It's a quick read, gives you the ONE thing you need to know about your biggest asset. Want yours? Call or text me at {{Phone}} and I'll get it to you this week.`},
 {t:"soi",ch:"text",adv:"Sharran Srivatsaa",title:"The Value Ping",body:
-`{{Name}} — saw something today that made me think of you: homes like yours in {{Neighborhood}} are quietly up again this quarter. No action needed, just keeping your biggest asset on your radar. Coffee soon? — {{Agent}}`},
+`{{Name}} — just reviewed the latest numbers: homes in {{Neighborhood}} are tracking up, specifically your asset class. No immediate action required, just an update for your owner P&L. Always here for the data. — {{Agent}}`},
 {t:"soi",ch:"email",adv:"Brian Buffini",title:"The Oh-By-The-Way Email",body:
 `Subject: Thinking of you (and a quick market note)
 
@@ -160,17 +162,17 @@ If lukewarm: "Totally fair. Tell me what was missing — because if it exists in
 
 Either way: follow up, follow through, follow back. You'll hear from me Tuesday with what happened to the house — deal?`},
 {t:"openhouse",ch:"vm",adv:"Ricky Carruth",title:"Sign Call Voicemail Return",body:
-`Hey, this is {{Agent}} — you called on my sign at {{Address}} earlier. Sorry I missed you! Quick answers: it's {{Price}}, {{Beds}} bed {{Baths}} bath, and yes, it's still available. I'm around all evening if you want the full story — or if that one's not the fit, tell me what you're looking for and I'll send you the two or three in {{Neighborhood}} that actually match. {{Phone}}. Talk soon.`},
+`Hey, it's {{Agent}} – you called my sign at {{Address}} earlier. Sorry I missed you! Quick answers: it's {{Price}}, {{Beds}} bed {{Baths}} bath, and still available. I'm around all evening if you want to swing by, no pressure. Or if that one's not the fit, tell me what you're looking for and I'll send you the two or three in {{Neighborhood}} that actually match. {{Phone}}. Talk soon.`},
 {t:"openhouse",ch:"text",adv:"Jason Pantana",title:"Post-Open-House Text",body:
-`Hi {{Name}} — {{Agent}} from today's open house at {{Address}}. Just sent you the full photo tour + disclosures link. One thing I didn't mention: the sellers review offers Tuesday. Want me to flag your interest so you're in the loop either way?`},
+`Hey {{Name}}, {{Agent}} here from the {{Address}} open house. Full tour + disclosures are in your inbox. Quick heads-up: sellers review offers Tuesday. Want me to put you on the list for updates so you don't miss anything?`},
 {t:"openhouse",ch:"email",adv:"Glennda Baker",title:"Open House Recap Email",body:
 `Subject: The story behind {{Address}} (since you asked)
 
 Hi {{Name}},
 
-Great meeting you today. You asked why the sellers are moving — here's the story I can share: they bought this house eleven years ago, raised two kids in it, and just accepted a job out of state. They love this house. They're not running from it — they're being pulled away.
+Oh, my stars, it was great meeting you today! You asked why these folks are letting go of this house — and honey, here's the real story, what agents won't always tell you: They bought this place eleven years ago, raised two sweet babies here, and just got pulled away by a job out of state. They truly love this home. They aren't running from it; they're being *pulled* away.
 
-Why does that matter to you? Because sellers who love their home price it fairly and keep it beautifully. That's exactly what the inspection reports show.
+Now, why does that matter to you? Because when sellers love their home, they price it right and they take care of it like family. That's exactly what the inspection reports show, darlin'.
 
 The photo tour and disclosures are attached. If you want to see it again quietly — no open-house crowd — I can make that happen this week.
 
@@ -178,66 +180,62 @@ The photo tour and disclosures are attached. If you want to see it again quietly
 
 /* ---------- ONLINE LEADS ---------- */
 {t:"online",ch:"call",adv:"Sharran Srivatsaa",title:"Speed-to-Lead First Call",body:
-`(call within 5 minutes of the inquiry — the odds of connecting drop 10x after that)
+`YOU: Hi {{Name}}, this is {{Agent}} — you were just looking at {{Address}} online. My goal is to save you time, so I wanted to connect while that property is top of mind. Do you have 90 seconds?
 
-YOU: Hi {{Name}}, this is {{Agent}} — you were just looking at {{Address}} online, so I wanted to reach out while it's fresh on your screen. Do you have 90 seconds?
+(pause for permission)
 
-Three quick questions so I only send you things worth your time:
-One — is {{Address}} the exact kind of home, or just in the ballpark?
-Two — when would moving actually make sense for you: months or years?
-Three — has anyone gotten you a real pre-approval number yet, or is that still on the list?
+Great. To make sure I only send you precise matches, I have three quick questions:
+One — is {{Address}} the exact type of home, or just close to your criteria?
+Two — what's your timeline for a move: are we talking months or years?
+Three — has anyone walked you through a real pre-approval number yet, or is that still a step you're planning?
 
-(then deliver ONE piece of value:) Based on that, here's what I'll do: I'll send you the three best matches in {{Neighborhood}} tonight — including one that isn't on the portals yet. If I'm useful, keep me. If I'm not, fire me. Fair?`},
+(then deliver ONE piece of value:)
+
+Based on that, here's the playbook: I'll engineer three top matches for you in {{Neighborhood}} tonight — including one that isn't publicly listed yet. If I prove useful, keep me. If not, you fire me. Fair?`},
 {t:"online",ch:"vm",adv:"Tom Ferry",title:"Online Lead Voicemail #1",body:
-`Hi {{Name}}, it's {{Agent}} with {{Brokerage}} — you inquired about {{Address}} a few minutes ago. I have the answers to the three things everyone asks about that one: the real status, the seller's timeline, and what it'll actually take to win it. Call or text me at {{Phone}} — and either way I'm sending you two similar homes tonight that most buyers haven't seen yet.`},
+`Hi {{Name}}, it's {{Agent}} with {{Brokerage}}. You inquired about {{Address}} a few minutes ago. I've got the current market intelligence on that one: the real status, the seller's exact plan, and what the winning bid looks like right now. Call or text me at {{Phone}} — and either way I'm sending you two similar homes tonight that most buyers haven't seen yet.`},
 {t:"online",ch:"text",adv:"Chelsea Peitz",title:"The Human First Text",body:
-`Hi {{Name}}, it's {{Agent}} 👋 — a real human, not a drip campaign, promise. You looked at {{Address}} — want the honest scoop on it? (There's one thing about it the photos don't show.) Happy to text it over, no phone call required.`},
+`Hey {{Name}}, it's {{Agent}} 👋. You checked out {{Address}} online. I was just there and there's a specific detail the listing photos don't tell you. Happy to share my take via text, no call needed. Just reply if you want the real story.`},
 {t:"online",ch:"email",adv:"Byron Lazine",title:"The Market-Reality Email",body:
-`Subject: {{Address}} — what the data actually says
+`Subject: {{Address}} — The Real Numbers
 
 {{Name}},
 
-You looked at {{Address}}, so here's the context most portals won't give you.
+You checked out {{Address}}, so let's cut through the noise. Most portals just show you headlines, not the actual take.
 
-Homes in {{Neighborhood}} are averaging {{DOM}} days on market right now, and the gap between list price and sold price tells you exactly how much negotiating room exists. That gap is the single most useful number in your search — and it changes monthly.
+Right now, homes in {{Neighborhood}} are clocking {{DOM}} days on market. But the real story is the gap between list price and what actually closes. That number tells you everything about leverage for your offer — and it moves fast.
 
-I send a two-minute data brief to my buyers every week: what listed, what sold, what cut, and what it means for your offer strategy. Want in? Just reply "brief."
-
-No spam, no fifteen-email drip. Just the numbers.
+My buyers get a quick Hot Sheet every week: what listed, what sold, what got a price cut, and what it means for your strategy *today*. No fluff, no endless emails. Just the numbers. Want in? Reply "brief."
 
 {{Agent}} · {{Brokerage}}`},
 
 /* ---------- SOCIAL ---------- */
 {t:"social",ch:"text",adv:"Glennda Baker",title:"DM Reply — Story Hook",body:
-`(when someone comments or DMs on a listing video)
-
-Hey {{Name}}! You found the house with the story 👀 — what I didn't put in the video: the sellers already found their next place, which means they're motivated on timeline, not just price. Are you asking for you, or scouting for someone?`},
+`Well hey there, {{Name}}! You caught the house with the story 👀. What I couldn't squeeze into that video? The sellers already bought their next place, honey. That means they're really pushing on timeline, not just the price. Are you asking for yourself, or are you playing matchmaker for somebody else?`},
 {t:"social",ch:"text",adv:"Chelsea Peitz",title:"DM Conversation Starter",body:
-`(replying to a story reaction / new follower who engages)
-
-Hey {{Name}}, thanks for the follow! I post the real side of {{Neighborhood}} real estate — the wins AND the weird stuff. Quick question so I post things you actually care about: are you more curious about home values, or thinking about a move at some point? (No pitch — I genuinely tailor content to who's here.)`},
+`Hey {{Name}}, thanks for connecting! My content shows the real, lived experience of {{Neighborhood}} real estate – the wins, the weird stuff, all of it. Quick question so I can share what matters to you: are you more curious about home values right now, or thinking about a move at some point? No pitch, just genuinely tailoring my perspective to who's here.`},
 {t:"social",ch:"email",adv:"Jason Pantana",title:"Video-to-Inbox Email",body:
-`Subject: The 90-second video everyone's asking about
+`Subject: Your {{Neighborhood}} market: What the numbers actually say
 
 Hi {{Name}},
 
-You watched my breakdown of the {{Neighborhood}} market on Instagram — this is the follow-up with the actual numbers on screen.
+Thanks for watching the {{Neighborhood}} market breakdown on Instagram. This is the follow-up with the tactical numbers on screen.
 
-Attached: the full chart of what's sold in the last 60 days, which price band is moving fastest, and the one stat that surprised everyone (hint: it's the price-cut percentage).
+Attached: the full chart of homes sold in the last 60 days, which price band is moving fastest, and the one stat that surprised everyone (hint: it's the price-cut percentage).
 
-If you want this monthly — real data, 90 seconds, zero jargon — reply "subscribe" and you're in.
+If you want this monthly — real data, 90 seconds, zero jargon — reply "subscribe" and you're in. No fluff, just what works.
 
 {{Agent}} · {{Brokerage}}`},
 {t:"social",ch:"call",adv:"Byron Lazine",title:"The Content-to-Call Bridge",body:
 `(calling a lead who's engaged with your content for weeks)
 
-YOU: {{Name}}? It's {{Agent}} — the one whose market videos you keep watching instead of doing whatever you're supposed to be doing. (laugh — earn the pattern interrupt)
+YOU: {{Name}}? It's {{Agent}} — the one whose market takes you keep hitting instead of, you know, doing your actual job. (laugh — earn the pattern interrupt)
 
-I'm calling because you commented on the video about {{Topic}}, and honestly the comment section wasn't the place for the full answer.
+I'm calling because you dropped a comment on the video about {{Topic}}, and honestly, the comment section wasn't the place for the full argument. You need the 'so what.'
 
-Here's the real version: (give the actual insight, with numbers — one full minute of pure value, nothing asked)
+Here's the real version: (give the actual insight, with numbers — one full minute of pure value, nothing asked, maybe the 'marry the house, date the rate' math if it fits)
 
-That's it — that's the call. But since I've got you: is any of this research for a real move, or are you a market nerd like me? Either answer's a good answer.`},
+That's it — that's the call. But since I've got you: is all this market research for a real move, or are you just a fellow market junkie like me? Both answers are good answers.`},
 
 /* ---------- LUXURY ---------- */
 {t:"luxury",ch:"call",adv:"Ryan Serhant",title:"Luxury Listing Pitch Call",body:
@@ -249,143 +247,145 @@ Here's what that looks like in practice: cinematic film, not photos. A launch, n
 
 I'd like 45 minutes to show you the full playbook, including exactly what I'd spend on your launch and where. When works — Thursday, or the weekend?`},
 {t:"luxury",ch:"vm",adv:"Sharran Srivatsaa",title:"Luxury Seller Voicemail",body:
-`{{Owner}}, this is {{Agent}} with {{Brokerage}}. Homes in your bracket in {{Neighborhood}} are quietly changing hands off-market — and owners who don't know their number are leaving money on the table when the knock comes. I put together a private valuation for {{Address}} — the real number, not an algorithm's guess. It's yours whether or not we ever work together. {{Phone}}.`},
+`{{Owner}}, this is {{Agent}} with {{Brokerage}}. My team tracks the unlisted assets moving in {{Neighborhood}}. Many owners are leaving significant capital on the table when an unsolicited offer arrives, because they haven't engineered their exit. I've built the market-data playbook for {{Address}} — your definitive number, not an algorithm's guess. It's yours. {{Phone}}.`},
 {t:"luxury",ch:"email",adv:"Cheryl Eisen",title:"The Staging ROI Email",body:
-`Subject: {{Address}}: what staging is worth in actual dollars
+`Subject: {{Address}}: The Investment in a Buyer's Fantasy
 
 {{Owner}},
 
-The difference between a beautiful empty house and a styled home isn't taste — it's the sale price. Buyers at this level don't purchase property; they purchase an identity. Our job is to hand it to them the moment the door opens.
+At this level, buyers aren't just shopping for square footage. They're looking for a fantasy, a future. A vacant luxury property reads cold and small; it can't tell that story, can't create that emotional connection.
 
-For {{Address}}, I'd focus on three moments: the entry (five seconds that set the price), the primary suite (where luxury buyers decide), and the outdoor room (California's second living room).
+For {{Address}}, our focus would be merchandising a specific price point, building photographable moments: the champagne terrace, the styled vanity, the breakfast moment. We make every room earn its job, creating magazine-worthy design that makes buyers fall in love.
 
-A tailored staging plan for your home, with projected return, is one walkthrough away. When may I see it?
+Considering the cost of a first price cut, the ROI on this approach is clear. When may I see {{Address}}?
 
 {{Agent}} · {{Brokerage}}`},
 {t:"luxury",ch:"text",adv:"Shea McGee",title:"Pre-List Design Text",body:
-`{{Owner}}, before your home hits the market: the highest-ROI hour we can spend is a design walk-through. Small moves — lighting, paint, what leaves the room — routinely add more than they cost. I'll bring the checklist; you keep the list price. Thursday or Friday?`},
+`{{Owner}}, before we list: let's spend an hour making your home feel truly designed. Getting the scale right, layering textures, and styling for a collected look routinely add more than they cost. I'll bring the vision; you keep the list price. Thursday or Friday?`},
 {t:"luxury",ch:"email",adv:"Joanna Gaines",title:"The Lifestyle Listing Email",body:
-`Subject: The story {{Address}} should tell
+`Subject: The feeling {{Address}} wants to share
 
 {{Owner}},
 
-Every home has a story, and buyers pay for the ones they can feel. When someone walks into {{Address}}, they shouldn't see a listing — they should see slow Saturday mornings, dinner that runs long, a porch that makes the day end better.
+Every home has a heart, and the ones that truly connect with people tell a story they can feel. When someone steps into {{Address}}, they shouldn't just see walls and rooms – they should imagine slow Saturday mornings, dinners that linger, and a quiet porch where the day unwinds.
 
-That's how I'd present your home: warm, honest, and styled so its best life is visible in every photo and every showing.
+That's how I approach a home: creating spaces you never want to leave. It's about intentionality and a few thoughtful touches, so its best life is visible in every photo and every showing.
 
-I'd love to walk it with you and show you the handful of touches that make buyers linger. Lingering buyers become offers.
+I'd love to walk through with you and share how we can bring out that warmth. Buyers always find a way back to a place that feels like home.
 
 Warmly,
 {{Agent}} · {{Brokerage}}`},
 
 /* ---------- ABSENTEE ---------- */
 {t:"absentee",ch:"call",adv:"David Greene",title:"Out-of-State Owner Call",body:
-`YOU: {{Owner}}? {{Agent}} here — I'm a local agent in {{Neighborhood}}, and I'm calling because you own {{Address}} but live out of the area. I work with a lot of long-distance owners, so I'll get right to the numbers.
+`YOU: {{Owner}}? {{Agent}} here — I'm a local agent in {{Neighborhood}}, and I'm calling because you own {{Address}} but live out of the area. I work with a lot of long-distance owners, so I'll get right to it. 
 
-Three things owners like you usually want to know:
-One — what the property would rent for today versus what you're getting.
-Two — what it would sell for, as-is, this month.
-Three — what the equity would do if you moved it into something with better returns and less brain damage.
+Most owners like you want to know three things to make a smart move with their equity:
 
-I can run all three for you this week — takes me an hour, costs you nothing, and you'll know exactly where you stand. Worst case, you keep the property and sleep better knowing the numbers. What's your email?`},
+One — what the property would rent for today, compared to what you're getting.
+Two — what it would sell for, as-is, right now.
+Three — how to move that capital into something that will actually cash flow better, with less work on your part.
+
+I can run those numbers for you this week. It takes about an hour, costs you nothing, and you'll know exactly where you stand. Worst case, you keep the property and sleep better. What's your email?`},
 {t:"absentee",ch:"vm",adv:"Ken McElroy",title:"Tired Landlord Voicemail",body:
-`{{Owner}}, this is {{Agent}} in {{City}}. You've owned {{Address}} a long time, and if you're like most landlords I talk to, the property's been good to you — but the calls, the turnover, the maintenance... that math changes. I ran your numbers: what it rents for, what it'd sell for, and what a 1031 into something truly passive could look like. Ten minutes and they're yours. {{Phone}}.`},
+`{{Owner}}, this is {{Agent}} in {{City}}. You've owned {{Address}} a long time. For many landlords, the property's been good, but the daily operations — the calls, turnover, maintenance — those start eating into your profit. I ran your numbers: what it rents for, what it'd sell for, and a 1031 into something truly cash-flowing, with professional management. Ten minutes and they're yours. {{Phone}}.`},
 {t:"absentee",ch:"text",adv:"Jerry Norton",title:"Absentee As-Is Text",body:
 `Hi {{Owner}}, {{Agent}} here in {{City}} — you own the property on {{Street}}. Quick one: if you could sell it AS-IS — no repairs, no cleanout, no flying back — would a cash number even interest you? If not, no worries at all. If maybe, I'll send it over today.`},
 {t:"absentee",ch:"email",adv:"Bob Knakal",title:"The Ownership-Duration Email",body:
-`Subject: {{Address}} — 14 years of ownership, one question
+`Subject: {{Address}} — Ownership since {{Year}}
 
 {{Owner}},
 
-You've owned {{Address}} since {{Year}} — long enough that your basis, your depreciation schedule, and today's values have quietly turned it into a very different investment than the one you bought.
+You've held {{Address}} since {{Year}}. Over that time, the market has shifted, and your original acquisition has evolved into a very different asset. Many owners in {{Neighborhood}} who bought around that period are now evaluating their options.
 
-Owners at your stage typically weigh three moves: hold and refinance, sell and pay the tax, or exchange into something larger or more passive. Each has a number attached, and most owners have never seen all three side by side.
+Based on our block-by-block data for this territory, there are typically three paths to consider: holding with a strategic refinance, a direct sale, or a tax-efficient exchange. Each decision has specific financial implications, and it's rare to see a detailed, data-driven comparison of all three.
 
-I prepare that comparison for {{Neighborhood}} owners at no cost. May I send you yours?
+We compile these precise comparisons for owners in {{Neighborhood}} as part of our work. Would it be useful to review yours?
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`},
 
 /* ---------- NOD ---------- */
 {t:"nod",ch:"call",adv:"Nicole Espinosa",title:"The Options Call (NOD)",body:
-`YOU: Hi {{Owner}}, my name is {{Agent}} — I'm a local agent, and I'm calling because a notice was filed on {{Address}}. I know I'm not the first call, and I know most of them have been vultures. I'm not calling to buy your house for fifty cents on the dollar.
+`YOU: Hi {{Owner}}, my name is {{Agent}} — I'm a local agent, and I'm calling because a notice was filed on {{Address}}. I know you've probably heard from a lot of people already, and most of them are just trying to buy your house for pennies. I don't operate that way.
 
-Here's the truth most callers won't tell you: you have MORE options right now than you'll have in 60 days, and every week that passes closes one of them.
+Here's what you need to know: the clock is always ticking once that NOD hits. Every week that passes means fewer real options. My first question is always: are you in foreclosure? Do you have a sale date yet? That timeline decides everything.
 
-Depending on your numbers, you may be able to: reinstate and stay. Modify the loan. Sell with your equity protected — you might have more than you think. Or, worst case, a short sale that saves your credit from the full hit.
+Depending on your situation, we can explore how to keep the home, or sell it to protect your equity. If a short sale is the best path, my team handles that entire process – the bank pays our fee, so it costs you nothing. We don't wait for the bank to call us; we drive the process.
 
-I don't charge you anything to map those out. One conversation, all your options on one page, and YOU pick. Even if you never call me again — can we do that this week?`},
+I can map out every option for you. One call, no cost, and you pick the best move. Can we talk this week?`},
 {t:"nod",ch:"vm",adv:"Nicole Espinosa",title:"NOD Voicemail — No Shame",body:
-`{{Owner}}, this is {{Agent}}, a local agent — not a bank, not an investor. A notice was filed on your home, and I help homeowners in exactly this spot figure out ALL their options: keeping the home, selling with equity protected, or stopping the clock. The one thing that makes it worse is waiting. Ten minutes, no judgment, no cost: {{Phone}}. Even if you don't call me, call someone this week.`},
+`{{Owner}}, this is {{Agent}}, a local agent — not a bank, not an investor. A notice was filed on your home, and the timeline is everything now. Waiting only narrows your options. I specialize in helping homeowners in exactly this spot figure out every avenue: keeping the home, selling to protect your equity, or stopping the sale. This isn't about shame. Ten minutes, no cost, no judgment: {{Phone}}. Even if it's not me, call someone this week.`},
 {t:"nod",ch:"text",adv:"Chris Voss",title:"NOD First Text",body:
 `{{Owner}}, this is {{Agent}}, a local agent. It seems like everyone calling about your home lately wants something FROM you. Is it a bad idea to send you a one-page list of the options that protect YOUR equity — no call needed, just the list?`},
 {t:"nod",ch:"email",adv:"Nicole Espinosa",title:"NOD Options Email",body:
-`Subject: {{Address}} — your options, on one page
+`Subject: {{Address}} — Options for your NOD
 
 {{Owner}},
 
-You've probably gotten thirty letters since the notice was filed. Here's what's different about this one: I'm not asking to buy your house.
+You've likely seen a flood of letters since your Notice of Default. What's different about mine is I'm not here to buy your house. My firm specializes in one thing: helping homeowners facing foreclosure.
 
-Attached is a one-page breakdown of every path from where you stand: reinstatement, loan modification, forbearance, selling with your equity intact, and — only if the numbers demand it — a short sale. Each option shows the deadline that kills it.
+Your timeline is everything now. We need to know: do you have a sale date yet? That decides your real options. We'll look at everything from a loan modification (if you still qualify) to selling the property traditionally, or if the numbers demand it, a short sale – where the lender pays our fee.
 
-The banks count on homeowners freezing. Don't freeze. Pick the option that protects your family and your money — I'll help you execute whichever one you choose, even the ones that don't involve me.
+Banks won't call you. You have to drive the process. Don't wait. Let's figure out your next step.
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`},
 
 /* ---------- TAX ---------- */
 {t:"tax",ch:"call",adv:"Ted Thomas",title:"Tax-Default Redemption Call",body:
-`YOU: {{Owner}}? My name is {{Agent}} — I'm a local agent here in {{City}}. I'm calling about the property taxes on {{Address}}. The county has it on the defaulted list, and I don't think most owners realize what that clock actually does.
+`YOU: {{Owner}}? My name is {{Agent}} — I help folks here in {{City}} understand their options. I'm calling about the taxes on {{Address}}. The county has it on the delinquent list, and most owners don't grasp what that clock really means.
 
-Here's the plain version: right now you're in the redemption window — you can bring it current and nothing happens. But if it runs the full five years, the county can auction the property, and here's the part that hurts: any equity above the taxes owed can get wiped out at auction for pennies.
+Here's the plain truth: right now, you're in the redemption period. You can bring it current, and everything's fine. But if it runs the full five years, the county will confiscate and auction the actual title. That's where it hurts: any equity above the back taxes is gone for pennies on the dollar.
 
-You have real options while the window's open: bring it current, set up a county payment plan, or — if the property's become a burden — sell it, pay the taxes at closing, and KEEP your equity.
+This isn't some broker; you're dealing directly with the government, and they don't negotiate once it's at auction. You have real choices while this window is open: bring it current, arrange a county payment plan, or — if the property's become a burden — sell it, pay the taxes at closing, and KEEP your equity.
 
-I map those out free. Can I show you the numbers this week, before another penalty date hits?`},
+Education is important. I'll map out your options free. Can I show you the numbers this week, before another penalty hits?`},
 {t:"tax",ch:"vm",adv:"Ted Thomas",title:"Tax-Default Voicemail",body:
-`{{Owner}}, this is {{Agent}}, a local agent in {{City}}. The county lists {{Address}} as tax-defaulted, and I work with owners in the redemption window — the period where you still control the outcome. Payment plan, bring it current, or sell and keep your equity: all three beat what happens at auction. The deadlines don't move, so let's look at your options this week. {{Phone}}.`},
+`{{Owner}}, this is {{Agent}}. The county's property tax code shows {{Address}} is delinquent. You're in the redemption window, the critical time to keep control. The government *will* confiscate that property, and someone *will* buy your mortgage-free equity for cents on the dollar if you don't act. Don't be doomed by not knowing the rules. Let's look at your options. {{Phone}}.`},
 {t:"tax",ch:"text",adv:"Ted Thomas",title:"Tax Deadline Text",body:
-`{{Owner}}, {{Agent}} here (local agent). The tax default on {{Address}} has a redemption deadline, and owners who act inside it keep their equity — owners who don't can lose it at auction. Want the one-pager on your three options? Takes 30 seconds to read.`},
+`{{Owner}}, {{Agent}} here. The tax default on {{Address}} has a critical redemption deadline. Owners who act know their options and keep their equity; those who don't lose it to the government at auction. My one-pager on your choices takes 30 seconds to read.`},
 {t:"tax",ch:"email",adv:"Ted Thomas",title:"Tax-Default Options Email",body:
-`Subject: {{Address}}: the redemption window is your leverage
+`Subject: {{Address}}: Your Tax-Defaulted Property Options
 
 {{Owner}},
 
-County records show {{Address}} on the tax-defaulted roll. That's fixable — but only inside the redemption window.
+County records indicate {{Address}} is on the tax-defaulted list. This means the clock is ticking, but you still have leverage inside the redemption window.
 
-Your three options, in order of what most owners prefer:
-1. Bring the taxes current (I can get you the exact payoff figure).
-2. County installment plan — spreads it out, stops the auction clock.
-3. Sell the property: taxes get paid at closing and every remaining dollar of equity goes to YOU — not to an auction bidder.
+Most owners in this situation have three paths forward:
 
-The only losing move is letting the window close. I'll run your equity number for free so you can decide with real figures. Reply or call {{Phone}}.
+1.  Pay the back taxes to keep your property. I can get you the exact figure.
+2.  Explore a county installment plan to spread payments and stop the auction.
+3.  Sell the property. We pay off the taxes at closing, and you keep every dollar of your remaining equity.
+
+The worst outcome is letting this window close. I'll help you calculate your exact equity for free so you can make an informed decision. Reply or call {{Phone}}.
 
 {{Agent}} · {{Brokerage}}`},
 
 /* ---------- PROBATE ---------- */
 {t:"probate",ch:"call",adv:"Chad Corbett",title:"Family-First Probate Call",body:
-`YOU: Hi, is this {{Name}}? My name is {{Agent}} — first, I'm sorry for your loss. I know this call is out of the blue, so I'll tell you exactly why I'm calling and you can decide if it's useful.
+`YOU: Hi, is this {{Name}}? My name is {{Agent}}. I have a social enterprise here in the community that helps families who are managing a loved one's estate. I know this call is out of the blue, so I'll be direct about why I'm reaching out.
 
-I help families who are settling an estate — and my job, honestly, is to take things OFF your plate. Not just the house: the cleanout, the utilities, the yard nobody's mowing, the insurance company that wants to cancel the vacant-home policy — all of it.
+My primary role is to take the non-dollar-productive tasks off your plate. That's everything from managing the cleanout and utilities, to ensuring the property is cared for, to dealing with insurance. We're here to be a solution for everything the estate throws up.
 
-Can I ask — of everything on your list right now, what's the part that's weighing on you the most?
+How important is it to you to get some of these logistical burdens resolved efficiently?
 
 (listen. Whatever they name, offer to handle a piece of it with NO strings:)
-Let me take that one off your plate this week. No cost, no obligation, truly. And when the family gets to the point of deciding what to do with the property — keep it, rent it, sell it — I'll lay out all three with real numbers, and whatever you choose, I'll help you do it.`},
+Let me take that one off your plate this week. No cost, no obligation, truly. And when the family is ready to consider the estate's assets, whether it's keeping, renting, or selling the property, I'll lay out all the options with real numbers. Whatever you choose, I'll help you do it. And if there are any proceeds, we can discuss a plan for investing those, so your loved one's legacy isn't erased.`},
 {t:"probate",ch:"vm",adv:"Bill Gross",title:"Probate Process Voicemail",body:
-`Hi {{Name}}, my name is {{Agent}} — I'm a local agent who works with families going through probate in {{County}} County. Court process here has its own timeline and its own rules — and the difference between a smooth estate sale and a stalled one is usually just knowing the sequence. I help with all of it, including the parts that have nothing to do with selling. If it'd help to have someone who's done this a hundred times, I'm at {{Phone}}. No rush — whenever you're ready.`},
+`Hi {{Name}}, this is {{Agent}}. I specialize in helping families settle estates here in {{County}} County. The court process often has its own timeline, and sometimes cases just get stuck. My focus is on helping you understand the path forward, whether that's navigating court requirements like overbids, or just making sure the right experts are involved. I help with all of it, including the steps that have nothing to do with selling. If it would help to get clear on the next steps, I'm at {{Phone}}. No rush — whenever you're ready.`},
 {t:"probate",ch:"text",adv:"Chad Corbett",title:"Probate Gentle Text",body:
-`Hi {{Name}}, this is {{Agent}} — I help families settling estates here in {{City}}. No agenda today: if the property on {{Street}} ever becomes one thing too many to manage, I handle everything from cleanouts to closings. Is it okay if I check in next month?`},
+`Hi {{Name}}, this is {{Agent}}. I specialize in supporting families through the estate settlement process here in {{City}}. If the property on {{Street}} ever feels like a burden, I coordinate everything from property preservation to finding the right solution. No pressure, just a resource. May I follow up?`},
 {t:"probate",ch:"email",adv:"Al Nicoletti",title:"Probate Timeline Email",body:
-`Subject: The {{County}} probate timeline, in plain English
+`Subject: Resolving {{County}} Probate: What to Expect
 
 {{Name}},
 
-Probate has a reputation for being slow — but most delays are avoidable, and the ones that aren't are at least predictable. Attached is a plain-English timeline of the {{County}} County process: what happens when, which documents unlock the next step, and where families most often lose months.
+Probate often feels like a challenge, but most delays are avoidable, and the path forward is always more predictable with a clear strategy. Attached is a straightforward timeline for {{County}} County: what happens, the key documentation, and where families often get stuck.
 
-Two things worth knowing early:
-1. The property can often be listed before the process fully closes — the sale just closes in sequence with the court.
-2. If there's no will, the path is different but very manageable with the right order of operations.
+Two things are worth knowing upfront:
+1. A property can often be listed and under contract even while the estate is settling – the sale just needs to close in sequence with the court and title company, ensuring a closeable title.
+2. If there's no will, it's a different setup, but very manageable when you understand the exact order of operations and what the underwriters will require.
 
-I work alongside probate attorneys, not instead of them. If your attorney has this handled, wonderful — keep the timeline anyway. If you don't have one yet, I can introduce you to two or three who are excellent.
+I work directly with specialist probate attorneys, not in their place. If your attorney has this handled, great – keep the timeline. If you need a referral to someone who truly understands how long and how much, I can connect you.
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`},
 
@@ -453,86 +453,83 @@ Is it a bad idea to try door one first, knowing doors two and three stay open? C
 
 /* ---------- CRE ---------- */
 {t:"cre",ch:"call",adv:"Bob Knakal",title:"The Building Owner Call",body:
-`YOU: {{Owner}}, {{Agent}} with {{Brokerage}}. I track ownership in {{Submarket}}, and you've held {{Address}} for {{Years}} years — which puts you in the window when most owners at least want to know their number.
+`YOU: {{Owner}}, {{Agent}} with {{Brokerage}}. My team focuses exclusively on this specific patch of {{Submarket}}, and our records show you've owned {{Address}} for {{Years}} years. That puts you in a common window where owners often want to understand their position.
 
-So here it is, no charge and no pitch: based on current cap rates for your asset class in this submarket, your building would trade somewhere in the range of {{Range}}. That's off today's comps, not a guess.
+We operate on information. So, here's what our data shows, no charge and no pitch: based on our historical transaction comps and current cap rates for your asset class in this specific block, your building would likely trade in the range of {{Range}}. This isn't a guess; it's what the market dictates today.
 
-Three things owners in your position do with that number: nothing — perfectly valid. Refinance and pull equity while keeping the asset. Or trade up via 1031 into something bigger or more passive before the exchange math changes.
+Owners in your position typically consider three paths: do nothing, which is always valid. Refinance to pull equity while retaining the asset. Or execute a 1031 exchange into something larger or more passive. 
 
-I'm not calling to list your building. I'm calling to be the broker who already knows it when you're ready. Can I send you the full valuation in writing?`},
+I'm not calling for a listing. I'm calling to be the expert who already knows your property when you're ready. Can I send you our full market analysis in writing?`},
 {t:"cre",ch:"vm",adv:"Tyler Cauble",title:"Small CRE Owner Voicemail",body:
-`{{Owner}}, this is {{Agent}} — I work small commercial in {{City}}. Your building on {{Street}} caught my attention: with what NNN leases are doing in this corridor, your rents may be under market by enough to change the building's value meaningfully. I ran the quick math — takes five minutes to share. Whether you'd ever sell or just want to raise rents at renewal, the number's worth knowing. {{Phone}}.`},
+`{{Owner}}, this is {{Agent}}. I specialize in small commercial properties in {{City}}. Your building on {{Street}} caught my attention: with NNN conversions and below-market rents, the NOI growth trajectory could significantly impact its value. I've run some numbers — takes five minutes to share. Whether you'd ever sell or just want to roll rents at renewal, understanding that value-add is worth knowing. {{Phone}}.`},
 {t:"cre",ch:"text",adv:"Tyler Cauble",title:"CRE Rent-Gap Text",body:
-`{{Owner}} — {{Agent}}, commercial agent in {{City}}. Rents on your corridor just reset ~{{Pct}}% higher at two recent signings. If your leases renew in the next 18 months, that gap is worth real money. Want the two comps? Free, no strings.`},
+`{{Owner}} — {{Agent}}, Cauble Group in {{City}}. Rents on your block just jumped ~{{Pct}}% on two new deals. That's a value-add lever for your NOI. If your leases are rolling, that's real money. Want the comps? No strings.`},
 {t:"cre",ch:"email",adv:"Ken McElroy",title:"Multifamily NOI Email",body:
-`Subject: {{Address}}: the NOI gap nobody's showing you
+`Subject: {{Address}}: The hidden cash flow
 
 {{Owner}},
 
-Every multifamily owner knows their rent roll. Fewer know their NOI gap — the spread between what the property nets today and what it would net with market rents, right-sized expenses, and modern management.
+Most multifamily owners know their rent roll. Fewer truly understand the *actual* cash flow versus what the property *could* be producing with professional management. That difference is your real profit potential.
 
-For a building like {{Address}}, that gap is usually 15-25% of NOI. At today's cap rates, every recovered dollar of NOI adds roughly {{Multiple}} dollars of value.
+For a property like {{Address}}, that gap often sits at 15-25% of the current NOI. Remember, every dollar of added NOI at today's cap rates creates roughly {{Multiple}} dollars of value. That's forced appreciation through operations.
 
-I put together gap analyses for {{City}} owners — what to fix, what it costs, what it returns, and what the building's worth on the other side. Yours is free. Interested?
+I analyze these numbers for {{City}} owners — identifying where to increase income and reduce costs. What that means for your bottom line. Yours is free. Interested?
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`},
 
 /* ---------- INVEST ---------- */
 {t:"invest",ch:"call",adv:"Tarek El Moussa",title:"The As-Is Seller Call",body:
-`YOU: {{Owner}}? Hey, it's {{Agent}} — local agent and investor here in {{City}}. I'll be straight with you: I'm calling about {{Address}} because homes like it are exactly what my buyers and I renovate.
+`YOU: {{Owner}}? Hey, it's {{Agent}} — I'm a local investor and flipper in {{City}}. I'm calling about {{Address}} because houses that need work are exactly the kind my crew and I target.
 
-Look — you've got two ways to sell a house that needs work, and they're BOTH legit:
+You've got two real options here. One: we crunch the ARV, pull the comps, and I tell you which kitchen or bath upgrades actually move the needle – anything else just eats your budget. Two: we walk away from the repairs, take a cash offer, skip the clean‑outs and the endless showings, and close on your schedule.
 
-Route one: fix it up, list it, top dollar. I can tell you exactly which repairs return money and which ones burn it — most sellers waste ten grand on the wrong stuff.
-
-Route two: sell as-is. No repairs, no cleanouts, no strangers walking through for months. Less money, way less hassle — and you close on YOUR timeline.
-
-Most agents only pitch route one because it's a bigger check for them. I'll run you both numbers side by side so you pick with your eyes open. Takes me a day. Want them?`},
+Most agents push the first because it fattens their commission. I'll lay both numbers out, side by side, in a single sheet – no guesswork, just the math. It takes me a day. Want me to send it over?`},
 {t:"invest",ch:"vm",adv:"Jerry Norton",title:"The Certainty Voicemail",body:
 `{{Owner}}, this is {{Agent}} in {{City}}. If you've thought about selling {{Address}} but the condition's been holding you back — that's literally my specialty. I'll bring you a real number, backed by a real deposit, with no repair requests and no six-month escrow. You pick the closing date. If the number doesn't work, we shake hands and you keep my card. {{Phone}}.`},
 {t:"invest",ch:"text",adv:"Pace Morby",title:"The Creative-Terms Text",body:
-`Hi {{Owner}}, {{Agent}} here. Different kind of question about {{Street}}: if you could sell for FULL price — but get paid over time instead of all at once (often better for taxes too) — is that something you'd at least want explained? 10-min call, zero pressure. Some sellers love it, some don't — both are fine.`},
+`Hi {{Owner}}, {{Agent}} here. Quick question about {{Street}}: what if you could sell for FULL price, avoid all the repairs and showings, and get paid over time? It's a creative way to buy. If that structure could solve a problem for you, would a 10-min chat be worth it to see if it fits? No pressure.`},
 {t:"invest",ch:"email",adv:"David Greene",title:"The Investor Exit Email",body:
-`Subject: {{Address}}: three exits, three very different checks
+`Subject: {{Address}}: Your options for getting capital out
 
 {{Owner}},
 
-Investment properties have more than one exit, and the spread between them is bigger than most owners think. For {{Address}}:
+There are multiple ways to exit an investment property, and the actual numbers show a big difference in what you keep. For {{Address}}:
 
-1. Retail sale, fixed up: highest gross, but repairs + months of carrying costs eat the spread.
-2. As-is sale to an investor: fastest and cleanest — the discount is the price of certainty.
-3. Keep it and refinance: pull the equity tax-free, let a tenant keep paying it down.
+1. Retail sale, fully rehabbed: This means aiming for maximum ARV, but the rehab budget and carrying costs will eat into that return.
+2. As-is to an investor: The fastest path. Investors need to make money when they buy, so they'll target a discount, often 75% or less of ARV.
+3. Keep it and refinance: The BRRRR approach. Pull your capital out tax-free, then let a tenant pay down the loan while it still cash flows.
 
-I run all three side by side — actual numbers, including the repair budget and the tax picture — so the decision makes itself. Want yours this week?
+I run the real math on all three – including the rehab budget and what you'd net – so the decision makes itself. Want yours this week?
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`},
 
 /* ---------- ESPANOL ---------- */
 {t:"espanol",ch:"call",adv:"Loida Velasquez",title:"Llamada de Prospección (ES/EN)",body:
-`YOU: Buenas tardes, ¿hablo con {{Owner}}? Le habla {{Agent}}, agente de bienes raíces aquí en {{Neighborhood}}. ¿Cómo está?
+`YOU: Hola, ¿es {{Owner}}? Le habla {{Agent}}, soy agente de bienes raíces aquí en {{Neighborhood}}.
 
-Le llamo porque acabamos de vender una casa en su calle, y los valores de la zona cambiaron. Muchos vecinos no saben cuánto vale su casa hoy — y ese número es SU dinero, le pertenece saberlo.
+Le llamo porque una propiedad en su calle acaba de venderse, y sé que muchos vecinos no saben qué significa eso para el valor de su casa. Es su dinero, y le pertenece saberlo.
 
-¿Le gustaría que le prepare un análisis gratis del valor de su casa? Sin compromiso — es información, nada más.
+¿Ha pensado en cuánto vale su propiedad hoy? (pause for response) ¿Le gustaría que le prepare un análisis para que sepa el número real, sin compromiso?
 
 (if they switch to English, flow with them:)
-Of course! Like I was saying — a home just sold on your street and it moved everyone's value. I'd love to send you the real number, free. Would email or text be better?
+Of course! Like I was saying, a home just sold on your street, and it moved everyone's value. I'd love to send you the real number, free. Would email or text be better?
 
-(cierre:) Perfecto. Y si algún familiar o amigo está pensando en comprar o vender, con mucho gusto los atiendo — en español o inglés, como se sientan más cómodos.`},
+(cierre:)
+Perfecto. Y si algún familiar o amigo está pensando en comprar o vender, con mucho gusto los atiendo — en español o inglés, como se sientan más cómodos.`},
 {t:"espanol",ch:"vm",adv:"Rene Rodriguez",title:"Buzón de Voz — Confianza Primero",body:
 `{{Owner}}, le habla {{Agent}}, agente local en {{City}}. Le dejo este mensaje porque los valores en {{Neighborhood}} subieron, y su casa probablemente vale más de lo que usted cree. Ese dato cambia decisiones — refinanciar, vender, o simplemente dormir tranquilo. Yo se lo preparo gratis, por escrito, sin ningún compromiso. Cuando guste: {{Phone}}. Que tenga excelente día.`},
 {t:"espanol",ch:"text",adv:"Carlos Reyes",title:"Texto Directo (ES)",body:
-`Hola {{Owner}}, soy {{Agent}}, agente aquí en {{City}}. Compramos y vendemos casas en {{Neighborhood}} — si algún día le interesa saber cuánto le darían por su propiedad TAL COMO ESTÁ (sin arreglar nada), se lo averiguo gratis. ¿Le mando el número?`},
+`Hola {{Owner}}, soy {{Agent}}. Compramos casas en {{Neighborhood}}, aquí en {{City}}. Si le interesa una oferta en efectivo por su propiedad TAL COMO ESTÁ (sin arreglar nada), le doy los números. ¿Se la mando?`},
 {t:"espanol",ch:"email",adv:"Veronica Figueroa",title:"Email Bilingüe — La Primera Casa",body:
 `Subject: Su casa propia: más cerca de lo que cree / Homeownership: closer than you think
 
 Hola {{Name}},
 
-Muchas familias creen que comprar casa requiere papeles perfectos, crédito perfecto y 20% de enganche. La verdad: existen programas con enganche desde 3%, ayudas para el pago inicial aquí en {{County}}, y opciones para compradores con ITIN.
+Muchas familias piensan que comprar casa requiere papeles perfectos, crédito perfecto y 20% de enganche. La verdad es que existen programas con enganche desde el 3%, ayudas para el pago inicial aquí en {{County}}, y opciones para compradores con ITIN o incluso préstamos para extranjeros.
 
-Nuestro equipo ha ayudado a cientos de familias — en español, paso a paso, sin apuros y sin letra chiquita.
+En The Fig Team, hemos ayudado a cientos de familias a usar estos programas. Lo hacemos en español, paso a paso, sin apuros y sin letra chiquita. Nuestro compromiso es que su herencia sea una ventaja, no un límite.
 
-(English: Many families think buying a home takes perfect credit and 20% down. There are programs with as little as 3% down, local down-payment assistance, and ITIN options. We'll walk you through it, in whichever language feels like home.)
+(English: Many families think buying a home takes perfect credit and 20% down. There are programs with as little as 3% down, local down-payment assistance, ITIN options, and even foreign-national loans. We'll walk you through it, in whichever language feels like home.)
 
 ¿Le gustaría una consulta gratis de 15 minutos? Responda este correo y la agendamos.
 
@@ -542,13 +539,17 @@ Nuestro equipo ha ayudado a cientos de familias — en español, paso a paso, si
 SCRIPTS.push(
 /* -- EXPIRED: +3 calls, +3 vm, +3 text, +3 email -- */
 {t:"expired",ch:"call",adv:"Ricky Carruth",title:"The No-Pitch Expired Call",body:
-`YOU: Hey {{Owner}}, {{Agent}} here — local agent. Your home came off the market and I'm NOT calling to pitch you. Honestly, after months of showings you've earned a break from agents.
+`YOU: Hey {{Owner}}, this is {{Agent}}. How are you doing today?
 
-One thing, then I'm gone: I keep a private list of buyers who missed out on {{Neighborhood}} homes this year. If one of them fits your house, would you want to know — even if you never re-list publicly?
+(pause for their answer, listen)
+
+I'm calling because your home just came off the market, and I'm not here to pitch you anything. Honestly, after all that, you've earned a break from agents. I just wanted to offer some help.
+
+I keep up with folks in {{Neighborhood}} and sometimes I know a buyer who missed out on a home here. If I learn of someone who might be a great fit for your place, would you want me to share that information? No pressure to re-list, just a heads-up.
 
 (whatever they say, accept it warmly)
 
-That's all I've got. I'll check on you next month either way — no agenda, I just stay in touch with everyone on this street. Take care of yourself.`},
+That's all I've got. I'll check in with you next month either way – I just stay in touch with everyone on your street. Take care.`},
 {t:"expired",ch:"call",adv:"Chris Voss",title:"The Tactical-Empathy Expired Call",body:
 `(slow, low, calm — let every pause breathe)
 
@@ -570,47 +571,47 @@ That's fair. What if we did this: no listing agreement, no pitch. I'll tell you 
 
 (listen — the number tells the story)
 
-That's the diagnosis right there. The first two weeks are 80% of a listing's energy. After that, buyers assume something's wrong — even when nothing is.
+That's the exact diagnosis. The first two weeks are 80% of a listing's impact. After that, buyers assume something's wrong — even when nothing is.
 
-A re-launch resets that clock completely: new photos, new price story, new first-two-weeks. Homes that re-launch properly get their second first-impression, and second first-impressions sell.
+A re-launch resets that clock completely: new photos, a clear price story, and a planned first-two-weeks. Homes that re-launch with a precise strategy get their second first-impression, and second first-impressions sell.
 
 I do a 20-minute re-launch audit — what went wrong, hour by hour, and the calendar for doing it right. Thursday at 5 or Saturday morning?`},
 {t:"expired",ch:"vm",adv:"Brandon Mulrenin",title:"Expired VM — Permission First",body:
-`Hi {{Owner}}, {{Agent}} here, local agent in {{Neighborhood}}. I know you've heard from a dozen agents since the listing ended, so I'll be different: I'm not asking for an appointment. I wrote up the three most likely reasons homes like yours stall — one page, specific to {{Address}}. Would you be opposed to me mailing it? If so, no reply needed and you'll never hear from me again. Otherwise it's in your mailbox Friday. {{Phone}}.`},
+`YOU: Hi {{Owner}}, {{Agent}} here, a local agent in {{Neighborhood}}. (Tonality: slow, downswing ending, no commission breath) I can only imagine your phone has been ringing nonstop since the listing ended, so I'll be brief. I'm not calling to ask for an appointment. I simply put together the three most common reasons homes like yours sometimes struggle to sell – specific to {{Address}}. Would you be opposed to me dropping it in the mail for you? If not, no reply needed. Otherwise, it'll be in your mailbox Friday. {{Phone}}.`},
 {t:"expired",ch:"vm",adv:"Ricky Carruth",title:"Expired VM — The Long Game",body:
-`Hey {{Owner}}, {{Agent}} — local agent, calling everyone whose listing ended this month. No pitch: whether you re-list, rent it, or stay put ten more years, somebody should keep you posted on what your home's worth without asking anything back. That's what I do for this neighborhood. You'll get my market note monthly — if you ever want off the list, one text does it. And if you ever need anything real estate, you've got a guy. {{Phone}}.`},
+`Hey {{Owner}}, {{Agent}} here. Just calling everyone in the neighborhood whose listing came off the market. Look, I'm not calling to pitch you anything. I just believe somebody should keep you updated on what's happening with home values around you, no strings attached. That's what I do for this neighborhood. I'll send you a quick market update monthly. If you ever want off the list, a text takes care of it. And if you ever need anything at all about real estate, you've got a guy to call. {{Phone}}.`},
 {t:"expired",ch:"vm",adv:"Jimmy Burgess",title:"Expired VM — The Gift",body:
-`{{Owner}}, {{Agent}} with {{Brokerage}}. Instead of telling you what I'd do differently, I already did it: I re-shot your home's market position — fresh comps, what buyers paid this quarter, and the price band where {{Address}} would get multiple offers today. It's done, it's yours, no meeting required. Text me the word SEND to {{Phone}} and it's in your inbox tonight.`},
+`YOU: "Hey {{Owner}}, {{Agent}} here with {{Brokerage}}. I saw your home came off the market, and I've already put together a quick valuation update for you. I pulled up {{Address}} in Google Earth and walked through the comparables, showing what buyers are paying right now. No pitch, just value. Text me SEND to {{Phone}} and I'll get that video over to you tonight."`},
 {t:"expired",ch:"text",adv:"Brandon Mulrenin",title:"Expired Text — The Soft Diagnostic",body:
-`Hi {{Owner}}, {{Agent}} here (local agent). Would you be opposed to me sending over a one-page look at why {{Address}} likely didn't sell? No call, no appointment — just the analysis. If it's useful, keep it. If not, delete it.`},
+`Hi {{Owner}}, {{Agent}} here. Would you possibly be open to a quick diagnostic perspective on why {{Address}} hasn't sold yet? No call, no pressure. If it makes sense, keep it. If not, simply delete it.`},
 {t:"expired",ch:"text",adv:"Tom Ferry",title:"Expired Text — The 30-Day Stat",body:
-`{{Owner}} — {{Agent}}, {{Brokerage}}. One stat before you decide anything: homes that re-list with a NEW strategy (not just a new sign) typically sell in the first 30 days. Happy to show you what "new strategy" actually means for {{Address}}. Worth 15 minutes?`},
+`{{Owner}} — {{Agent}}, {{Brokerage}}. The math is clear: homes re-listed with a *focused* strategy (not just a new sign) sell in 30 days. Your prior plan didn't work. I'll show you the numbers behind a winning strategy for {{Address}}. Worth 15 minutes to review?`},
 {t:"expired",ch:"text",adv:"Chris Voss",title:"Expired Text — No-Oriented",body:
 `{{Owner}}, {{Agent}} here. Have you completely given up on selling {{Address}}? (Serious question — if yes, I'll stop here. If no, I have one idea the last listing never tried.)`},
 {t:"expired",ch:"email",adv:"Brandon Mulrenin",title:"Expired Email — The Autopsy",body:
-`Subject: {{Address}}: the listing autopsy (one page)
+`Subject: {{Address}}: a few thoughts
 
 {{Owner}},
 
-When a home doesn't sell, the market left clues. I pulled the data on your listing and the answer is almost always one of these three:
+It can be frustrating when a home doesn't move as expected. Usually, when a property doesn't sell, the market leaves distinct signals. These often boil down to one of three areas:
 
-1. THE PRICE STORY — not the price itself, but where it sat against the homes buyers compared you to that week.
-2. THE FIRST 14 DAYS — how many showings happened before the listing went stale in the algorithm.
-3. THE MARKETING FOOTPRINT — where the home actually appeared, versus where your buyer actually looks.
+1.  The way the home was positioned against what buyers were comparing it to.
+2.  The momentum created (or not) in those critical first two weeks.
+3.  Where the marketing reached, versus where your specific buyer was actually looking.
 
-I wrote up which one hurt {{Address}} — with the receipts. Reply "send it" and it's yours. Reading it costs you nothing and commits you to nothing.
+I've put together some observations on what might have happened with {{Address}}. I'm not sure if it'll be useful, but if you're open to seeing it, just reply 'send it.' No pressure at all.
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`},
 {t:"expired",ch:"email",adv:"Ricky Carruth",title:"Expired Email — Zero Pressure",body:
-`Subject: No pitch — just staying in touch
+`Subject: No pressure, just real numbers
 
 {{Owner}},
 
-Your listing ended and I imagine the agent calls started before the sign was down. This email isn't one of those.
+Your listing came off, and I bet your phone's been ringing off the hook. This isn't one of those calls, or one of those emails.
 
-I work {{Neighborhood}} for the long haul — which means I'd rather be useful to you for the next five years than pushy for the next five days. Once a month I send neighbors a short note: what sold, for how much, and what it means for your value. You're on it as of today; one reply takes you off.
+I work {{Neighborhood}} full-time, building relationships, not chasing transactions. My goal is to be helpful for the long haul, not pushy for a quick deal. I send neighbors a simple market update once a month: what's sold, for how much, and what that means for your value here. You're on it now; one reply takes you off.
 
-Sell, stay, rent it out — whatever you decide, you'll decide it with current numbers. That's the whole offer.
+Sell, stay, or rent it out — whatever you decide, you'll have the current facts. That's the whole offer. Why wouldn't I help you for free?
 
 {{Agent}} · {{Phone}}`},
 {t:"expired",ch:"email",adv:"Tim & Julie Harris",title:"Expired Email — The Second Opinion",body:
@@ -618,32 +619,33 @@ Sell, stay, rent it out — whatever you decide, you'll decide it with current n
 
 {{Owner}},
 
-Whoever you interview next — me or anyone else — make them answer these five questions before you sign:
+Before you commit to another agent — me or anyone else — make sure they answer these five questions. It's how you prequalify them for the job:
 
-1. What EXACTLY failed last time? (If they only say "price," keep interviewing.)
-2. What will the first 14 days look like, day by day?
-3. Where will the marketing run, and what does each channel cost THEM?
-4. What's the showing-to-offer ratio they expect, and what happens if we miss it?
+1. What was the real reason your home didn't sell? (If they only say 'price,' keep interviewing.)
+2. What's their precise 7-step plan for the first two weeks?
+3. Beyond the MLS, what are the five spokes of lead generation they'll use?
+4. What's the expected conversion rate from showings to offers, and what's the backup plan if we don't hit it?
 5. What's their average days-on-market versus the area's?
 
-I'll happily answer all five in writing before you ever meet with me. That's how confident I am in the plan for your home.
+I'll happily provide my Polished, Professional Presentation and answer all five in writing before we ever meet. That's how confident I am in my system.
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`},
 
 /* -- FSBO: +3 each -- */
 {t:"fsbo",ch:"call",adv:"Tim & Julie Harris",title:"FSBO — The Buyer-in-Hand Call",body:
-`YOU: Hi {{Owner}}, {{Agent}} with {{Brokerage}} — calling about the home you're selling yourself. Quick and honest: I work buyers in {{Neighborhood}} every week. If one of them matches your home, I'd bring them and you'd pay only the buyer's side — nothing for listing, because you're not listing.
+`YOU: Hi {{Owner}}, {{Agent}} with {{Brokerage}} here. I'm calling about the home you're selling yourself.
 
-Two questions so I don't waste your time:
-What's your price? ... And what's the one feature buyers keep reacting to at showings?
+I specialize in working with buyers actively looking in {{Neighborhood}}. If I have a prequalified buyer whose ideal home matches yours, I'd bring them by. You'd only cover their commission, no listing fee, as you're handling that part.
 
-Great. If I've got a match I'll call you before I bring anyone. And listen — you're doing the hard part yourself; the least the industry can do is send you real buyers. Good luck with it, seriously.`},
+To see if there's a match, what price are you asking? And on a scale of 1 to 10, how motivated are you to get this home sold and move on to your next one?
+
+Great. If I have a match, I'll call you before I bring anyone. You're doing the work; the least I can do is bring you a real buyer.`},
 {t:"fsbo",ch:"call",adv:"Ricky Carruth",title:"FSBO — The Friend-in-the-Business Call",body:
-`YOU: Hey {{Owner}}, {{Agent}} — local agent. Saw the FSBO sign. Not calling to list it — calling because most owners selling themselves have nobody in the business to sanity-check things with. Free of charge, no catch: I'll be that person.
+`YOU: Hey {{Owner}}, {{Agent}} here. Saw your FSBO sign. Listen, I'm not calling to list your place today. I just want to help you for free. Most folks selling on their own could use a friend in the business to bounce things off of. I can be that person.
 
-Pricing question? Call me. Weird buyer behavior? Call me. Contract lands and something smells off? DEFINITELY call me.
+Got a question about pricing? Call me. Buyer acting strange? Call me. Contract comes in and it feels off? Definitely call me.
 
-Only thing I ask: if you ever DO decide it's not worth the headache — three months from now, a year from now — give me one conversation before you pick an agent. Deal?`},
+My only ask: if you ever decide it's just not worth the headache — whether that's in three months or a year — just give me one conversation before you pick an agent. Deal?`},
 {t:"fsbo",ch:"call",adv:"Chris Voss",title:"FSBO — The Calibrated Call",body:
 `YOU: {{Owner}}, {{Agent}} here, local agent. It sounds like you've decided agents aren't worth the commission — and honestly, for some homes, you're right.
 
@@ -655,28 +657,29 @@ Can I ask a calibrated question? How will you know — what's the sign — that 
 
 That's worth thinking about. Most owners set a deadline or a showing count. Whatever yours is, write it down today while you're objective. And if that day ever comes, is it a bad idea for me to be the first call?`},
 {t:"fsbo",ch:"vm",adv:"Brandon Mulrenin",title:"FSBO VM — The Two Stats",body:
-`Hi {{Owner}}, {{Agent}}, local agent — not calling for the listing. Two numbers worth having as you sell on your own: the average FSBO in our area sells for meaningfully less than agent-listed homes — but the ones that DON'T are the ones priced with real comps from day one. I'll send you the comp set I'd use for {{Address}}, free, because an informed seller is good for the whole street. Text COMPS to {{Phone}}.`},
+`Hi {{Owner}}, this is {{Agent}}. I'm a local broker, and I'm certainly not calling to ask for your listing. You're likely in a good position to sell independently. But sometimes, sellers contemplate the two stats: that FSBOs usually sell for less, unless they're priced with accurate data from day one. I can share the comp set I'd consider for {{Address}}, no strings attached. It's just sensible information. Text COMPS to {{Phone}}.`},
 {t:"fsbo",ch:"vm",adv:"Jimmy Burgess",title:"FSBO VM — The Open-House Offer",body:
-`{{Owner}}, {{Agent}} with {{Brokerage}}. Different kind of offer: I hold open houses in {{Neighborhood}} most weekends, and buyers constantly ask about other homes nearby. With your permission, I'll mention yours — free. Why? Because if they buy your house through me, I earn the buyer's side, and you sell without listing. Everybody wins. Call me and I'll add it to this weekend's sheet: {{Phone}}.`},
+`YOU: {{Owner}}, this is {{Agent}} from {{Brokerage}}. I'm running an open house play in {{Neighborhood}} this weekend, and buyers always ask about other homes nearby. With your permission, I'll mention your property – no cost, no listing. If a buyer I bring purchases, I earn the buyer's side, and you move your property. Just call me to add it to my sheet: {{Phone}}.`},
 {t:"fsbo",ch:"vm",adv:"Ricky Carruth",title:"FSBO VM — The Check-In",body:
-`Hey {{Owner}}, {{Agent}} again — the local agent with no pitch. Week three of the FSBO, just checking in like I said I would. If traffic's strong, ignore this and keep rolling. If the calls slowed down — that's normal, and there are two free fixes I can tell you in five minutes. Either way I'm rooting for you. {{Phone}}.`},
+`YOU: Hey {{Owner}}, {{Agent}} here. Just checking in on your home, like I promised. Look, I just wanted to remind you I'm here to help you for free if you need anything at all. No pitch, just genuinely want to see you win. If things are moving fast, great! If calls slowed down, that's normal. I've got a couple of quick ideas that might help. Give me a call back if you want to chat. {{Phone}}.`},
 {t:"fsbo",ch:"text",adv:"Tim & Julie Harris",title:"FSBO Text — The Qualifier Gift",body:
-`Hi {{Owner}}, {{Agent}} ({{Brokerage}}). Free thing every FSBO needs: a 60-second buyer-qualification checklist — so nobody unqualified walks through your home. Want it? It's saved my sellers hundreds of wasted showings.`},
+`Hi {{Owner}}, {{Agent}} ({{Brokerage}}). Every FSBO needs this: a 60-second buyer pre-qualification checklist. It'll stop unqualified buyers from wasting your time and get you to the real ones. Want it?`},
 {t:"fsbo",ch:"text",adv:"Pace Morby",title:"FSBO Text — The Backup Offer",body:
-`{{Owner}} — {{Agent}} here. While you sell on your own: want a standing backup offer in your pocket? Costs nothing, expires never, and makes every buyer negotiation stronger ("I have another offer" hits different when it's true). One walkthrough and you'll have it in writing.`},
+`{{Owner}} — {{Agent}} here. Selling on your own? I specialize in buying properties when cash offers fall short. Want a standing offer that could mean full price, no repairs, and no showings? It costs nothing and never expires. One walkthrough, I'll show you how.`},
 {t:"fsbo",ch:"text",adv:"Jimmy Burgess",title:"FSBO Text — The Exposure Boost",body:
-`Hi {{Owner}}, {{Agent}} here. Your FSBO isn't on the MLS, which hides it from ~90% of active buyers' searches. There are two legit free workarounds most owners never hear about. Want them? (Still no listing pitch — promise.)`},
+`Hi {{Owner}}, {{Agent}} here. Your FSBO isn't on the MLS, cutting it off from 90% of active buyers. I have two free plays most owners miss that get homes seen. Want them? No pitch, just value.`},
 {t:"fsbo",ch:"email",adv:"Brandon Mulrenin",title:"FSBO Email — The Honest Math",body:
-`Subject: The FSBO math nobody shows you
+`Subject: Thinking about your sale at {{Address}}
 
 {{Owner}},
 
-You're selling yourself to save the commission — smart, IF the sale price holds. Here's the honest math to watch:
+I understand you're likely selling independently to save on commission, and that's often a sensible approach. Given today's market, you might very well succeed.
 
-- Agent-listed homes in {{Neighborhood}} have been closing at roughly {{Pct}}% of list. FSBOs typically negotiate from a weaker position because buyers know you're saving commission — and they want that savings for themselves.
-- Break-even: if going it alone costs you more than about 5% in final price, the savings inverted.
+I just wanted to offer a quick thought: sometimes, the savings can invert if the final sale price isn't quite where it could be. Buyers often factor in your commission savings when making their offer, which usually means they want that discount for themselves.
 
-Attached: the comp set I'd price {{Address}} against, so your number is bulletproof from day one. Use it with my compliments — a well-priced FSBO is better for this street than an overpriced listing.
+I've seen homes like yours in {{Neighborhood}} close at roughly {{Pct}}% of list when an agent is involved. If going it alone possibly costs more than about 5% in the final price, it's worth contemplating.
+
+No pressure, but if you'd ever be open to a quick chat about what I'm seeing, let me know. Either way, best of luck.
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`},
 {t:"fsbo",ch:"email",adv:"Chris Voss",title:"FSBO Email — The Negotiation Edge",body:
@@ -692,65 +695,63 @@ Attached is a one-pager of the five questions buyers use on FSBOs, and the respo
 
 {{Agent}} · {{Phone}}`},
 {t:"fsbo",ch:"email",adv:"Ricky Carruth",title:"FSBO Email — The 90-Day Friend",body:
-`Subject: Rooting for you (and here if it changes)
+`Subject: Helping you out (no strings attached)
 
 {{Owner}},
 
-Most agents email FSBOs waiting for them to fail. Not this one — plenty of owners sell fine on their own, especially with a sharp price and good photos.
+Most agents are looking for a deal. I'm just looking to help. Plenty of folks sell their own home, especially with a good price and sharp photos.
 
-So here's my only move: for the next 90 days I'll send you what I send my clients — the weekly buyer-activity note for {{Neighborhood}} (what listed, what went pending, how fast). It'll make your pricing and timing decisions sharper.
+So here's what I'll do: for the next 90 days, I'll send you the same buyer-activity updates I share with my clients. It's the real pulse of {{Neighborhood}} — what's listed, what's pending, how fast things are moving. It'll make your decisions sharper.
 
-If you sell it yourself: congratulations, keep the reports as a housewarming-in-reverse gift. If you ever want backup: you'll already know I do what I say.
+If you sell it yourself: great job. Keep the reports. If you ever want backup: you'll already know I do what I say. Why wouldn't I help?
 
 {{Agent}} · {{Phone}}`},
 
 /* -- CIRCLE: +3 each -- */
 {t:"circle",ch:"call",adv:"Tom Ferry",title:"The Equity-Update Circle Call",body:
-`YOU: Hi {{Owner}}, {{Agent}} with {{Brokerage}}. I'm doing annual equity updates for {{Neighborhood}} homeowners this month — takes 90 seconds and it's free.
+`YOU: Hi {{Owner}}, {{Agent}} with {{Brokerage}}. I'm calling homeowners in {{Neighborhood}} this week with a quick equity update — it's free and takes about 90 seconds.
 
-Here's yours in headline form: homes on your street are trading around {{Price}}, which likely puts your equity meaningfully above where it was two years ago.
+Here's the headline: homes on your street are trading around {{Price}}. That math means your equity is likely up significantly from two years ago.
 
-Most owners do one of three things with that: nothing — great option; tap it for improvements or investments; or trade up while their buying power is strong.
+When I share this, most owners see three options: do nothing, which is fine; use that equity for investments or home improvements; or consider a move while buying power is still strong.
 
-Want the full one-pager with your specific numbers? And while I have you — any real estate plans in the next 12 months I should factor in?`},
+Want the full one-page report with your exact numbers? And, thinking ahead, any real estate goals in the next 12 months I should be aware of?`},
 {t:"circle",ch:"call",adv:"Loida Velasquez",title:"Circle Call — Bilingual Neighborhood Update",body:
-`YOU: Hi, {{Owner}}? This is {{Agent}}, a local agent here in {{Neighborhood}} — ¿prefiere que hablemos en español o inglés?
+`YOU: Hi, {{Owner}}? This is {{Agent}}, a local real estate agent here in {{Neighborhood}} — ¿prefiere que hablemos en español o inglés?
 
 (continue in their choice)
 
-I'm calling neighbors because a home nearby just sold, and it changed values on the street. Most owners have no idea what that did to THEIR number — and it's your equity, you should know it.
+I'm calling neighbors because a home just sold nearby that directly affected the value of your property. Most owners have no idea what that did to THEIR equity – and it's your money, you should absolutely know it.
 
-I'll prepare it free, in writing, in whichever language is easier for your family to review together. And if a hermano, prima, or coworker is thinking about buying or selling — I take care of referrals like family. ¿Le mando el análisis?`},
+I'll prepare a free analysis, in writing, in whichever language is easiest for your family to review. If a hermano, prima, or coworker needs help buying or selling — I take care of referrals like family. ¿Le mando el análisis?`},
 {t:"circle",ch:"call",adv:"Gary Keller",title:"The Farm-Anchor Call",body:
-`YOU: {{Owner}}, {{Agent}} with {{Brokerage}} — I'm the agent who's adopted {{Neighborhood}} as my home base, which means you're one of the people I keep informed, whether or not we ever do business.
+`YOU: {{Owner}}, {{Agent}} with {{Brokerage}}. I'm the agent whose ONE Thing is knowing {{Neighborhood}} better than anyone, and you're in my database of homeowners I keep informed.
 
-This quarter's headline: {{Stat}} — and what it means for your home specifically is worth two minutes.
+This quarter, the big number is {{Stat}} — and what that means for your home specifically is worth two minutes.
 
-But the reason for the call: I run my business on a simple model — know the neighborhood better than anyone, and be the first call when anyone here needs anything real estate. Repairs, refi questions, contractor referrals, value checks. What's on your house list this year — anything I can point you to a good person for?`},
+But the real reason for the call: My business runs on a clear model. I aim to be the first call for anything real estate here. Repairs, refi questions, contractor referrals, value checks. What's on your house list this year? Anything I can leverage my network for?`},
 {t:"circle",ch:"vm",adv:"Ricky Carruth",title:"Circle VM — The Standing Offer",body:
-`Hey {{Owner}}, {{Agent}} — your neighborhood agent here in {{Neighborhood}}. No pitch: a home on {{Street}} just sold and it moved your value. I keep every neighbor posted on their number, free, forever — that's just how I run my business. If you ever want yours, it's one text away: {{Phone}}. Talk soon.`},
+`Hey {{Owner}}, it's {{Agent}} in {{Neighborhood}}. Just wanted to let you know a home on {{Street}} recently sold, shifting values. I connect with neighbors to share their numbers, no strings attached. That's just how I run my business. If you ever want yours, it's one text away: {{Phone}}. Talk soon.`},
 {t:"circle",ch:"vm",adv:"Glennda Baker",title:"Circle VM — The Story Number",body:
-`{{Owner}}, {{Agent}} here. Let me tell you what just happened on {{Street}}: listed Thursday, 40 groups through Saturday, offers Monday, closed above asking. THAT'S the market on your street right now — and it won't last forever, markets never do. If you've even day-dreamed about selling, this is the chapter to do it in. I'll tell you your number free: {{Phone}}.`},
+`{{Owner}}, it's {{Agent}} here. Let me tell you what just happened on {{Street}}: listed Thursday, 40 groups through Saturday, multiple offers Monday, closed for more than they asked. That's the real truth of your street right now, and honey, it won't last. If you've even daydreamed about selling, this is the chapter. I'll tell you your number, no charge: {{Phone}}.`},
 {t:"circle",ch:"vm",adv:"Sharran Srivatsaa",title:"Circle VM — The Quiet Wealth Check",body:
-`{{Owner}}, {{Agent}} with {{Brokerage}}. Your home is likely your largest asset, and most owners review it less often than their phone bill. Once a year I prepare a private wealth snapshot for {{Neighborhood}} owners: value, equity, and the two or three moves that number makes possible. Yours takes me an hour; reviewing it takes you five minutes. {{Phone}} — I'll have it to you this week.`},
+`YOU: "{{Owner}}, {{Agent}} with {{Brokerage}}. Your home is a capital asset, often reviewed less than a phone bill. Annually, I prepare a private wealth blueprint for {{Neighborhood}} owners: current value, equity, and the two or three tactical moves that number makes possible. This systematic review takes me an hour; your review takes five minutes. {{Phone}} — I'll have it to you this week."`},
 {t:"circle",ch:"text",adv:"Ricky Carruth",title:"Circle Text — Just Sold, No Agenda",body:
-`Hi {{Owner}} — {{Agent}}, your {{Neighborhood}} agent. The home on {{Street}} just closed and it nudged your value up. No action needed — I just believe owners should always know their number. Want it?`},
+`Hi {{Owner}} — {{Agent}}, your {{Neighborhood}} agent. The home on {{Street}} just closed. I always make sure neighbors know their number, no strings attached. Want the update?`},
 {t:"circle",ch:"text",adv:"Tom Ferry",title:"Circle Text — The Buyer Waitlist",body:
-`{{Owner}}, {{Agent}} here ({{Brokerage}}). After the sale on {{Street}}, I have {{N}} buyer families who missed out and asked me to watch this block. Zero pressure — but if a no-showings, no-sign, quiet sale ever appealed to you, this is what it looks like. Interested in hearing their range?`},
+`{{Owner}}, {{Agent}} here ({{Brokerage}}). Since the {{Street}} sale, I have {{N}} families specifically looking on your block. They missed out. No pressure, but if a quiet, off-market sale interests you, this is the demand. Curious to hear their price range?`},
 {t:"circle",ch:"text",adv:"Jimmy Burgess",title:"Circle Text — The Free CMA Drop",body:
-`Hi {{Owner}}, {{Agent}} here. I ran updated values for every home on {{Street}} after the recent sale (it's what I do instead of cold-calling 😄). Yours is ready — want me to text the number or email the full report?`},
+`Hi {{Owner}}, {{Agent}} here. I just completed a valuation update for every home on {{Street}} after the recent sale. This consistent play keeps owners informed. Yours is ready – text the number or email the full report?`},
 {t:"circle",ch:"email",adv:"Glennda Baker",title:"Circle Email — The Street Story",body:
-`Subject: What really happened with the house on {{Street}}
+`Subject: The REAL story behind that house on {{Street}}
 
-{{Owner}},
+Well, hey there, {{Owner}}!
 
-You saw the sign go up and come down. Here's the story behind it:
+You saw the sign go up and come down on {{Street}}, didn't you? Let me tell you, that was a wild one. The folks living there were convinced the market had just gone flat, thought they'd missed their window. Oh, my stars, they almost didn't even call me!
 
-The sellers almost didn't list — they were sure the market had cooled. Then their agent (hi 👋) showed them what buyers were actually doing in {{Neighborhood}}: showing up prepared, competing fast, and paying for move-in-ready.
+But I showed them the truth of what was happening right here in {{Neighborhood}}: real buyers, ready to move, coming in hot. We put it on the market {{Day}}, had {{N}} showings that first weekend, and ended up with multiple offers. Sold for {{Price}}!
 
-Listed {{Day}}. {{N}} showings the first weekend. Multiple offers. Closed at {{Price}}.
-
-Why am I telling you? Because "I didn't know the market was like that" is the most expensive sentence in real estate. Now you know. If you ever want YOUR home's version of this story, I write those for a living.
+I'm telling you this because "I didn't know the market was like that" is the single most expensive sentence in real estate. Now you do. If you ever want to write your own story like that, I do this for a living.
 
 {{Agent}} · {{Brokerage}}`},
 {t:"circle",ch:"email",adv:"Brian Buffini",title:"Circle Email — The Neighbor Letter",body:
@@ -767,32 +768,32 @@ And if you know someone — family, friend, coworker — thinking about a move, 
 Warmly,
 {{Agent}} · {{Brokerage}} · {{Phone}}`},
 {t:"circle",ch:"email",adv:"Byron Lazine",title:"Circle Email — The Data Drop",body:
-`Subject: {{Neighborhood}} by the numbers — {{Month}}
+`Subject: Your {{Neighborhood}} Hot Sheet — {{Month}}
 
 {{Owner}},
 
-No fluff, just your street's market in four numbers:
+No fluff, just the latest numbers for your street:
 
 - MEDIAN LIST: {{Price}} — where sellers are starting
-- DAYS ON MARKET: {{DOM}} — how fast buyers are moving
-- PRICE CUTS: {{Pct}}% — who overpriced and paid for it
+- DAYS ON MARKET: {{DOM}} — how fast homes are moving
+- PRICE CUTS: {{Pct}}% — how many listings missed the mark on price
 - SALE-TO-LIST: {{Ratio}} — the negotiation gap, i.e., your leverage
 
-The one that matters most for you: sale-to-list. When it's this tight, prepared sellers keep almost every dollar of asking. When it widens, buyers take the wheel.
+Here's the 'so what': That sale-to-list ratio is the game. When it's tight like this, sellers who price right are holding their ground. When it widens, buyers get the leverage. This isn't cheerleading; it's what's happening TODAY.
 
-I send this monthly to {{Neighborhood}} owners. Want your home's specific position added to next month's? Reply "position me."
+I send this market take to {{Neighborhood}} owners monthly. Want your home's specific position added to next month's? Reply "position me."
 
 {{Agent}} · {{Brokerage}}`},
 
 /* -- SOI: +3 each -- */
 {t:"soi",ch:"call",adv:"Sharran Srivatsaa",title:"SOI — The Annual Wealth Call",body:
-`YOU: {{Name}}! {{Agent}}. I'm doing something for the people in my corner this month and you're on the list.
+`YOU: {{Name}}! {{Agent}}. I'm running a specific playbook this month for the people in my network, and you're on the list.
 
-Once a year, I build what I call a Home Wealth Review — one page: what your home's worth now, what you owe, your equity, and what that equity could be doing. It's the review every financial advisor skips because it's not their asset class.
+Once a year, I engineer what I call a Home Asset Review. It's a single page: your home's current valuation, what you owe, your equity, and how that capital could be working for you. It's the owner P&L for your primary asset, the one financial advisors miss.
 
-No meeting needed — I build it, you read it. But while I've got you: anything changing this year I should know about? Job, family, space needs? ...
+No meeting needed — I build the numbers, you review. But while I've got you: anything changing this year I should track? Job, family structure, space requirements? ...
 
-(then:) One more thing — you know how I work: my whole business is people my people send me. Who do you know that's talking about moving this year?`},
+(then:) One more thing — you know my business is built on referrals. Who do you know who's talking about making a move this year?`},
 {t:"soi",ch:"call",adv:"Brian Buffini",title:"SOI — The Pop-By Follow-Up Call",body:
 `YOU: {{Name}}! {{Agent}} — did the little {{Item}} make it to your porch okay? (laugh) Good. It's small, but it comes with a real thank-you: people like you are literally why my business exists.
 
@@ -810,30 +811,30 @@ So: no pitch, just the question — is there anything on your horizon this year 
 {t:"soi",ch:"vm",adv:"Brian Buffini",title:"SOI VM — The Gratitude Drop",body:
 `{{Name}}, it's {{Agent}}. No agenda — I was doing my morning list of people I'm grateful for and you came up, so you get the call. Hope {{Family Member}} is doing great and the {{Thing}} is going strong. If there's ever anything I can do for you — real estate or just a good contractor's number — you know where I am. Talk soon.`},
 {t:"soi",ch:"vm",adv:"Sharran Srivatsaa",title:"SOI VM — The Market Minute",body:
-`{{Name}}, {{Agent}} here — your one-minute market update, then I'm gone: values in {{Neighborhood}} moved again this quarter, rates did something interesting, and there's a window open for anyone thinking about trading up. If any of that touches a decision in your house this year, call me first — I'd rather save you money early than sympathize later. {{Phone}}.`},
+`{{Name}}, {{Agent}} here. One minute, then I'm gone: {{Neighborhood}} asset values have a new trend this quarter, and the financing environment shifted. If this data impacts your wealth stack or any decision in your house this year, call me first. I'd rather engineer a solution early than react later. {{Phone}}.`},
 {t:"soi",ch:"vm",adv:"Tom Ferry",title:"SOI VM — The Referral Seed",body:
-`Hey {{Name}}, {{Agent}}. Two things, twenty seconds: first, if you get my market email this week, the {{Neighborhood}} numbers are actually remarkable — worth the two-minute read. Second: I'm growing my business by referral this year, and I'd love to be the name you drop when anyone mentions moving. That's it! Give my best to the family. {{Phone}}.`},
+`YOU: Hey {{Name}}, {{Agent}} here. Just a quick check-in. (Keep it tight, focused.) First, if you saw my market update, the {{Neighborhood}} numbers are moving — I'm the local economist-of-choice, so check it out. (Be the source of data.) Second: I'm building my business on referrals this year, and I'd love to be the agent you think of first. (Clear ask.) That's it! Give my best to the family. {{Phone}}.`},
 {t:"soi",ch:"text",adv:"Brian Buffini",title:"SOI Text — The Anniversary",body:
 `{{Name}} — {{Agent}} here. {{N}} years ago this week you got the keys to your home! 🎉 Happy home-iversary. Fun fact: it's likely worth quite a bit more than that day. Want this year's number? (Free, always, for you.)`},
 {t:"soi",ch:"text",adv:"Gary Keller",title:"SOI Text — The One Question",body:
-`{{Name}}, {{Agent}} here — doing my quarterly check-in with the people who matter. One question: anything real-estate-shaped on your family's radar this year? (Move, refi, rental, helping a kid buy?) If yes, coffee's on me and the numbers are free.`},
+`{{Name}}, {{Agent}} here. This is my system check-in. One question: Is there any real estate goal on your family's radar this year? (Moving, refinancing, rentals, helping a kid buy?) If so, let's connect. My numbers are always free.`},
 {t:"soi",ch:"text",adv:"Chelsea Peitz",title:"SOI Text — The Personal Touch",body:
-`{{Name}}!! Saw {{Personal Thing}} — amazing 👏 Also being your friendly neighborhood agent for one second: if anyone at {{Their Work/Group}} ever mentions moving, you know who loves you. Okay back to being a normal friend. How ARE you?`},
+`{{Name}}!! Saw {{Personal Thing}} — awesome 👏 Quick real estate thought: if anyone at {{Their Work/Group}} ever just *mentions* moving, you know the human who'd love to help. Okay, back to being a normal friend. How ARE you?`},
 {t:"soi",ch:"email",adv:"Gary Keller",title:"SOI Email — The Equity Statement",body:
-`Subject: Your annual home equity statement
+`Subject: Your biggest asset: a statement
 
 {{Name}},
 
-Banks send statements. Brokerages send statements. Your biggest asset? Silence. So once a year, I fix that for my people.
+Banks send statements. Brokerages send statements. Your single biggest asset? Too often, silence. Once a year, I fix that for my people. Because until you know your numbers, you can't make decisions.
 
 YOUR HOME — {{Year}} SNAPSHOT:
 - Estimated market value: {{Price}}
 - Change vs. last year: {{Change}}
 - Estimated equity: {{Equity}}
 
-What owners do with this: most do nothing (fine!). Some refinance or renovate. A few realize they're one move away from the home they actually want, funded by equity they forgot they had.
+This isn't just data; it's opportunity. Most do nothing. Some refinance or renovate. A few use it to fund the home they actually want. Others realize they're sitting on a listing ready to go.
 
-Want the detailed version with the comps behind it? One reply. And as always — if someone you care about needs a straight-shooting agent, that introduction means everything to me.
+Want the detailed version with the comps? One reply. And if someone you care about needs a straight-shooting agent, that introduction means everything to me.
 
 {{Agent}} · {{Brokerage}}`},
 {t:"soi",ch:"email",adv:"Rene Rodriguez",title:"SOI Email — The Decision Window",body:
@@ -854,17 +855,17 @@ All five, one page, free — because the cheapest time to get clarity is before 
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`},
 {t:"soi",ch:"email",adv:"Jimmy Burgess",title:"SOI Email — The Give-First Newsletter",body:
-`Subject: 3 things worth knowing this month (2-min read)
+`Subject: Quick Update: Your {{Neighborhood}} & Local Info
 
 {{Name}},
 
-No pitch, just three useful things:
+No pitch, just three useful things for you this month:
 
-1. HOME VALUES: {{Neighborhood}} moved {{Change}} this quarter. If you want your specific number, it's a free reply away.
-2. THE TRADES: My clients' favorite {{Trade}} just opened their schedule — if your house list has been waiting on a good one, reply and I'll connect you.
-3. THE OPPORTUNITY: Rates did something quietly useful for move-up buyers this month. If a bigger/smaller/different home has crossed your mind, this window is worth a look.
+1.  HOME VALUES: Your {{Neighborhood}} saw a {{Change}} in value this past quarter. If you'd like me to send over an updated valuation specific to your address — like I do for my clients — just reply.
+2.  THE TRADES: My clients' go-to {{Trade}} just opened their schedule. If you've been putting off a project waiting for a good one, reply and I'll connect you.
+3.  THE OPPORTUNITY: Rates made a quiet, positive move for move-up buyers. If a different home has crossed your mind, this window is worth a look.
 
-That's it. I send these so that when real estate matters in your life, you already have a guy.
+That's it. I send these so that when real estate matters in your life, you already have a guy who gives value first.
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`}
 );
@@ -872,37 +873,37 @@ That's it. I send these so that when real estate matters in your life, you alrea
 SCRIPTS.push(
 /* -- OPEN HOUSE: +3 each -- */
 {t:"openhouse",ch:"call",adv:"Ricky Carruth",title:"Open House — The Neighbor Invite Call",body:
-`YOU: Hey {{Owner}}, {{Agent}} — local agent. I'm hosting an open house at {{Address}} this Saturday and I always invite the neighbors first. Two reasons:
+`YOU: Hey {{Owner}}, how are you doing today? This is {{Agent}}, a local agent here. I'm hosting an open house at {{Address}} this Saturday, and I always like to reach out to the neighbors first.
 
-One — you get the sneak peek before the crowd (come see what your neighbor's equity looks like!).
+I just want to help you out a little. You can get a sneak peek before the crowd, see what your neighbor's place looks like. And honestly, neighbors are the best connectors – you might know someone who'd love to live on this street.
 
-Two — neighbors are the best matchmakers. Everyone knows someone who's been dying to get onto this street. Bring them, text them the address, whatever's easy.
-
-Saturday, {{Time}}. Cold drinks, no sign-in pressure for neighbors — you're my guests. And hey, while you're there, ask me what the sale means for YOUR value. That answer's free.`},
+It's this Saturday, {{Time}}. No pressure, just good conversation. While you're there, ask me what this sale means for your property's value. That answer's free, no strings attached. Why wouldn't I share that?`},
 {t:"openhouse",ch:"call",adv:"Tim & Julie Harris",title:"Open House — The Buyer Conversion Call",body:
 `YOU: {{Name}}, {{Agent}} — we met Saturday at {{Address}}. You mentioned you've been looking for {{Timeframe}} — that's longer than most, and it's usually not a buyer problem, it's a process problem.
 
-Here's what I mean: buyers who tour open houses without representation see maybe 4 homes a month. My buyers see everything that fits within 48 hours of it listing — including off-markets.
+Here's what I mean: buyers without representation see maybe 4 homes a month. My clients see everything that fits within 48 hours of it listing. By the way, which home in the neighborhood do you plan on selling?
+
+(Pause for answer, then continue)
 
 You clearly know what you want. What's missing is first-look access. I have room for two more buyer clients this month. When can we spend 20 minutes building your exact search profile — tonight or tomorrow?`},
 {t:"openhouse",ch:"call",adv:"Jason Pantana",title:"Open House — The Database Activation Call",body:
-`YOU: {{Name}}! {{Agent}} — you came through my open house at {{Address}} a while back. It didn't work out (someone snagged it fast), but I kept your wishlist: {{Criteria}}.
+`YOU: {{Name}}! {{Agent}} – you came through my open house at {{Address}} a while back. It moved fast, but I kept your wishlist: {{Criteria}}.
 
-Reason for the call: two homes hitting the market this week match it almost exactly — and one hasn't published photos yet, which means most buyers won't notice it for days.
+Reason for the call: two homes hit the market this week that match almost exactly. One hasn't published photos, which means most buyers won't even see it for days.
 
-That first-72-hours window is where deals happen. Want me to send both addresses right now? And should I keep you on the early-alert list going forward — takes you off the portal treadmill entirely.`},
+That first-72-hours window is where you get the edge. Want me to send both addresses right now? And should I keep you on the early-alert list going forward – takes you off the portal treadmill entirely.`},
 {t:"openhouse",ch:"vm",adv:"Ryan Serhant",title:"Open House VM — Same-Night Energy",body:
 `{{Name}}! {{Agent}} — you walked through {{Address}} today and I could tell it landed different for you. Quick update you'll want: two groups requested disclosures tonight. If that house is IT, tomorrow morning matters. If it's not, tell me what was missing and I'll hunt down the version that has it — that's literally what I do. Either way: {{Phone}}, tonight or first thing. Follow up, follow through — that's the whole job.`},
 {t:"openhouse",ch:"vm",adv:"Tom Ferry",title:"Open House VM — The Second Home Tease",body:
-`Hi {{Name}}, {{Agent}} here — great meeting you at the open house. You said {{Address}} was close but not quite. Good news: "close but not quite" is a search profile, not a rejection. I found three homes that fix exactly what was off — one's not even publicly listed yet. Call me back and I'll send all three: {{Phone}}. Buyers who move on day one get first pick — everyone else gets the bidding war.`},
+`YOU: Hey {{Name}}, {{Agent}} here. Great connecting at the open house. You mentioned {{Address}} wasn't quite it, but it gave us a clear target. I've got three properties that hit your exact criteria – one isn't even public yet. The market moves fast, and the best homes go quickly. Call me back right away at {{Phone}} so you don't miss out. Let's make sure you get first pick.`},
 {t:"openhouse",ch:"vm",adv:"Glennda Baker",title:"Open House VM — The Seller Watcher",body:
-`{{Owner}}, {{Agent}} here. You stopped by my open house on {{Street}} Saturday — and half the neighbors who do that are quietly wondering about their own home's number. No shame in it, it's the smartest reason to attend! So here's my offer: I'll tell you what YOUR home would list for in this exact market — the real story, front porch to final offer. Free, private, no sign in the yard required. {{Phone}}.`},
+`Hey {{Owner}}, it's {{Agent}}. You stopped by my open house on {{Street}} Saturday, and honey, let's be real. Most folks who do that are just wonderin' what their own place is worth. And bless your heart, that's smart! So here's the deal: I'll tell you the *real story* on your home's value right now, no fluff. What agents won't tell you. No sign, no pressure. Just the truth. Call me, {{Phone}}.`},
 {t:"openhouse",ch:"text",adv:"Ryan Serhant",title:"Open House Text — The 24-Hour Follow-Up",body:
 `{{Name}} — {{Agent}} from yesterday's open house at {{Address}}. Promised update: offers are being called for {{Day}}. If you want in, I need 10 minutes today. If it wasn't the one — what was the miss? I'll fix it in the next search.`},
 {t:"openhouse",ch:"text",adv:"Chelsea Peitz",title:"Open House Text — The Warm Memory",body:
-`Hi {{Name}}! {{Agent}} from the {{Address}} open house — you were the one with {{Personal Detail}} 😊 Following up like I promised: want me to set up that custom search we talked about? Takes 5 min and you'll never miss a {{Neighborhood}} listing again.`},
+`Hey {{Name}}! It's {{Agent}} from the {{Address}} open house. You were the one with {{Personal Detail}}! 😊 Just reaching out like I said I would. Want me to get that custom search going for you? Takes just a few minutes, and you won't miss any new listings in {{Neighborhood}}.`},
 {t:"openhouse",ch:"text",adv:"Jimmy Burgess",title:"Open House Text — The Neighbor Value Drop",body:
-`Hi {{Owner}}, {{Agent}} here — thanks for stopping by the open house on {{Street}}! Since you're a neighbor: when this one closes, it resets your home's value. Want me to send you the before/after once it's final? Most neighbors are surprised.`},
+`Hi {{Owner}}, {{Agent}} here. Thanks for stopping by the open house on {{Street}}! Since you're a neighbor, this sale will reset your home's value. I'll send you the before/after numbers once it's final. Most neighbors are surprised.`},
 {t:"openhouse",ch:"email",adv:"Ryan Serhant",title:"Open House Email — The Momentum Email",body:
 `Subject: {{Address}} — where it stands (and where you stand)
 
@@ -922,19 +923,19 @@ The market rewards decisiveness. So do I.
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`},
 {t:"openhouse",ch:"email",adv:"Tim & Julie Harris",title:"Open House Email — The Process Email",body:
-`Subject: How my buyers keep winning homes like {{Address}}
+`Subject: How my clients secure homes like {{Address}}
 
 {{Name}},
 
-You've been searching {{Timeframe}} — so you've probably lost a home or two to buyers who "moved faster." Here's what faster actually means:
+You've been searching {{Timeframe}} — so you've likely seen homes slip away. The truth is, winning isn't luck; it's a proven system. Here's how my clients get it done:
 
-1. PRE-APPROVAL, not pre-qualification — sellers can tell the difference.
-2. FIRST-DAY SHOWINGS — my clients tour within 48 hours of listing, before the weekend crowd exists.
-3. CLEAN OFFERS — fewer contingencies, smarter timelines, personal terms sellers care about.
+1. Proper Prequalification: We know your lender's absolute ceiling, which makes you a stronger offer. Sellers can tell the difference.
+2. Exclusivity: We identify opportunities before they hit the open market, often securing homes before the weekend crowds.
+3. A Polished Offer: Clean terms, smart timelines, and a commitment sellers value.
 
-None of this requires more money. It requires a process. I install it in one 20-minute meeting, and my last {{N}} buyers all closed within {{X}} weeks of starting it.
+This isn't about more money. It's about a proprietary process. We install it in one 20-minute meeting. My last {{N}} buyers all closed within {{X}} weeks of starting.
 
-This week or next?
+What would it take to make you a 10 for connecting this week?
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`},
 {t:"openhouse",ch:"email",adv:"Brian Buffini",title:"Open House Email — The No-Rush Nurture",body:
@@ -954,13 +955,11 @@ That's the whole plan. Talk when it's time.
 
 /* -- ONLINE: +3 each -- */
 {t:"online",ch:"call",adv:"Tom Ferry",title:"Online Lead — The 5-5-5 Call",body:
-`(the cadence: 5 minutes after inquiry, 5 pieces of value, 5-day follow-up plan)
+`YOU: {{Name}}? {{Agent}} here — you just hit us up about {{Address}} online. I saw it pop and called, because the best homes don't wait.
 
-YOU: {{Name}}? {{Agent}} — you just asked about {{Address}} online. I literally saw it come in and called, because the good ones don't wait.
+Quick facts: it IS still available, the owners are selling because of {{Reason}}, and properties nearby have been moving in about {{DOM}} days. That's the market reality.
 
-Real quick — the answers everyone wants: it IS still available, the sellers are motivated by {{Reason}}, and homes on that street have been going in about {{DOM}} days.
-
-Now the useful part: tell me what pulled you to THAT home, and I'll send you tonight — no obligation — the two or three others that match it, including anything coming soon that the portals haven't caught. What was the hook: the location, the layout, or the price?`},
+Now, the useful part for you: what specifically caught your eye about that home? Location, layout, or price point? Tell me that, and I'll send you the two or three others that truly match, including anything coming soon that the public sites haven't caught yet. No obligation, just information.`},
 {t:"online",ch:"call",adv:"Chris Voss",title:"Online Lead — The Mirror Call",body:
 `YOU: {{Name}}, {{Agent}} here — you inquired about {{Address}}. Most agents would start pitching. I'd rather understand.
 
@@ -975,33 +974,33 @@ You picked that home out of hundreds. Something specific stopped your scroll... 
 
 Would it be a bad idea for me to put together what that life actually costs right now — the real monthly number, not the portal estimate? No commitment; numbers first, decisions whenever.`},
 {t:"online",ch:"call",adv:"Veronica Figueroa",title:"Online Lead — The Team Warm Transfer",body:
-`YOU: Hi {{Name}}! This is {{Agent}} — you were looking at {{Address}} online. First: real person, local office, and I actually know that house. (¿Y si prefiere español, con gusto!)
+`YOU: Hi {{Name}}! This is {{Agent}} with The Fig Team. You just clicked on {{Address}} online. (¿Y si prefiere español, con gusto!)
 
-Before anything else — are you working with anyone yet? ... Perfect. Then here's how we take care of people: one point of contact (me), a lender who answers on weekends, and a search set up so YOU see homes before the crowd does.
+First, real person, local office, and yes, I actually know that house. Before anything else — are you already working with a professional here in Central Florida? ... Perfect. So here's how we operate, how we take care of our people on The Fig Team: we get our clients into homes before the crowd, connect them with lenders who answer on weekends, and understand programs like down-payment assistance or foreign-national loans.
 
-The house you clicked — want the honest scoop on it? And more importantly: tell me about the home you're actually trying to find. Beds, area, budget, dream feature — give me the wishlist and let my whole team hunt for you.`},
+That house you clicked — want the honest scoop? More importantly: tell me about the home you're truly trying to find. Beds, area, budget, dream feature — give me the wishlist and let my whole team hunt for you.`},
 {t:"online",ch:"vm",adv:"Sharran Srivatsaa",title:"Online Lead VM — The Concierge Open",body:
-`{{Name}}, {{Agent}} with {{Brokerage}} — you inquired about {{Address}}. Here's my promise, which you won't get from the portal: within one hour of us talking, you'll have the real status of that home, the seller's actual timeline, and the two best alternatives if it's already spoken for. That's the concierge version of house hunting, and the first conversation is free. {{Phone}} — or just text "INFO" and I'll start there.`},
+`{{Name}}, {{Agent}} with {{Brokerage}} — regarding your inquiry on {{Address}}. My promise is simple: within one hour of our conversation, you'll have the verified status of that home, the seller's actual operating rhythm, and the two best alternatives if it's already under contract. Portals can't deliver that market intelligence. This is how we engineer your search. Call {{Phone}}, or text "INFO" to start.`},
 {t:"online",ch:"vm",adv:"Chelsea Peitz",title:"Online Lead VM — The Anti-Drip",body:
-`Hi {{Name}}! {{Agent}} here — you looked at {{Address}} online. I know what happens next usually: twelve robo-emails and three agents reading the same script. I'm going to do the opposite — one voicemail (this one), one text with the honest answer about that house, and then silence unless YOU want more. Check your texts in two minutes. If it's useful, I'm {{Phone}}. If not, no hard feelings and no drip campaign, promise.`},
+`Hey {{Name}}, it's {{Agent}}. You checked out {{Address}} online. I get it, usually this means a bunch of generic emails and agents reading the same script. I'm doing the opposite. This one quick voicemail, then one text from me with the honest scoop on that house. After that, total silence unless you actually want to talk. Your texts will have it in two minutes. If it's helpful, I'm {{Phone}}. If not, no hard feelings, no drip. My promise.`},
 {t:"online",ch:"vm",adv:"Byron Lazine",title:"Online Lead VM — The Analyst",body:
-`{{Name}}, {{Agent}}. You inquired on {{Address}} — before you fall in love, three data points you deserve: it's priced {{Position}} against its comps, it's been sitting {{DOM}} days versus the area's {{AvgDOM}}, and the seller's already cut once. Translation: there's a negotiation here, and most buyers won't see it. Want the full breakdown? {{Phone}}. I do this analysis for every home my buyers consider — it's the difference between paying the price and setting it.`},
+`YOU: {{Name}}, {{Agent}}. You looked at {{Address}}. Before you fall in love, here's the daily Hot Sheet on it: priced {{Position}} against the market, sitting {{DOM}} days versus the area's {{AvgDOM}}, and the seller's already cut the price once. My take? There's a deal to be made here today that most won't spot. Want the full breakdown? {{Phone}}. I give my buyers this analysis on every property — it's how we set the price, not just pay it.`},
 {t:"online",ch:"text",adv:"Ryan Serhant",title:"Online Lead Text — Speed Wins",body:
 `{{Name}} — {{Agent}}. You asked about {{Address}} 4 minutes ago; here's the real story: {{Status}}. Two more like it (one unlisted) if this one's not perfect. Want both addresses? Speed wins in this market — that goes for agents too. 😄`},
 {t:"online",ch:"text",adv:"Byron Lazine",title:"Online Lead Text — The Data Hook",body:
-`Hi {{Name}}, {{Agent}} here re: {{Address}}. One thing the portal won't tell you — it's priced {{Diff}} vs. the last 3 comparable sales. That's either a deal or a trap depending on one detail. Want the 60-second version?`},
+`Hey {{Name}}, {{Agent}} on {{Address}}. The portal shows one price, but the last 3 sales comps put it {{Diff}}. That's a huge swing. Could be a play, could be a problem. Want my take on the numbers in 60 seconds?`},
 {t:"online",ch:"text",adv:"Veronica Figueroa",title:"Online Lead Text — Bilingual Welcome",body:
-`Hi {{Name}}! {{Agent}} here 🏡 — you were viewing {{Address}}. Happy to help in English o en español, whichever's comfortable. Quick honest answer about that home + 2 better matches if you want them. What's your ideal move-in timing?`},
+`Hi {{Name}}! {{Agent}} here 🏡 — you were viewing {{Address}}. I'm here for you in English o en español, whichever feels best. Quick honest answer about that home + 2 stronger matches if you want them. What's your ideal move-in timing?`},
 {t:"online",ch:"email",adv:"Sharran Srivatsaa",title:"Online Lead Email — The VIP Setup",body:
-`Subject: Your {{Neighborhood}} search, upgraded
+`Subject: Your {{Neighborhood}} market advantage
 
 {{Name}},
 
 You inquired about {{Address}} — here's the honest status: {{Status}}.
 
-More useful: let me upgrade how you search. Portal browsing shows you what everyone sees, when everyone sees it. My clients get:
+More useful: let's install a system for your search. Portal browsing gives you what everyone sees, when everyone sees it. My clients get:
 
-- COMING-SOON ACCESS — homes 3-10 days before public
+- PRE-MARKET ACCESS — homes 3-10 days before public
 - THE REAL NUMBERS — monthly cost per home, not just price
 - ONE-HOUR ANSWERS — status, seller motivation, negotiation room, on request
 
@@ -1009,21 +1008,19 @@ It costs nothing; it's how I earn trust before I earn business. Reply with your 
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`},
 {t:"online",ch:"email",adv:"Tom Ferry",title:"Online Lead Email — The 5-Day Plan",body:
-`Subject: {{Address}} + a smarter 5 days
+`Subject: {{Address}} + your 5-day advantage
 
 {{Name}},
 
-The home you clicked: {{Status}}. Now the plan most buyers never get.
+The home you clicked: {{Status}}. Most buyers just browse. You need a plan to win. Here's what I'll deliver, no strings attached, while you decide if I'm your agent:
 
-For the next 5 days, here's what I'll do free while you decide if I'm your agent:
+DAY 1 (today): The real numbers for {{Address}} — price position, seller situation, what it takes to get the deal done.
+DAY 2: Your custom search goes live — everything that fits, including off-market opportunities.
+DAY 3: Lender intro (if you want it) — 15 minutes to a REAL number you can trust.
+DAY 4: Your shortlist — the top 3 options with my direct notes on each.
+DAY 5: We tour, or you tell me to stop. Either answer is fine. Zero pressure, full effort.
 
-DAY 1 (today): honest breakdown of {{Address}} — price position, seller situation, what winning takes.
-DAY 2: your custom search goes live — everything that fits, including coming-soons.
-DAY 3: lender intro (only if you want) — 15 minutes to a REAL number.
-DAY 4: the shortlist — top 3 with my notes on each.
-DAY 5: we tour, or you tell me to stop. Either answer is fine.
-
-Five days, zero pressure, full effort. Reply "start" and Day 1 lands tonight.
+Reply "start" and Day 1 lands tonight. Let's make action obvious.
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`},
 {t:"online",ch:"email",adv:"Chris Voss",title:"Online Lead Email — The Have-You-Given-Up",body:
@@ -1045,79 +1042,77 @@ No pitch here. Just one question, and "no" is a perfectly good answer: would it 
 
 /* -- SOCIAL: +3 each -- */
 {t:"social",ch:"call",adv:"Chelsea Peitz",title:"Social — The DM-to-Call Bridge",body:
-`(they've been engaging with your content; the DM thread earned a call)
+`YOU: {{Name}}! It's {{Agent}} — from Instagram! (let it land — this is fun, not formal)
 
-YOU: {{Name}}! It's {{Agent}} — from Instagram! (let it land — this is fun, not formal)
-
-I know, calls are ancient. But you asked something in the DMs that deserves better than my thumbs: {{Their Question}}.
+Look, your question in the DMs, {{Their Question}}, deserved my voice, not just my thumbs. It's about getting you the real context.
 
 (answer it fully, generously — 2 minutes of real value)
 
-Okay, that's the real answer. Can I ask you something back? You've been watching my stuff for a while — what's going on in YOUR housing world? Renting and curious? Own and wondering? I ask because my favorite clients all started exactly where you are: lurking, then one good conversation.`},
+Okay, that's the honest answer. Now, can I ask you something? You've been seeing my perspective on social for a bit — what's happening in YOUR world? Renting and just curious? Own and wondering? My best clients always start exactly where you are: lurking, then one good conversation.`},
 {t:"social",ch:"call",adv:"Glennda Baker",title:"Social — The Story Collector Call",body:
-`YOU: {{Owner}}, {{Agent}} here! Okay, unusual request, hear me out.
+`YOU: {{Owner}}, {{Agent}} here! Okay, unusual request, but hear me out, honey.
 
-I tell {{Neighborhood}} stories on video — real ones: the house with the offers, the sellers who almost waited, the buyer who wrote the letter. Half a million people watched last month, and buyers move here BECAUSE of those stories.
+I tell the real stories of {{Neighborhood}} on video — the kind that show folks what they don't know. Like the house that got twenty-seven offers, or the time a buyer wrote the sweetest letter, or even the mistake a seller made that cost 'em. My videos get seen by hundreds of thousands, and people are moving here because of those tales.
 
-Your street is next on my list, and I'd love 10 minutes of neighborhood lore from someone who's lived it. What's the story of this block — who's been here longest, what's changed, what do people not know?
+Your street is next on my list, and I'd love just ten minutes of neighborhood lore from someone who's truly lived it. What's the real story of this block – who's been here forever, what's changed, what's the truth nobody knows?
 
 (listen — this builds the deepest rapport there is)
 
-This was gold. And listen — when your home's chapter is ready to be written, you know exactly who tells it best.`},
+Oh, my stars, that was gold. And listen — when your home's chapter is ready to be written, you know exactly who tells it best.`},
 {t:"social",ch:"call",adv:"Jason Pantana",title:"Social — The Retargeting Call",body:
-`YOU: {{Name}}, {{Agent}} — you registered for my {{Lead Magnet}} download last week. Calling to make sure it landed, and because the download only tells half the story.
+`YOU: {{Name}}, {{Agent}} here. You grabbed my {{Lead Magnet}} last week. Just checking it landed, and because that download only gives you the playbook, not the game plan for *your* market.
 
-Quick check: did the numbers surprise you? Most people fixate on {{Common Fixation}} — but the finding that actually changes decisions is {{Real Insight}}.
+Quick check: most fixate on {{Common Fixation}}, but the finding that actually changes decisions is how {{Real Insight}} drives *appointments*, not just leads.
 
-Here's the other half the PDF can't do: YOUR situation, plugged into those numbers. Ten minutes, screen share or coffee, and you'll know exactly where you stand in this market. When's good this week?`},
+Let's get your specific situation into that framework. Ten minutes, screen share or coffee, and you'll know *your* next steps to get found. When's good this week?`},
 {t:"social",ch:"vm",adv:"Glennda Baker",title:"Social VM — The Cliffhanger",body:
-`{{Name}}, {{Agent}} here! You commented on my video about {{Topic}} — and girl/friend, the part I COULDN'T say on camera is better than the part I could. It involves {{Neighborhood}}, a number that made my jaw drop, and why the next 60 days matter. Call me back and I'll tell you the whole story: {{Phone}}. Some things you just can't put on the internet!`},
+`Hey {{Name}}, it's {{Agent}}! You commented on my video about {{Topic}} — and honey, the part I couldn't tell you on camera? It's even better. It involves {{Neighborhood}}, a number that's just wild, and why these next 60 days are gonna make all the difference. Call me back and I'll spill the whole tea: {{Phone}}. Some things, you just can't put on the internet!`},
 {t:"social",ch:"vm",adv:"Jason Pantana",title:"Social VM — The Webinar Follow-Up",body:
-`Hi {{Name}}, {{Agent}} — thanks for joining the {{Topic}} session (or catching the replay). The #1 question afterward was "okay but what about MY situation?" — which is exactly what the 15-minute one-on-one version is for. I'm holding {{N}} slots this week for attendees. Grab one: {{Phone}} or just reply to the follow-up email. The generic version was free; the specific version is too.`},
+`Hey {{Name}}, {{Agent}} here. Thanks for tuning into the {{Topic}} session. The big question afterward was, 'how do I apply this to *my* property?' That's why I've blocked out {{N}} quick 15-minute calls this week. We'll get specific on your situation and what it takes to get found. Call me at {{Phone}} or just hit reply on the email. No charge for the specific answers.`},
 {t:"social",ch:"vm",adv:"Byron Lazine",title:"Social VM — The Hot Take Follow-Up",body:
-`{{Name}}, {{Agent}}. You pushed back on my take about {{Topic}} in the comments — and honestly? Half your point was right. That's why I'm calling: the data's more interesting than either of our comments had room for. Ten minutes and I'll show you what the numbers actually say — and if you're still not convinced, you win the comment section. {{Phone}}. Good sparring partners make better clients than yes-people anyway.`},
+`{{Name}}, {{Agent}}. You pushed back on my take on {{Topic}} in the comments — and honestly? You weren't entirely wrong. That's why I'm calling: the real market numbers are always more nuanced than a comment section allows. Give me ten minutes and I'll show you what the rates, inventory, and price cuts are *actually* doing. If you're still not convinced, you win the living-room debate. {{Phone}}. I'd rather work with someone who pushes back than a 'yes-person' anyway.`},
 {t:"social",ch:"text",adv:"Jason Pantana",title:"Social Text — The Lead Magnet Delivery",body:
-`{{Name}} — {{Agent}} here! Your {{Lead Magnet}} is attached/linked 📊 The page most people skip is page {{N}} — it's where the actual money is. Want the 5-min walkthrough of what it means for your block specifically?`},
+`{{Name}} — {{Agent}} here. Your {{Lead Magnet}} is linked. Most skip page {{N}} — that's where the local edge is. Want a quick 5-min walkthrough on what it means for *your* neighborhood?`},
 {t:"social",ch:"text",adv:"Byron Lazine",title:"Social Text — The Comment Continuation",body:
-`Hey {{Name}}, {{Agent}} from IG — your comment on the {{Topic}} video deserved a real answer, not a 🔥 emoji. Short version: {{One-Line Answer}}. Long version has numbers. Want it?`},
+`Hey {{Name}}, {{Agent}} from IG. Your comment on the {{Topic}} video deserved my real take, not just an emoji. The short answer: {{One-Line Answer}}. The full story has the numbers and the 'so what.' Want it?`},
 {t:"social",ch:"text",adv:"Glennda Baker",title:"Social Text — The Behind-The-Scenes",body:
-`{{Name}}! {{Agent}} 👋 You always watch my {{Neighborhood}} stories, so you get the news first: something's happening on {{Street}} that isn't public yet. If you (or anyone in your circle) has been waiting for a sign — this is the sign. Call me before Friday.`},
+`{{Name}}! {{Agent}} here. Honey, you know I tell it like it is. Something's stirring on {{Street}} that ain't public yet, and you watch my {{Neighborhood}} stories. If you've been waiting for a real sign, this is it. Call me before Friday.`},
 {t:"social",ch:"email",adv:"Chelsea Peitz",title:"Social Email — The Follower-to-Friend",body:
 `Subject: You've been here a while — thank you
 
 {{Name}},
 
-I noticed you've been part of my little corner of the internet for a bit — the likes, the story views, that one comment that made me laugh. Thank you. Genuinely.
+I just wanted to reach out, human-to-human. I've seen you here in my little corner of the internet — liking posts, watching stories, even that one comment that made me smile. Thank you for showing up. Genuinely.
 
-I wanted to say something human: behind the content is a real practice, and the people I serve best are the ones who watched for months before ever needing me. No algorithm involved — just trust built slowly, which is the only kind that matters.
+Behind all the content, the market updates, and the stories from my day, there's a real person and a real business. My best clients are always the ones who've been watching for months, absorbing the context, before they ever need me. It's how trust is built, slowly and genuinely, and that's the only kind that counts.
 
-So, no pitch. Just an open door: whenever a housing question crosses your mind — even a hypothetical, even for a friend — you can just ask me. DM, email, text: {{Phone}}. That's what all the content is actually for.
+So, no sales pitch here. Just an open door. Whenever a question about housing crosses your mind — even a hypothetical, even for a friend — just ask. DM, email, text: {{Phone}}. That's what all this content, all this sharing, is actually for.
 
 {{Agent}}`},
 {t:"social",ch:"email",adv:"Glennda Baker",title:"Social Email — The Story Newsletter",body:
-`Subject: The house that taught {{Neighborhood}} a lesson
+`Subject: What waiting cost a family on {{Street}}
 
 {{Name}},
 
-Story time. A couple on {{Street}} spent two years "waiting for the right time." They watched three neighbors sell. They tracked rates like day traders. They knew everything — except that waiting was costing them {{Cost}} a year in the home they actually wanted.
+Let me tell you about a couple right there on {{Street}}. They spent two years just waiting for everything to feel 'perfect.' Oh, my stars, they watched three neighbors sell their houses and tracked every little interest rate change like it was their job.
 
-Last month they finally moved. Their words at closing: "We could have done this two years ago."
+But here's the real truth: all that waiting cost them a whopping {{Cost}} a year in the house they actually wanted. Last month, they finally moved. And at the closing table, their exact words were, "We could have done this two years ago."
 
-I tell these stories because data doesn't change decisions — recognition does. If you saw yourself in that couple, that's worth noticing.
+I share these stories because the real life of real estate isn't always what you expect. If you heard yourself in that, well, that's worth a conversation.
 
-Your chapter, whenever you're ready. I'll bring the pen.
+Whenever you're ready to write your own next chapter, I'm here.
 
 {{Agent}} · {{Brokerage}}`},
 {t:"social",ch:"email",adv:"Jason Pantana",title:"Social Email — The Value Sequence",body:
-`Subject: The 3 tools my followers use most (all free)
+`Subject: The 3 free tools my community is using right now
 
 {{Name}},
 
-You grabbed my {{Lead Magnet}} — here's the rest of the toolkit, no forms required:
+You grabbed my {{Lead Magnet}} – so here are the next three plays, no sign-up forms needed:
 
-1. HOME VALUE TRACKER — your address's real number, updated monthly, straight to your inbox. Reply "track" + your address.
-2. THE MONTHLY MARKET MINUTE — 90-second video, actual data, zero jargon. You're subscribed as of now (unsubscribe anytime).
-3. THE DEAL ALERT — when something under-priced hits {{Neighborhood}}, my list hears first. Reply "alerts" to join.
+1.  HOME VALUE TRACKER — your address's actual number, updated monthly, direct to your inbox. Just reply "track" + your address.
+2.  THE MONTHLY MARKET MINUTE — my 90-second video, local data, zero jargon. You're in as of now (opt out anytime).
+3.  THE DEAL ALERT — when something under-priced hits {{Neighborhood}}, my list hears first. Reply "alerts" to get on it.
 
 Free forever, because informed people make confident moves — and confident movers eventually need an agent they already trust.
 
@@ -1125,38 +1120,38 @@ Free forever, because informed people make confident moves — and confident mov
 
 /* -- LUXURY: +3 each (has 5 already: call, vm, 2 email, text → add 2 call, 2 vm, 2 text, 2 email) -- */
 {t:"luxury",ch:"call",adv:"Sharran Srivatsaa",title:"Luxury — The Private Market Call",body:
-`YOU: {{Owner}}, {{Agent}} with {{Brokerage}}. I'll respect your time with directness: a family I represent is looking for a home like {{Address}} — specifically in your enclave — and they've asked me to make discreet inquiries before anything touches the open market.
+`YOU: {{Owner}}, {{Agent}} with {{Brokerage}}. I'll be direct to respect your time: a family I represent is looking for a home exactly like {{Address}} — specifically in your enclave. They've asked me to conduct discreet inquiries before anything hits the open market.
 
-I'm not asking you to sell your home. I'm asking whether — at the right number, with zero signs, zero strangers, and a closing built around YOUR calendar — a conversation would even be worth having.
+I'm not asking you to sell your home today. I'm asking if, given a number that works for you, and a process with zero signs, zero strangers, and a close engineered around YOUR calendar, a brief conversation would be valuable.
 
-Most owners say no, and that's a perfectly good answer. The few who say "what's the number?" tend to be glad they asked. Which are you?`},
+Most owners say no, and that's a perfectly good answer. The few who say 'what's the number?' are usually glad for the insight. Which are you?`},
 {t:"luxury",ch:"call",adv:"Cheryl Eisen",title:"Luxury — The Presentation Audit Call",body:
-`YOU: {{Owner}}, {{Agent}}. Your home has been on the market {{DOM}} days, and I'm going to say what your current agent may not: at this price point, the issue is almost never the home — it's the presentation of the identity buyers are purchasing.
+`YOU: {{Owner}}, {{Agent}}. Your home has been on the market {{DOM}} days, and at this price point, the issue is rarely the property itself. It's about selling a fantasy, a future, not just square footage.
 
-Affluent buyers don't buy square footage; they buy the version of themselves your home promises. If the photography, staging, and story don't deliver that promise in the first five seconds, the price gets blamed for a presentation problem.
+Luxury buyers fall in love with a story, an aspirational life they see themselves living. If the listing photos, the design, and the overall impression don't create that emotional connection in the first few seconds, the price often takes the blame.
 
-I'd like to walk {{Address}} and give you a presentation audit — the five-second test, room by room. If your current setup passes, I'll tell you that too. When can I see it?`},
+I'd like to walk {{Address}} and assess how well it's merchandising that target buyer's life. We'll look at the 'moments' room by room. If it's doing its job, I'll tell you. When can I see it?`},
 {t:"luxury",ch:"vm",adv:"Ryan Serhant",title:"Luxury VM — The Out-of-Market Buyer",body:
 `{{Owner}}, {{Agent}}. Your buyer probably doesn't live in {{City}} — that's the single most important fact about selling a home like yours. My last {{N}} closings at this level: buyers from out of state or overseas, found through film-quality marketing that travels, not yard signs that don't. I put together a two-minute concept of how {{Address}} launches to that audience. It'll be the best two minutes of marketing you've seen this year — {{Phone}}.`},
 {t:"luxury",ch:"vm",adv:"Shea McGee",title:"Luxury VM — The Design Equity Note",body:
-`{{Owner}}, this is {{Agent}}. I drove past {{Address}} this week and here's what struck me: homes with your bones are exactly the ones where design choices return five-to-one at sale. A few deliberate moves — lighting, texture, how each room announces itself — and buyers stop calculating price per square foot and start imagining dinner parties. If a sale is anywhere on your horizon, the smartest hour is a design walk-through BEFORE anything else. I'd love to give you that hour: {{Phone}}.`},
+`{{Owner}}, this is {{Agent}}. I drove past {{Address}} this week, and what struck me is how homes with your bones are perfectly poised for transformation. A few intentional shifts – like getting the scale right with lighting, layering textures for a rich, tactile experience, and making each space feel collected – means buyers stop seeing numbers and start imagining a beautiful life unfolding there. If selling is on your horizon, the smartest hour is a design walk-through *before* anything else. I'd love to give you that hour: {{Phone}}.`},
 {t:"luxury",ch:"text",adv:"Ryan Serhant",title:"Luxury Text — The Discreet Probe",body:
 `{{Owner}} — {{Agent}}, {{Brokerage}}. A serious buyer has asked me about homes in your enclave (nothing public, no listings involved). If a quiet, on-your-terms conversation about {{Address}} ever made sense, this is the low-pressure version of it. Worth a coffee?`},
 {t:"luxury",ch:"text",adv:"Cheryl Eisen",title:"Luxury Text — The Staging Stat",body:
-`{{Owner}}, {{Agent}} here. One number worth knowing before you list: professionally staged luxury homes in this market are averaging {{Pct}}% higher sale prices and half the market time. The walk-through that unlocks that is complimentary. This week or next?`},
+`{{Owner}}, {{Agent}} here. Before you list: our design for the target buyer's fantasy consistently sees luxury homes sell for {{Pct}}% more and in half the time. Let's create those moments. My walk-through is complimentary. This week or next?`},
 {t:"luxury",ch:"email",adv:"Sharran Srivatsaa",title:"Luxury Email — The Wealth Architecture",body:
 `Subject: {{Address}} as a balance-sheet decision
 
 {{Owner}},
 
-Homes at your level aren't just residences — they're the largest line on a balance sheet, and they deserve balance-sheet thinking.
+Properties at your level aren't just homes — they're a significant asset on your books, and they demand owner-level thinking.
 
-Three numbers I prepare for owners in {{Enclave}}:
-1. TODAY'S PRIVATE-MARKET VALUE — what discreet buyers would pay, off-market.
-2. THE CARRY — what keeping it costs annually against alternatives.
-3. THE ARBITRAGE — what the equity does redeployed, versus staying put.
+Here are three numbers I engineer for principals in {{Enclave}}:
+1. PRIVATE-MARKET VALUE: What discreet buyers would pay, off-market.
+2. THE CARRY: Your annual cost of capital against alternatives.
+3. THE ARBITRAGE: What your equity does redeployed, versus staying put.
 
-Most owners review these once a decade, at a moment chosen by circumstance. The better ones review annually, at a moment chosen by them.
+Most owners review these when circumstance dictates. The top operators review them annually, on their own schedule.
 
 Yours would take me a week to build, privately. Shall I?
 
@@ -1185,53 +1180,49 @@ SCRIPTS.push(
 `YOU: {{Owner}}? {{Agent}} in {{City}}. You own the rental on {{Street}} — I'll talk numbers, not feelings.
 
 Three questions that tell me if this call is worth your time:
-One — is the rent within $200 of market? (Most long-held rentals aren't.)
-Two — when did you last raise it? (If you winced, that's the answer.)
+One — are you capturing market rent? (Most long-held assets aren't getting the right rent.)
+Two — when did you last adjust it? (If you winced, that's the answer.)
 Three — who takes the 2am call: you, or a manager taking 8%?
 
-Here's why it matters: an under-rented, self-managed property is usually netting HALF what the equity could earn elsewhere. I run that comparison for {{City}} owners — current net versus market-rent net versus sold-and-redeployed net. Twenty minutes of my time, zero of yours. Where do I send it?`},
+Here's why it matters: an under-rented, self-managed property is leaving cash flow on the table. Every dollar of lost NOI is twenty dollars of lost value. I run that comparison for {{City}} owners — what your current cash flow is versus what it could be with professional management, versus what you could redeploy. Twenty minutes of my time, zero of yours. Where do I send it?`},
 {t:"absentee",ch:"call",adv:"Pace Morby",title:"Absentee — The Terms Conversation",body:
-`YOU: {{Owner}}, {{Agent}} here. You own {{Address}} free and clear (or close to it), and that puts you in a position most sellers don't know they have.
+`YOU: {{Owner}}, {{Agent}} here. You own {{Address}} free and clear, and that puts you in a unique spot most sellers don't even know exists.
 
-Everyone offers you two doors: keep dealing with tenants, or sell and hand a chunk to the IRS. There's a third door: sell on TERMS.
+Most buyers only offer you one thing: cash. That means you either keep dealing with tenants, or you sell, take a big tax hit, and walk away. But there's another structure.
 
-You become the bank. Full price — often above market. Monthly income continues, but no tenants, no toilets, no property tax. The tax hit spreads over years instead of landing at once.
+What if you could sell for full price, sometimes even above what the market says, and still get monthly income — without any tenants, no repairs, and no property tax headaches? You become the bank. The tax benefit spreads out, too.
 
-It's not for everyone — you need to NOT need the lump sum. But for owners tired of managing who still want the income? It's the best-kept secret in real estate. Want the one-pager with real numbers for your property?`},
+It's not for everyone, you don't get a lump sum upfront. But for owners done with the grind who still want that income stream? It's a powerful way to move a property. I can show you how it works with real numbers for yours.`},
 {t:"absentee",ch:"call",adv:"Bob Knakal",title:"Absentee — The Portfolio Review Call",body:
-`YOU: {{Owner}}, {{Agent}} with {{Brokerage}}. I track ownership across {{Submarket}} and you hold {{N}} properties here — which makes you exactly who I build market intelligence for.
+`YOU: {{Owner}}, {{Agent}} with {{Brokerage}}. My business is knowing every building in {{Submarket}} better than anyone else. You hold {{N}} properties here, which means I build market intelligence exactly for owners like you.
 
-I'm not calling about selling anything. I'm calling because owners at your scale make three predictable mistakes: holding past peak rent growth, missing the refi window, and 1031-ing too late in the cycle.
+I'm not calling to sell anything. Owners at your scale often make three predictable mistakes: holding past peak rent growth, missing the refi window, or executing a 1031 too late in the cycle.
 
-Twice a year I prepare portfolio owners a one-page brief: where the cycle sits, what each holding would trade at, and which of the three mistakes is currently in season. No charge — the owners who read it tend to become clients eventually, and I play long games.
-
-What's the best email for it?`},
+Twice a year, I prepare a one-page brief for portfolio owners: where the cycle sits, what each holding would trade at based on our data, and which of those three mistakes is currently in season. No charge. I play long games, and the owners who use this information often become clients. What's the best email for it?`},
 {t:"absentee",ch:"vm",adv:"David Greene",title:"Absentee VM — The Remote Owner",body:
-`{{Owner}}, {{Agent}} in {{City}}. Managing {{Address}} from {{TheirState}} means every small problem costs you double — the repair AND the coordination. I work with out-of-state owners weekly, so here's a standing offer: I'll be your local eyes, free. Rent check against market, condition drive-bys, and a real number if you ever want to trade the headache for equity. No commitment — out-of-state owners just deserve someone local who answers. {{Phone}}.`},
+`{{Owner}}, {{Agent}} in {{City}}. Managing {{Address}} from {{TheirState}} often means property distress, and that burden costs you double. I specialize in systems that make distance irrelevant for owners like you. Here's a standing offer: I'll be your local eyes, free. We can check real cash flow against market, verify condition, and get you a firm number to trade the headache for equity. No commitment — absentee owners deserve someone local who answers. {{Phone}}.`},
 {t:"absentee",ch:"vm",adv:"Jerry Norton",title:"Absentee VM — The Simple Exit",body:
 `{{Owner}}, this is {{Agent}} in {{City}}, about your property on {{Street}}. If it's performing and you're happy — delete this, sincerely. But if any part of it has become a chore: the tenant, the repairs, the taxes, the distance — I make clean exits happen. As-is, no showings parade, close when you want. One number, in writing, this week. {{Phone}}. Worst case, you know what walking away is worth.`},
 {t:"absentee",ch:"vm",adv:"Ken McElroy",title:"Absentee VM — The Rent Gap",body:
-`{{Owner}}, {{Agent}} — quick math on your rental at {{Address}}: units like it are renting for {{MarketRent}} right now. If you're below that, the gap times twelve is what politeness costs annually. Raise it, or sell while low rents make the LISTING look like opportunity to investors ("upside!"). Either way you win — but only if you know the number. It's free: {{Phone}}.`},
+`YOU: {{Owner}}, {{Agent}} here. Regarding your rental at {{Address}}. Units like it are commanding {{MarketRent}} today. If you're below that, the annual rent gap subtracts from your cash flow and property value. That's money you're leaving on the table. You can capture it by raising rents, or sell to an investor who'll force that appreciation themselves. Know the numbers. It's free: {{Phone}}.`},
 {t:"absentee",ch:"text",adv:"David Greene",title:"Absentee Text — The Eyes-On Offer",body:
-`Hi {{Owner}}, {{Agent}} — local agent in {{City}}. You own {{Street}} from out of the area; I drive past it weekly. Standing offer: free rent-vs-market check + condition report whenever you want one. No strings — remote owners deserve local eyes. Want this quarter's?`},
+`Hi {{Owner}}, {{Agent}} here. I'm a local agent in {{City}}. I pass {{Street}} often and know the area. For absentee owners like you, I offer a free market rent check and condition report. It's about having local eyes and good systems. Want this quarter's numbers?`},
 {t:"absentee",ch:"text",adv:"Ken McElroy",title:"Absentee Text — The NOI Nudge",body:
-`{{Owner}} — {{Agent}}, {{City}}. Rents near your {{Street}} property just printed {{MarketRent}}. If yours is under that, you're donating the difference. Want the 3-line math (current vs market vs sold-and-redeployed)? Free.`},
+`{{Owner}} — {{Agent}}, {{City}}. Rents near your {{Street}} property just printed {{MarketRent}}. If yours is under that, you're losing cash flow. That impacts your NOI and value. Want the 3-line math? Free.`},
 {t:"absentee",ch:"text",adv:"Pace Morby",title:"Absentee Text — The Third Door",body:
-`Hi {{Owner}}, {{Agent}} here. Odd question about {{Street}}: if you could keep the monthly income but lose the tenants forever (selling on terms — you become the bank), would that be worth 10 minutes? Most owners have never heard the real version of this.`},
+`Hi {{Owner}}, {{Agent}} here. Quick thought on {{Street}}: if you could get full price, keep the monthly income, but ditch the tenants forever (you'd essentially be the bank), would that be worth 10 minutes? Most owners haven't heard this structure.`},
 {t:"absentee",ch:"email",adv:"David Greene",title:"Absentee Email — The Long-Distance Playbook",body:
 `Subject: Managing {{Street}} from {{TheirState}} — the honest math
 
 {{Owner}},
 
-Long-distance ownership works — I wrote the playbook on it — but only when three systems are in place. A quick self-audit:
+Long-distance investing works — I literally wrote the book on it — but only if you build the right systems. A quick self-audit:
 
-1. PRICING: Is rent within 3% of market? (Local comps attached — you're currently {{Gap}}.)
-2. PEOPLE: Do you have a manager, handyman, and agent who answer texts? (You're reading one of the three.)
-3. EXIT CLARITY: Do you know TODAY'S sale number, so holding is a choice, not a default?
+1. CASH FLOW: Does the rent cover PITI, vacancy, repairs, CapEx, and management? (Local comps attached — your current rent is {{Rent}}, market is {{MarketRent}}.)
+2. TEAM: Do you have a property manager, agent, and contractor who respond quickly? (You're reading one of the three.)
+3. EXIT CLARITY: Do you know the property's *as-is* sale number today? (Current value ~{{Value}}, equity ~{{Equity}}.)
 
-Most remote owners fail #3 — they hold by inertia. Your current numbers: rent {{Rent}}, market rent {{MarketRent}}, as-is sale value ~{{Value}}, equity ~{{Equity}}.
-
-Whether you optimize or exit, do it on purpose. I'm happy to help with either — or just re-run these numbers for you each quarter, free.
+Most remote owners hold by inertia. If you don't know your true numbers, you're not making money when you buy, or when you hold. Whether you hold or sell, do it on purpose. I'm happy to help with either — or just re-run these calculations for you each quarter, free.
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`},
 {t:"absentee",ch:"email",adv:"Jerry Norton",title:"Absentee Email — The Clean Break",body:
@@ -1254,29 +1245,27 @@ One walkthrough gets you the written offer. {{Phone}}.
 
 {{Agent}}`},
 {t:"absentee",ch:"email",adv:"Bob Knakal",title:"Absentee Email — The 1031 Clock",body:
-`Subject: {{Address}} and the exchange window
+`Subject: {{Address}} and the 1031 timeline
 
 {{Owner}},
 
-A pattern I see with long-held income property: owners think about selling for two years, finally do it, and THEN discover the 1031 exchange timeline — 45 days to identify, 180 to close — is brutally short for finding quality replacement property.
+My four decades in this business show a consistent pattern with long-held income properties: owners sell, then discover the 45-day identification clock for a 1031 exchange. That window is simply too narrow to secure a quality replacement asset without prior intelligence.
 
-The owners who win do it backwards: they identify what they'd exchange INTO first, then sell with the destination already scoped.
+We see owners succeed when they reverse the sequence. They use market information to identify their ideal replacement property first. Only then do they sell, with the destination already secured.
 
-If {{Address}} is ever going to become something bigger, more passive, or out of state, the preparation should start a quarter before the listing. I run that process end to end — valuation, exchange strategy, replacement pipeline — and the first conversation is free.
+If {{Address}} is part of a plan for a larger, more passive, or out-of-state holding, that preparation should begin a quarter before any listing. We provide the valuation, strategy, and replacement options based on deep market knowledge. The first conversation is always about information, not obligation.
 
-Worth 20 minutes this month?
+Worth 20 minutes to discuss this month?
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`},
 
 /* -- NOD: +3 each -- */
 {t:"nod",ch:"call",adv:"Nicole Espinosa",title:"NOD — The Equity Defense Call",body:
-`YOU: {{Owner}}, {{Agent}} — local agent, not an investor, and I'll prove it in one sentence: you likely have equity worth protecting, and everyone else calling wants it.
+`YOU: {{Owner}}, this is {{Agent}}. I specialize in pre-foreclosure. That notice started a clock, not a verdict, and you likely have equity worth protecting. Everyone else calling wants that equity.
 
-Here's the math nobody explains: if your home's worth {{Value}} and you owe {{Debt}}, that gap is YOUR money — but only while YOU control the sale. At auction, that same gap becomes some bidder's discount.
+Here's the math nobody explains: your true payoff isn't just the principal owed. If your home's worth {{Value}} and the bank's full demand is {{Debt}}, that gap is YOUR money—but only while YOU control the sale. At auction, that same gap becomes a bidder's discount.
 
-Every option on your table — reinstate, modify, sell, even a graceful exit with cash for your next deposit — works better with more time. The notice started a clock, not a verdict.
-
-I'll map every option with real numbers, free, this week. The only thing I ask: don't sign ANYTHING from the door-knockers until you've seen the map. Fair?`},
+We need to confirm your timeline now, because the closer it is to a sale date, the fewer options you have. I'll map out every option—reinstatement, modification, selling—with real numbers. Don't sign anything until you've seen the map. Fair?`},
 {t:"nod",ch:"call",adv:"Chris Voss",title:"NOD — The Late-Night-DJ Call",body:
 `(slow. warm. zero urgency in your voice — they have enough urgency)
 
@@ -1304,15 +1293,15 @@ May I send you both the same one-page option map, same email, same minute?`},
 {t:"nod",ch:"vm",adv:"Chris Voss",title:"NOD VM — The No-Pressure Label",body:
 `{{Owner}}... {{Agent}}, local agent. (unhurried) It probably seems like every voicemail this week wants something from you... so I'll keep this one different. You have more options than the letters make it feel like — and the one-page version of them is free, no meeting required. If having it would make this week feel even slightly lighter... I'm at {{Phone}}. If not, throw this voicemail away with the letters. Either way... you're going to get through this.`},
 {t:"nod",ch:"vm",adv:"Ted Thomas",title:"NOD VM — The Timeline Truth",body:
-`{{Owner}}, {{Agent}}, local agent in {{City}}. One thing about the notice on {{Address}} that the letters bury: the timeline has SPECIFIC dates where options expire — reinstatement has one deadline, sale-with-equity has another, and they're months apart. Most owners treat it as one big countdown and panic. It's actually a sequence, and knowing the sequence is power. I'll walk you through your exact dates, free, ten minutes: {{Phone}}.`},
+`{{Owner}}, {{Agent}}, local agent in {{City}}. That notice on {{Address}} starts a government process, and the rules are specific. It's not one big countdown; it's a sequence of dates, each with its own options. Missing a deadline means losing a choice. My job is to make sure you understand your exact dates and what each step means. Call me, free, ten minutes: {{Phone}}.`},
 {t:"nod",ch:"vm",adv:"Brandon Mulrenin",title:"NOD VM — The Permission Ask",body:
-`Hi {{Owner}}, {{Agent}} — local agent. I'm sure every message this week has told you what to do, so I won't. One question instead: would you be opposed to knowing what your home would actually sell for today — not to decide anything, just so every choice you make this month is made knowing that number? It changes more decisions than any advice does. Free, in writing, no meeting: {{Phone}}.`},
+`Hi {{Owner}}, {{Agent}} here. I'm sure you're getting a lot of calls, and I'm certainly not calling to tell you what to do. My only question is, would you possibly be open to seeing what your home might realistically sell for right now? Not to decide anything, just so you have that number in hand. It usually helps clarify things. No pressure at all. If that's something you'd contemplate, my number is {{Phone}}.`},
 {t:"nod",ch:"text",adv:"Nicole Espinosa",title:"NOD Text — The Deadline Decoder",body:
-`{{Owner}}, {{Agent}} here (local agent, not an investor). The notice on {{Address}} has 3 different deadlines buried in it — most owners miss the one that matters most. Want me to decode your exact dates? Free, takes me 10 min, no meeting.`},
+`{{Owner}}, {{Agent}} here. The notice on {{Address}} has a critical date that changes everything for your options. Most homeowners miss it. I can decode your exact timeline and next steps. Free, 10 min, no meeting.`},
 {t:"nod",ch:"text",adv:"Laurel Starks",title:"NOD Text — The Two-Owner Note",body:
 `Hi {{Owner}}, {{Agent}} — local agent. When a notice involves two owners, BOTH have to act for most options to work — and time splits nobody's way. I send both parties identical info, always. Want the option map sent to you both?`},
 {t:"nod",ch:"text",adv:"Pace Morby",title:"NOD Text — The Keep-The-House Angle",body:
-`{{Owner}} — {{Agent}} here. Before you assume selling is the only way out: there are structures where an investor brings the loan current and you STAY (lease-back, equity share, subject-to payoff plans). Not always possible, but worth 10 min before any bigger decision. Want the honest version?`},
+`{{Owner}} — {{Agent}} here. Before you assume selling is the only path: I help homeowners with payment burdens. We can take over your existing loan, bring it current, and sometimes even let you stay. It's a creative way out. Worth 10 min to see if one of my structures fits your situation?`},
 {t:"nod",ch:"email",adv:"Chris Voss",title:"NOD Email — The Safe First Step",body:
 `Subject: The smallest possible first step
 
@@ -1343,68 +1332,65 @@ If this describes your situation even a little, I can have identical option maps
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`},
 {t:"nod",ch:"email",adv:"Pace Morby",title:"NOD Email — The Creative Rescue",body:
-`Subject: The options between "catch up" and "give up"
+`Subject: Your Notice of Default: Creative Options Beyond the Letters
 
 {{Owner}},
 
-The letters give you two choices: pay everything you're behind, or lose the house. There's a whole menu between those that nobody mails you:
+Those letters make it feel like you only have two choices: pay everything you're behind, or lose your house. But that's not the full story. When you can't win on price or credit, you win on structure. There's a whole toolkit of real solutions that nobody tells you about:
 
-- SUBJECT-TO PAYOFF: an investor brings the loan current and takes over payments; you walk away clean with cash, credit intact.
-- LEASE-BACK: sell, stay as a tenant, keep the kids in their school. Sometimes with a buy-back option.
-- EQUITY PARTNERSHIP: someone cures the default for a share of the equity; you keep the home.
-- SELLER-FINANCED EXIT: you sell on terms and turn the crisis into monthly income.
+- Take over payments (Sub-to): An investor brings the loan current, takes title, and makes your payments. You get debt relief, a clean exit, and your credit stays intact.
+- Seller finance: If you have equity, we can structure a sale where you become the bank, turning a crisis into monthly income – often at full price.
+- Hybrid: Combine both – we take over the loan, and you carry the equity. 
 
-Every one has real trade-offs and real scams that imitate it — the difference is in the paperwork, and I'll show you what to look for even if you never work with me.
+These structures solve problems. We close through a title company, offer independent counsel, and use third-party loan servicing to protect everyone. I'll walk you through how it works, even if you never work with me. 
 
-The menu is free. {{Phone}}, or reply here.
+Let's talk. {{Phone}}, or reply here.
 
 {{Agent}}`},
 
 /* -- TAX: +3 each -- */
 {t:"tax",ch:"call",adv:"Nicole Espinosa",title:"Tax Default — The Stacked Problems Call",body:
-`YOU: {{Owner}}, {{Agent}}, local agent. I work with owners on the county's tax-default list, and here's what I've learned: the taxes are almost never the whole story. Usually something upstream caused them — a job change, a health thing, an inherited house that's more burden than blessing.
+`YOU: {{Owner}}, Nicole Espinosa. I work exclusively with owners on the county's tax-default list, and what I've seen is the taxes are rarely the core problem. Usually, it's an income issue, a divorce, or too much debt stacking up. So, instead of lecturing you about deadlines, my first question is: do you have a sale date set for {{Address}}?
 
-So instead of lecturing you about deadlines, let me ask: what's the real situation with {{Address}}?
+(listen — the timeline decides everything)
 
-(listen — the answer determines everything)
-
-Okay. Whatever the story, the good news is the same: while you're in the redemption window, YOU hold the cards. Payment plan, bring it current, or sell and walk away with your equity minus the taxes. All three beat the auction, where your equity becomes someone's win at your expense. Which one should we price out first?`},
+Okay. Whatever the story, the good news is the same: while you're in the redemption window, you still hold the cards. A payment plan, bringing it current, or selling and walking away with your equity minus the taxes. All three beat the auction, where your equity becomes someone else's win. Which avenue should we price out first?`},
 {t:"tax",ch:"call",adv:"Pace Morby",title:"Tax Default — The Equity Rescue Call",body:
-`YOU: {{Owner}}? {{Agent}} here. Straight to it: the county lists {{Address}} as tax-defaulted, and if the number's grown past what's easy to write a check for, I have options most callers don't.
+`YOU: Hey {{Owner}}, {{Agent}} here. Calling about {{Address}}. The county flagged some tax issues, and if that number's grown past an easy check, I've got a different way to handle it.
 
-The usual pitch is "sell to me cheap before the auction." Mine is different: there are investors — I'm one, I know others — who will PAY THE TAXES today in exchange for a piece of the deal, not the whole thing. You keep the house, or you sell on your schedule instead of the county's.
+Most people just want to buy it cheap, fast. My approach is structured to solve your problem: we can get those taxes paid today. Instead of selling for pennies on the dollar, we partner up. You get the relief, keep your options open, and we work to put more money in your pocket on your timeline, not the county's. 
 
-Costs you nothing to see the structure in writing. If the taxes are handled some other way already — even better, tear it up. Can I send it?`},
+Costs nothing to look at how it works. If it's already handled, no sweat. Can I send you the details?`},
 {t:"tax",ch:"call",adv:"Bill Gross",title:"Tax Default — The Inherited-House Call",body:
-`YOU: {{Owner}}, my name's {{Agent}} — local agent. County records show the taxes on {{Address}} have gone unpaid a while, and when I see that pattern with a long-held family home, it usually means one thing: the person who always handled it... isn't handling things anymore.
+`YOU: {{Owner}}, my name's {{Agent}} — I'm a local broker here. County records show the property at {{Address}} has some back taxes, and when I see that with a family home, it often means the person who managed things isn't able to anymore. If I'm right, I'm truly sorry. This is a common situation, and it's where I focus my service. Often, these homes also have a probate case that's either stuck or was never opened, or heirs who can't get on the same page.
 
-If I'm close: first, I'm sorry. Second — this exact situation is my specialty. Inherited homes with tax arrears usually ALSO have title tangles: a probate that never happened, siblings who don't agree, a trust nobody funded.
-
-The tax clock doesn't wait for family consensus, but there are legal moves that pause the bleeding while the family sorts things out. Fifteen minutes and I'll tell you which apply. No cost, and I work alongside your attorney if you have one.`},
+The tax situation needs attention, but there are ways to pause the bleeding while your family takes the time to sort out the estate. I can walk you through the options, no cost, and I'm happy to work with your attorney, or connect you with the right expert if you need one. Can we talk for fifteen minutes?`},
 {t:"tax",ch:"vm",adv:"Nicole Espinosa",title:"Tax VM — The No-Shame Message",body:
-`{{Owner}}, {{Agent}} — local agent, and before anything else: tax trouble happens to good people constantly. Medical year, job gap, inherited house nobody planned for. No shame, just math. The county gives you a redemption window and inside it you have three clean outs — payment plan, catch-up, or sell keeping your equity. Outside it, the auction takes the choice away. I map the three for free: {{Phone}}. The map is worth more than the lecture, I promise.`},
+`{{Owner}}, {{Agent}} here. Tax trouble happens to good people all the time — job changes, medical bills, unexpected inheritances. No shame, just numbers. You've got a window to resolve this, and inside it, there are three clear pathways: payment plan, catch-up, or selling to protect your equity. Outside that window, the auction takes away your choices. I can walk you through these options, no cost, no obligation. Call me back at {{Phone}}.`},
 {t:"tax",ch:"vm",adv:"Bill Gross",title:"Tax VM — The Title Check",body:
-`{{Owner}}, {{Agent}}, local agent in {{County}}. Beyond the taxes on {{Address}} — one thing owners in your spot discover too late: if the title has any tangle (an old probate, a deceased co-owner, a trust issue), fixing it takes MONTHS, and the redemption deadline doesn't extend for paperwork. I check title condition free before it's urgent. Ten minutes now saves ninety days later: {{Phone}}.`},
+`{{Owner}}, {{Agent}} here. About {{Address}} and the tax situation, many owners discover too late that an old probate or title tangle can stall everything for months, even years. That redemption deadline won't wait for paperwork. My team can check your title condition, free, to see what it takes to un-stick it. Ten minutes now saves you a year of struggle: {{Phone}}.`},
 {t:"tax",ch:"vm",adv:"Jerry Norton",title:"Tax VM — The Clean Number",body:
 `{{Owner}}, {{Agent}} in {{City}} — about {{Address}} on the county tax roll. Simplest voicemail you'll get this week: I'll bring you ONE written number for the house as-is — taxes paid at closing out of proceeds, rest is yours, close on your calendar. If the number's wrong, no hard feelings. But walking into any county deadline without knowing your cash-out number is negotiating blind. {{Phone}}.`},
 {t:"tax",ch:"text",adv:"Nicole Espinosa",title:"Tax Text — The Three Outs",body:
-`{{Owner}}, {{Agent}} here (local agent). The tax default on {{Address}} has 3 clean exits while the redemption window's open: payment plan, catch-up, or sell keeping your equity. I'll price all 3 for you free — takes one text back: which one do you WANT to work?`},
+`{{Owner}}, {{Agent}} here. The tax default at {{Address}} has options. While the redemption window is open, we can look at a payment plan, catch-up, or a sale. We only do this, and the lender pays our fee. Which option do you want to explore?`},
 {t:"tax",ch:"text",adv:"Bill Gross",title:"Tax Text — The Family Home Question",body:
-`Hi {{Owner}}, {{Agent}} — local agent. Is {{Address}} an inherited/family property? Tax arrears + inherited homes usually means a title issue is hiding too — and those take months to fix while the county clock runs. Free title check if you want it.`},
+`Hi {{Owner}}, {{Agent}}. About {{Address}} – is this an inherited family property? Tax arrears often mean a hidden title issue. Those take months to fix, making it tough to sell while the county clock runs. Getting it unstuck is my service. I can check the title for you.`},
 {t:"tax",ch:"text",adv:"Pace Morby",title:"Tax Text — The Taxes-Paid Play",body:
-`{{Owner}} — {{Agent}}. Different angle on the {{Address}} taxes: there are structures where an investor PAYS the tax bill today and you keep the house (equity share / payoff plans). Not a gimmick, real paperwork. Want the honest one-pager?`},
+`{{Owner}} — {{Agent}}. Regarding {{Address}} taxes: I specialize in creative structures where I can take over the payments, including the taxes, so you keep your equity. Not a gimmick, just a different way to solve a problem. Want to see how it works?`},
 {t:"tax",ch:"email",adv:"Bill Gross",title:"Tax Email — The Sequence Letter",body:
 `Subject: {{Address}}: the order to fix things in
 
 {{Owner}},
 
-When a property has tax arrears, owners usually attack the tax bill first. That's backwards about half the time. The right order:
+When a property has tax issues, most people jump straight to the county. Often, that's not the first step. Especially if the property is part of an estate, or has a deceased co-owner. That legal tangle — the unprobated estate — is the real problem.
 
-1. TITLE FIRST — if there's any tangle (unprobated estate, deceased co-owner, unrecorded deed), start the legal fix NOW. It's the slowest piece and everything else waits on it.
-2. COUNTY SECOND — installment plans stop the auction clock with a surprisingly small first payment.
-3. DECISION THIRD — keep (now that it's stabilized) or sell (now that it's sellable). A tangled title can't close; a stabilized one can.
+Here's how we tackle it, to un-stick the process:
 
-I've walked {{County}} owners through this sequence for years, alongside their attorneys when needed. The 15-minute version of where YOUR situation sits: free.
+1. TITLE FIRST — get that estate settled. This is the slowest piece. Everything else waits on it. Many attorneys aren't probate experts, which creates these delays. We sort that out.
+2. COUNTY SECOND — once the title is clear, we can stabilize the tax situation. Installment plans stop the clock.
+3. DECISION THIRD — now that it's sellable, we can make a clear decision to keep or sell. You can't sell a stuck property.
+
+I've guided {{County}} families through this sequence for years, often alongside their attorneys. A 15-minute chat about your situation is free.
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`},
 {t:"tax",ch:"email",adv:"Nicole Espinosa",title:"Tax Email — The Real Numbers Letter",body:
@@ -1412,104 +1398,98 @@ I've walked {{County}} owners through this sequence for years, alongside their a
 
 {{Owner}},
 
-Every choice about the tax default comes down to three numbers most owners never see side by side:
+When you're facing a tax default, the decision hinges on three clear numbers. Most owners don't see them side-by-side, which is the biggest mistake.
 
-1. THE CURE: taxes + penalties to bring it current = {{Cure}}
-2. THE PLAN: county installment first payment ≈ {{Plan}} (stops the auction clock)
-3. THE EXIT: what you'd walk away with selling as-is, taxes paid from proceeds ≈ {{Net}}
+1.  THE CURE: taxes + penalties to bring it current = {{Cure}}
+2.  THE PLAN: county installment first payment ≈ {{Plan}} (This stops the auction clock, but you have to drive it.)
+3.  THE EXIT: what you'd walk away with selling as-is, taxes paid from proceeds ≈ {{Net}}
 
-Look at those three and the decision usually makes itself — keep and cure, keep and plan, or take the equity and be done.
+Look at these three. The choice usually makes itself — keep and cure, keep and plan, or take the equity and be done. Waiting is not an option. The timeline decides everything.
 
 I'll fill in your actual figures this week, free. The only losing move is deciding without them.
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`},
 {t:"tax",ch:"email",adv:"Ken McElroy",title:"Tax Email — The Investor-Owner Letter",body:
-`Subject: The {{Street}} property: burden math
+`Subject: The {{Street}} property: actual performance
 
 {{Owner}},
 
-Investors fall behind on property taxes for one honest reason: the property stopped earning its keep, and every bill for it feels like throwing good money after bad.
+Too many investors get stuck with property taxes because the asset isn't generating the cash flow to cover its own costs. It becomes a drain, not a business.
 
-If that's {{Address}}, run the burden math with me:
+Let's look at the actual numbers for {{Address}}:
 - Annual carry (taxes + insurance + maintenance): {{Carry}}
-- Actual income: {{Income}}
+- Actual income it's producing: {{Income}}
 - The gap, funded from your pocket: {{Gap}}/year
 
-An asset with a negative gap and rising tax penalties isn't an investment — it's a subscription you forgot to cancel. Selling as-is (arrears paid at closing) converts it back into capital that can actually work.
+When the numbers show a negative gap, it's not an investment; it's an expense. A property that isn't cash-flowing turns you into a forced seller, especially with rising tax penalties. Selling as-is (with arrears paid at closing) converts this back into capital that can actually work for you.
 
-I'll run your specific numbers free. If the property still pencils, I'll tell you that too — I have no interest in talking anyone out of a performing asset.
+I'll run your specific numbers free. If it still pencils, I'll tell you that too — I have no interest in talking anyone out of a performing asset.
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`},
 
 /* -- PROBATE: +3 each -- */
 {t:"probate",ch:"call",adv:"Bill Gross",title:"Probate — The Court-Process Call",body:
-`YOU: Hi {{Name}}, my name is {{Agent}} — I'm a local agent who specializes in {{County}} probate sales, and I'll keep this short out of respect for what your family's going through.
+`YOU: Hi {{Name}}, this is {{Agent}}. I work with families settling estates here in {{County}}, and I'll be brief. (I'm coming from being of service here, not just chasing a lead.)
 
-One thing I tell every executor early, because nobody else does: in California, HOW the sale happens depends on the authority the court gave you. Full authority under IAEA means you can sell almost like a normal listing. Limited authority means court confirmation, overbid hearings, different timelines — a completely different playbook.
+One thing I always share upfront, because most attorneys aren't probate experts, is that how you sell the house depends entirely on the authority your Letters grant. Full IAEA means you can often sell in 2-6 months like a normal listing. Limited authority means court confirmation, overbids, and a completely different timeline – a process that can easily get stuck for years without the right plan.
 
-Do you know yet which one your Letters granted? ... That single answer changes your price strategy, your buyer pool, and your timeline. I map it all out for families at no charge — the attorney handles the law, I handle the property. Would that map help this week?`},
+Do you know if your Letters granted full or limited authority? That single detail changes everything for your price, buyer pool, and timeline. I map out the court process for families at no charge – the attorney handles the law, I handle the property. Would that map help this week?`},
 {t:"probate",ch:"call",adv:"Al Nicoletti",title:"Probate — The Attorney-Partner Call",body:
-`YOU: {{Name}}, {{Agent}} here — I work alongside probate attorneys on the real-estate side of estates. Quick but important question: does the estate have counsel yet?
+`YOU: {{Name}}, {{Agent}} here — I specialize in the real estate side of estate challenges. Quick but crucial question: do you have a probate attorney on the case yet?
 
-(if yes:) Perfect — then my role is simple. Your attorney moves the case; I make sure the PROPERTY never becomes the bottleneck: valuation for the inventory, securing and insuring a vacant house, and when the time comes, a sale that matches the court's requirements. All coordinated THROUGH your attorney, never around them.
+(if yes:) Excellent. My role is straightforward: your attorney handles the legal filings, and I ensure the property itself doesn't become the roadblock. That means getting the right valuation, securing and insuring the house, and ultimately, a sale that satisfies all court and title requirements. We work directly with your counsel to architect a closeable title.
 
-(if no:) Then let's fix that first — I'll introduce you to two or three excellent {{County}} probate attorneys and you pick. The right attorney saves months. THEN we talk about the house.
+(if no:) Then that's the first step. I'll connect you with a few specialized {{County}} probate attorneys — the ones who understand how to make a complicated topic simple. Choosing the right one upfront prevents months of delay. Then we'll address the house.
 
-Either way — what's the property situation today: occupied, vacant, or "we're not sure what's in there yet"?`},
+Either way — what's the property situation today: occupied, vacant, or we're not sure what's in there yet?`},
 {t:"probate",ch:"call",adv:"Chad Corbett",title:"Probate — The Vacant House Call",body:
-`YOU: {{Name}}, {{Agent}} — local agent, and I'll get right to the concern: county records suggest the home on {{Street}} may be sitting vacant since {{Deceased Name}} passed. I'm sorry for your loss — and I want to flag three quiet risks nobody warns families about:
+`YOU: {{Name}}, this is {{Agent}}. I was just down at the probate court this week, and it looks like the property on {{Street}} connected to {{Deceased Name}}'s estate might be sitting empty. First, I'm genuinely sorry for your family's loss. That's a lot to manage.
 
-One — most homeowner's insurance quietly voids after 30-60 days of vacancy. A pipe burst next month might not be covered.
+My social enterprise here helps families with the non-billable aspects of settling an estate. One thing that often catches families off guard is that most homeowner's insurance becomes void after 30-60 days of vacancy. A burst pipe might not be covered. Also, empty homes attract unwanted attention.
 
-Two — vacant homes get noticed: by squatters, by thieves who target copper and appliances, and by the county.
-
-Three — deferred small stuff (a roof leak, a dead lawn) eats sale value fast.
-
-I check on estate properties for families as a free service: photos, utilities check, insurance-safe status. Total honesty: someday, if the family sells, I hope you remember me. Until then — can I put eyes on the house this week?`},
+I offer a free service to check on estate properties: photos, utility status, making sure it's secure. How important is it to you that the property stays protected while you're navigating everything else? If you ever consider options for the property, I'd hope you'd think of me. Can I put eyes on it this week?`},
 {t:"probate",ch:"vm",adv:"Chad Corbett",title:"Probate VM — The One Less Thing",body:
-`Hi {{Name}}, {{Agent}} — local agent. I know settling {{Deceased Name}}'s affairs is a long list, and the house is somewhere on it. My whole practice is making that item lighter: the cleanout, the utilities, the insurance, the eventual keep-rent-or-sell decision — with numbers for all three, whenever the family's ready. No timeline, no pressure. When the house becomes the thing you're dealing with, I'm {{Phone}}. Until then, take care of each other.`},
+`Hi {{Name}}, this is {{Agent}}. I noticed the recent filing for {{Deceased Name}}'s estate. I know this period can bring a lot of details to manage, and the property often becomes a significant one. My work is helping families like yours navigate all those moving pieces — from cleanout and utilities to understanding the options for the home. No pressure, just a resource. When it's time to resolve that piece of the estate, I'm at {{Phone}}. Until then, take care of each other.`},
 {t:"probate",ch:"vm",adv:"Bill Gross",title:"Probate VM — The Authority Question",body:
-`{{Name}}, {{Agent}} — local agent specializing in {{County}} probate. One question that saves families months: has the court granted full or limited authority? The answer changes everything about selling — timeline, pricing, even which buyers can bid. Most families don't know theirs, and most agents never ask. I'll explain what yours means in plain English, free: {{Phone}}. The right process is the difference between a clean sale and a stalled one.`},
+`Hello {{Name}}, this is {{Agent}}, focused on {{County}} probate. One question cuts through months of delay for families: does the estate have full or limited authority? That single detail dictates everything about the sale — your timeline, how we price, even who can overbid. Most executors don't realize this, and frankly, most agents don't know to ask. I'll walk you through what your specific authority means, no charge: {{Phone}}. Getting this right is the difference between a smooth close and a case that gets stuck for years.`},
 {t:"probate",ch:"vm",adv:"Al Nicoletti",title:"Probate VM — The No-Attorney Flag",body:
-`{{Name}}, this is {{Agent}}, local agent. If the estate already has a probate attorney — great, ignore everything except this: I work WITH counsel, handling the property side. But if there's NO attorney yet, please hear this: the filing order and the forms matter enormously, and DIY probate mistakes cost families months and real money. I'll introduce you to excellent {{County}} probate attorneys, free, no strings — choosing well is the single highest-leverage move you'll make. {{Phone}}.`},
+`{{Name}}, this is {{Agent}}. If you have a probate attorney already, great; I simply handle the property side. But if there's no counsel yet, please know: getting an expert who understands the whole real estate world, not just court paperwork, is key. It's about architecting a closeable title from day one. I can connect you to specialized {{County}} probate attorneys, no cost, no obligation. Choosing the right one upfront makes all the difference. {{Phone}}.`},
 {t:"probate",ch:"text",adv:"Chad Corbett",title:"Probate Text — The Property Check",body:
-`Hi {{Name}}, {{Agent}} — local agent. If the home on {{Street}} is sitting vacant during the estate process: quick heads-up that insurance usually lapses after 30-60 vacant days. I do free property checks for families (photos, utilities, insurance status). Want one this week?`},
+`Hi {{Name}}, I'm {{Agent}}. Regarding the home on {{Street}} during estate settlement: vacant properties often lose insurance after 30-60 days. I offer families complimentary property checks – photos, utilities, insurance status. Would a check this week bring you peace of mind?`},
 {t:"probate",ch:"text",adv:"Bill Gross",title:"Probate Text — Full or Limited",body:
-`{{Name}}, {{Agent}} here (probate-specialized local agent). One question that changes your whole sale plan: did the court grant FULL or LIMITED authority? If you're not sure, I'll explain both in 5 min — the difference is months of timeline. Free.`},
+`{{Name}}, {{Agent}} here. The fork in the road for your estate sale: FULL or LIMITED IAEA authority? I can clarify the difference in timelines and court confirmation for you in 5 minutes. No charge.`},
 {t:"probate",ch:"text",adv:"Al Nicoletti",title:"Probate Text — The Timeline Ask",body:
-`Hi {{Name}}, {{Agent}} — I handle the property side of {{County}} estates. Quick one: has the estate's inventory & appraisal been filed yet? That milestone unlocks the property options. If the sequence feels foggy, I'll send the plain-English timeline — free.`},
+`Hi {{Name}}, {{Agent}} here. For {{County}} estates, my focus is always on getting a closeable property title efficiently. What's the plan for that? We can often simplify these challenges. Knowing the timeline and cost upfront is key. I can help.`},
 {t:"probate",ch:"email",adv:"Chad Corbett",title:"Probate Email — The Family Meeting Agenda",body:
-`Subject: When the family talks about the house — an agenda that keeps the peace
+`Subject: When the family talks about the estate — an agenda that keeps the peace
 
 {{Name}},
 
-At some point the family will sit down and talk about {{Street}}. Those conversations go one of two ways: everyone leaves aligned, or the house becomes the thing that divides people who just lost someone.
+Eventually, the family will gather to discuss {{Street}} and settling the estate. In my experience helping families in the community, these conversations typically go one of two ways: everyone finds alignment, or the property becomes a point of division during an already difficult time.
 
-The difference is usually structure. Attached is the agenda I give families — three questions, in order:
+The difference often comes down to structure and data. I've attached the agenda I share with families — three questions, in order, to turn opinion into arithmetic:
 
-1. WHAT DOES IT COST TO KEEP? (taxes, insurance, upkeep — real annual number)
-2. WHAT WOULD IT RENT FOR? (income minus management headaches, honestly stated)
-3. WHAT WOULD IT NET IF SOLD? (after everything — the number that ends speculation)
+1.  WHAT DOES IT COST TO KEEP? (taxes, insurance, upkeep — the real annual number)
+2.  WHAT WOULD IT RENT FOR? (income minus management headaches, honestly stated)
+3.  WHAT WOULD IT NET IF SOLD? (after everything — the clear number that ends speculation)
 
-Families who see all three numbers argue less, because opinion turns into arithmetic. I prepare all three at no charge, before the meeting — so the meeting is about the FAMILY's wishes, not competing guesses.
+Families who see all three numbers argue less. I prepare all three at no charge, before your meeting, so the discussion can focus on the FAMILY's wishes, not competing guesses. This way, you're equipped to make the right decisions in the right order.
 
 Whenever you're ready.
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`},
 {t:"probate",ch:"email",adv:"Bill Gross",title:"Probate Email — The Court Sale Playbook",body:
-`Subject: Selling estate property in {{County}} — the plain-English version
+`Subject: Probate Property Sale in {{County}} — What You Need to Know
 
 {{Name}},
 
 When you're ready (no rush), here's the plain-English version of how estate sales actually work here:
 
-WITH FULL AUTHORITY (IAEA): you can list, accept an offer, and close much like a normal sale — with a Notice of Proposed Action to heirs instead of court confirmation. Fastest, cleanest, most buyer-friendly.
+When the estate has **FULL Authority (IAEA)**, the Personal Representative can sell much like a standard listing. We just give a Notice of Proposed Action to the heirs, and then it's a cleaner, faster path to close.
 
-WITH LIMITED AUTHORITY: the sale goes through court confirmation — a hearing, a possible overbid auction in the courtroom, and specific deposit rules. Slower, but very manageable when the agent has done it before. (I have, many times.)
+With **LIMITED Authority**, the sale goes through court confirmation. This means a hearing, and often an overbid auction in the courtroom. We follow specific rules, like the CA Probate Code §10311 overbid formula. It's slower, but very manageable when the agent knows the process. (I do.)
 
-EITHER WAY: pricing must respect the probate referee's appraisal, and the buyer pool should be told what kind of sale this is UP FRONT — surprised buyers cancel; prepared ones close.
-
-That's 80% of what families need to know. The other 20% is specific to your case — free conversation, whenever it helps.
+Either way, pricing must respect the probate referee's appraisal. It's critical to tell the buyer pool upfront what kind of sale this is — prepared buyers close, surprised ones cancel. That's 80% of what families need to know. The other 20% is specific to your case — free conversation, whenever it helps.
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`},
 {t:"probate",ch:"email",adv:"Al Nicoletti",title:"Probate Email — The Heir Alignment Letter",body:
@@ -1517,15 +1497,15 @@ That's 80% of what families need to know. The other 20% is specific to your case
 
 {{Name}},
 
-A hard truth from years around estates: the house is where sibling disagreements go to become permanent. One heir wants to keep it, one needs money now, one lives out of state and just wants it over.
+I've seen it countless times: a family home becomes the focal point for all kinds of challenges among heirs. One wants to hold, another needs the cash now, and someone else just wants the whole process done.
 
-What actually works:
+What actually works to get to a closeable title:
 
-1. NUMBERS BEFORE OPINIONS. Keep/rent/sell — three written numbers, from a neutral party, before anyone stakes out a position.
-2. ONE POINT OF CONTACT. Every heir gets identical information simultaneously. (This is non-negotiable in how I work — favoritism, even accidental, poisons estates.)
-3. THE ATTORNEY SETS THE LANES. What requires unanimity, what the executor can decide alone — knowing this early prevents the fight, because everyone knows what's actually decidable.
+1. CLEAR NUMBERS, NOT EMOTIONS. Before anyone digs in, get three solid figures from a neutral party for keeping, renting, or selling the property.
+2. ONE VOICE. Every heir receives the exact same information at the same moment. This avoids favoritism, even accidental, which can poison an estate.
+3. THE SPECIALIST SETS THE PATH. Understanding early what requires everyone's agreement versus what the executor can decide prevents unnecessary battles. It's about knowing the lanes.
 
-If your family is anywhere near this crossroads, I can provide #1 and #2 within a week, and work inside whatever lanes your attorney draws.
+If your family is facing this crossroads, I can help get you those clear numbers and ensure everyone hears the same message, working within whatever path your attorney outlines.
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`}
 );
@@ -1559,23 +1539,23 @@ Three — I've handled sales under every posture: cooperative, contested, court-
 
 Next time the marital residence is the sticking point, try me on one case. If I don't make your file easier, there's no second case. Fair?`},
 {t:"divorce",ch:"call",adv:"Al Nicoletti",title:"Divorce — The Timing Strategy Call",body:
-`YOU: {{Name}}, {{Agent}} — local agent who works with families in transition. You mentioned the divorce is in progress, so before anything else, one piece of timing insight that saves people real money:
+`YOU: {{Name}}, {{Agent}} — I specialize in helping families facing property challenges, especially when a divorce is in progress. You've got a lot on your plate, so I wanted to share one critical timing insight that can save serious money.
 
-WHEN you sell relative to the judgment changes the tax picture. Sell while married-filing-jointly and you may exclude up to $500K of gain; wait until after, and each ex-spouse's exclusion, basis, and buyout math shifts. Your CPA and attorney own that decision — my job is making sure you're ASKING it before the choice gets made by default.
+It's about when you close on the property relative to the final divorce judgment. Sell while still married-filing-jointly, and you might exclude up to $500K in gain. Wait until after, and that exclusion, basis, and buyout math shifts for each of you. Your CPA and attorney are the strategists here — my job is to make sure you're asking the right questions before a default decision costs you.
 
-So: has anyone put the sell-now versus sell-after numbers side by side for you two? ... That's the analysis I prepare, both parties copied, attorneys welcome to review. Want it in both inboxes this week?`},
+Has anyone laid out the 'sell now' versus 'sell after' numbers for you two? I put together that exact analysis, copying both parties, and your attorneys are always welcome to review it. Want me to send that over this week?`},
 {t:"divorce",ch:"vm",adv:"Chris Voss",title:"Divorce VM — The Reluctant Party",body:
 `{{Name}}... {{Agent}}, local agent. (unhurried) It sounds like everyone in this process wants something from you — a signature, a date, a decision. I'm not calling to add to the pile. When a house has to be sold in circumstances nobody chose... the person who feels steamrolled usually has the power to slow everything down — and usually should, until the process respects them. If you want the version of this where YOU set the terms of engagement... I'm at {{Phone}}. No signature required to talk.`},
 {t:"divorce",ch:"vm",adv:"Laurel Starks",title:"Divorce VM — The Court-Ordered Sale",body:
 `{{Name}}, {{Agent}} — I understand the court has ordered the residence sold. That order feels like losing control; the process doesn't have to. My role in court-ordered sales: both parties get identical information at identical times, every decision is documented for counsel, and the house sells for full market value — not the fire-sale number people fear. I've done this many times under every level of cooperation, including none. Your attorney can verify my process before we speak: {{Phone}}.`},
 {t:"divorce",ch:"vm",adv:"Sharran Srivatsaa",title:"Divorce VM — The Fresh Start Number",body:
-`{{Name}}, {{Agent}} with {{Brokerage}}. In every divorce there's a number that makes the next chapter real: what the house nets, split per the agreement, and what that buys each of you going forward. Most people negotiate for months without ever seeing that number precisely — arguing over a fog. I prepare it neutrally, both parties copied: net sheet, division scenarios, and each person's realistic next-home budget. Clarity first; decisions after. {{Phone}}.`},
+`{{Name}}, {{Agent}} with {{Brokerage}}. In any divorce, the critical number for the next chapter is what the house actually yields. Most people negotiate for months, arguing over assumptions, without ever seeing precise scenarios. I prepare a neutral financial blueprint: net sheet, division options, and each party's realistic next-home budget. It's a clear playbook, not a guess. Clarity first; then, decisions. {{Phone}}.`},
 {t:"divorce",ch:"text",adv:"Laurel Starks",title:"Divorce Text — The Neutral Offer",body:
 `Hi {{Name}}, {{Agent}} — local agent who works divorce sales as a strict neutral (both parties get identical info, attorneys copied on everything). If the {{Street}} house needs a valuation both sides can trust, I can deliver it to both inboxes this week. OK to send my one-page process?`},
 {t:"divorce",ch:"text",adv:"Chris Voss",title:"Divorce Text — The Slow-Down Text",body:
 `{{Name}} — {{Agent}} here. It seems like the house decision is being rushed at you. For what it's worth: the party who insists on a clean process usually ends up with a better outcome than the one who just pushes. If you want the checklist of what a fair sale process looks like — no strings — say the word.`},
 {t:"divorce",ch:"text",adv:"Al Nicoletti",title:"Divorce Text — The Tax Timing Flag",body:
-`Hi {{Name}}, {{Agent}}. One flag worth raising with your attorney early: selling the house BEFORE vs AFTER the judgment can change the capital-gains exclusion by up to six figures. Want the one-page explainer to bring to your next meeting? Free.`},
+`Hi {{Name}}, {{Agent}}. With divorce, selling the house BEFORE vs AFTER judgment can change your capital-gains by six figures. It's a challenge, but we architect for a closeable deal. Want the one-page explainer for your attorney? Free.`},
 {t:"divorce",ch:"email",adv:"Laurel Starks",title:"Divorce Email — The Process One-Pager",body:
 `Subject: How the house gets sold without becoming the war
 
@@ -1597,15 +1577,17 @@ Boring is the goal. Boring closes. I'm happy to walk both counsel through this b
 
 {{Name}},
 
-Most divorcing couples argue about the house in adjectives — "it's worth more," "we can't afford to keep it." The argument ends when adjectives become arithmetic:
+Most divorcing couples argue about the house in adjectives — "it's worth more," "we can't afford to keep it." The argument ends when adjectives become arithmetic. I call this the Two-Futures Analysis. It's a structured playbook for clarity.
 
-SCENARIO A — SELL NOW: market value, minus loan, minus costs = net to divide. Each party's share, and what that share buys/rents in today's market.
-SCENARIO B — ONE KEEPS IT: buyout number, refinance reality check (can one income qualify?), and what the keeping spouse gives up elsewhere in the settlement.
-SCENARIO C — HOLD AND SELL LATER: carrying cost split, market risk, and the tax exclusion you may forfeit by waiting.
+PLAYBOOK 1 — SELL NOW: What is the net to divide after market value, loan, and costs? What does each party's share acquire or rent today?
 
-I prepare all three, neutrally, both parties and counsel copied. Decisions come easier when everyone's arguing about the same numbers.
+PLAYBOOK 2 — ONE KEEPS IT: The precise buyout number, the refinance reality (can one income qualify?), and what the keeping spouse trades in the overall settlement.
 
-One week to prepare. Shall I?
+PLAYBOOK 3 — HOLD AND SELL LATER: The carrying cost split, market risk, and the tax exclusion you may forfeit by waiting.
+
+I prepare all three, neutrally, both parties and counsel copied. Decisions become simple when everyone operates from the same numbers.
+
+One week to engineer this analysis. Shall I?
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`},
 {t:"divorce",ch:"email",adv:"Chris Voss",title:"Divorce Email — To the Party Who Didn't Choose This",body:
@@ -1656,17 +1638,15 @@ So, a calibrated question for your side: what would your buyers need to see from
 
 Bring me that, and we'll have a real negotiation.`},
 {t:"nego",ch:"call",adv:"Bob Knakal",title:"Nego — The Repair-Request Defense Call",body:
-`(seller-side: the inspection response just came in heavy)
+`YOU: {{Owner}}, the inspection response just arrived. Before you react, understand this: it's not a repair list, it's an opening position. Buyers' agents often pad these, hoping sellers just… concede. 
 
-YOU: {{Owner}}, inspection response is in. Before you read it and get angry, let me reframe it: this is not a repair list, it's an OPENING POSITION. Buyers' agents pad these because sometimes sellers just... pay.
+We approach this with market intelligence, not emotion. I've analyzed their requests against our transaction history for properties like yours. We'll categorize them:
 
-Our move is math, not emotion. I've sorted their asks three ways:
+NON-NEGOTIABLES — the {{Item}} — these are items any lender would demand. We address them.
+NEGOTIABLE ITEMS — worth a credit at 50-70 cents on the dollar. Credits close cleaner than contractors, and we know what's customary.
+WISH-LIST ITEMS — cosmetic asks that vanish once we politely decline.
 
-SAFETY/LENDER ITEMS — the {{Item}} — we address these; any buyer's lender would demand them anyway.
-REAL-BUT-NEGOTIABLE — worth a credit at 50-70 cents on the dollar; credits close cleaner than contractors.
-WISH-LIST PADDING — cosmetic asks that die the moment we say no politely.
-
-My proposed response protects your net at {{Number}} while giving them a win to take back to their clients. Every negotiation needs both sides to bring home a story. Want me to send it tonight?`},
+My proposed response protects your net at {{Number}} while giving them a win to take back. Information wins these negotiations. Want me to send it tonight?`},
 {t:"nego",ch:"vm",adv:"Ryan Serhant",title:"Nego VM — The Deal-Rescue Energy",body:
 `{{Name}}, {{Agent}}. The deal hit a bump — the {{Issue}} — and I want you to hear my voice, not read a text, when I tell you: this is fixable, and bumps are where good agents earn their keep. I've already got two paths sketched out, and both keep you moving toward keys. Call me tonight, even late — we'll pick one and execute tomorrow morning. Deals don't die from problems; they die from silence. We don't do silence. {{Phone}}.`},
 {t:"nego",ch:"vm",adv:"Chris Voss",title:"Nego VM — The Stalled Counter",body:
@@ -1696,19 +1676,19 @@ What would your buyers need to feel good saying yes?
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`},
 {t:"nego",ch:"email",adv:"Bob Knakal",title:"Nego Email — The Appraisal Rebuttal",body:
-`Subject: {{Address}} appraisal — the formal rebuttal, attached
+`Subject: {{Address}} — Our appraisal rebuttal package
 
 Team,
 
-The appraisal came in {{Gap}} under contract. Before anyone renegotiates against themselves, the rebuttal package is attached:
+The appraisal for {{Address}} came in {{Gap}} under contract. Before any discussion of price adjustment, our formal rebuttal package is attached. This isn't about personality; it's about superior information:
 
-1. TWO SUPERIOR COMPS the appraiser missed — {{Comp1}} and {{Comp2}} — both closed inside the window, both more similar than two he used.
-2. ADJUSTMENT ERRORS: his {{Feature}} adjustment is against the market data (documented, page 3).
-3. PENDING SALE at {{Address2}} that will close above our contract price within two weeks — the market is literally proving our number as we argue about it.
+1.  **Two overlooked comps:** {{Comp1}} and {{Comp2}} are both more relevant sales, closed within the window, that establish a higher value. We know this specific block.
+2.  **Adjustment errors:** The appraiser's {{Feature}} adjustment is inconsistent with current market data (see page 3). We rebuild these numbers ourselves.
+3.  **Real-time market validation:** A pending sale at {{Address2}} will close above our contract price within two weeks, proving our valuation right now.
 
-Reconsideration of value goes to the lender today. Historical odds of ROVs succeeding with comp-level evidence are meaningful — and even a partial correction changes the renegotiation math entirely.
+The reconsideration of value goes to the lender today. Our experience shows that deep, comp-level evidence like this significantly improves the odds of success. Even a partial correction changes the negotiation entirely.
 
-Nobody moves numbers until the ROV answers. That's the discipline that protects everyone's deal.
+We hold the line until the ROV answers. That's the discipline that protects the value of your asset.
 
 {{Agent}} · {{Brokerage}}`},
 {t:"nego",ch:"email",adv:"Rene Rodriguez",title:"Nego Email — The Cold-Feet Letter",body:
@@ -1732,92 +1712,90 @@ Otherwise: you made a good decision. It's still good at 3am.
 
 /* -- CRE: +3 each -- */
 {t:"cre",ch:"call",adv:"Tyler Cauble",title:"CRE — The Vacancy Fix Call",body:
-`YOU: {{Owner}}, {{Agent}} — commercial agent in {{City}}. Your space at {{Address}} has been sitting empty about {{Months}} months, and every month is roughly {{Rent}} you never get back.
+`YOU: {{Owner}}, {{Agent}} — commercial agent here in {{City}}. Your space at {{Address}} has been sitting empty about {{Months}} months. Every month that goes by is roughly {{Rent}} in lost NOI, and it changes the economics of that asset.
 
-Straight diagnosis from the outside: at this rent and this condition, you're priced for a tenant that this corridor isn't producing. Three fixes, cheapest first:
+From the outside, it looks like a classic 'pro forma over actuals' problem. You're priced for a tenant profile that this submarket isn't producing. Three fixes, cheapest first:
 
-One — REPACKAGE: better photos, a floor plan, and listing where {{Use Type}} tenants actually search. Costs almost nothing; fixes more vacancies than people admit.
-Two — RESLICE: that footprint divides into two smaller suites — smaller spaces are what's moving here.
-Three — REPRICE with escalations: start lower, bake in bumps, protect the pro forma.
+One — REPACKAGE: better photos, a floor plan, and listing where actual {{Use Type}} tenants search. It costs almost nothing; fixes more vacancies than people admit.
+Two — RESLICE: that footprint divides into two smaller suites. Smaller spaces are what's actually moving here, especially for local businesses.
+Three — REPRICE with escalations: start lower, bake in bumps, protect the NOI growth trajectory.
 
-I fill spaces on this corridor — it's my niche. Want the 15-minute walk-through version with actual comps?`},
+I fill spaces like this in {{City}}— it's my niche. Want the 15-minute walk-through version with actual comps?`},
 {t:"cre",ch:"call",adv:"Ken McElroy",title:"CRE — The Value-Add Reposition Call",body:
-`YOU: {{Owner}}, {{Agent}}. Your building on {{Street}} is what I'd call a sleeping asset — solid bones, below-market rents, tired operations. That's not an insult; it's a purchase order. Value-add buyers pay premiums for exactly that upside right now.
+`YOU: {{Owner}}, {{Agent}}. Your building on {{Street}} is a classic case of hidden profits – solid structure, but under-market rents and operations that aren't maximizing cash flow. That's not a criticism; it's a blueprint for forced appreciation. Savvy investors pay a premium for that exact opportunity right now.
 
 Which puts you at a fork:
 
-CAPTURE IT YOURSELF: renovate units on turnover, push rents to market over 18-24 months, refinance at the new NOI. I'll model the budget and the payoff.
+CAPTURE THE NOI: Renovate units as tenants turn, push rents to market, and capture income from things like utility bill-backs. We'd underwrite the budget and show the new cash-on-cash return, then refinance to pull capital out of your golden goose.
 
-SELL THE UPSIDE: let a buyer pay you today for tomorrow's rents. In this cap-rate environment, upside sells at a premium — sometimes more than the renovation math nets you, with none of the work.
+SELL THE UPSIDE: Let a buyer pay you today for tomorrow's NOI. With current cap rates, that future value often sells for more than the work nets you, with none of the management headaches.
 
-The deciding factor is honest: do you have the appetite for two more years of operating? If yes, capture. If the appetite left years ago — and for most owners at your hold length it has — sell the story. I'll price both paths this week.`},
+The deciding factor is honest: do you have the appetite for two more years of active operations? If yes, capture. If that appetite left years ago – and for most owners at your hold length it has – sell the story. I'll price both paths this week.`},
 {t:"cre",ch:"call",adv:"Sharran Srivatsaa",title:"CRE — The Professional-Owner Call",body:
-`YOU: {{Owner}}, {{Agent}} with {{Brokerage}}. You own commercial property AND run a business — which means the building is the investment you have the least time to manage professionally.
+`YOU: {{Owner}}, {{Agent}} with {{Brokerage}}. Your primary P&L is your operating company. Your building is an asset that needs an owner P&L, but not your daily attention.
 
-Here's what my commercial-owner clients get quarterly, and what I'd like to send you free this quarter to earn the relationship:
+My commercial-owner clients get a tactical playbook quarterly. I'd like to send you this quarter's edition, free, to earn the relationship:
 
-- MARK-TO-MARKET: what the building would trade at TODAY, not what it appraised at last refi.
-- LEASE AUDIT: which tenants are under market, when the bumps hit, where the rollover risk sits.
-- THE MOVE: the one action this quarter — a renewal to lock early, a refi window, a tax angle worth asking your CPA about.
+- MARKET DATA: what your asset would trade at TODAY, not last refi.
+- LEASE AUDIT: which tenants are under market, when bumps hit, where rollover risk sits.
+- THE MOVE: the one high-leverage action this quarter—a renewal, a refi window, a tax angle for your CPA.
 
 One page. Real numbers. If it's not the most useful thing in your inbox that week, unsubscribe me from your business forever. Email?`},
 {t:"cre",ch:"vm",adv:"Bob Knakal",title:"CRE VM — The Off-Market Bid",body:
-`{{Owner}}, {{Agent}} with {{Brokerage}}. Not a listing call: I have an exchange buyer with a closing deadline — a 1031 clock running — who needs {{Asset Type}} in {{Submarket}} and has authorized me to approach owners directly. Deadline buyers pay for certainty; it's the best seller's position that exists. If a quiet, no-listing conversation about {{Address}} interests you at the right number, call me this week — after their 45-day window, this call is worthless to both of us. {{Phone}}.`},
+`YOU: {{Owner}}, this is {{Agent}}. My firm's focus on the {{Submarket}} territory has identified a specific buyer requirement for an {{Asset Type}}. This isn't a listing call. I have a 1031 exchange principal with a hard closing deadline — a clock running — who has authorized me to approach owners directly. These deadline buyers pay a premium for certainty, which puts you in the strongest seller's position. If a quiet conversation about {{Address}} interests you at a specific number, call me this week. After their 45-day window, this opportunity vanishes. {{Phone}}.`},
 {t:"cre",ch:"vm",adv:"Tyler Cauble",title:"CRE VM — The Lease Expiry Heads-Up",body:
-`{{Owner}}, {{Agent}} — commercial agent in {{City}}. Public record + a little legwork says your lease with {{Tenant}} at {{Address}} likely rolls in the next 12-18 months. That window is where owners either capture the {{Pct}}% rent growth this corridor just printed — or sign another five years at yesterday's number because the tenant asked nicely. Renewal strategy is a 20-minute conversation and it's free: {{Phone}}. The rent bump pays for a lot of 20-minute conversations.`},
+`{{Owner}}, {{Agent}} — commercial broker in {{City}}. My research shows your lease with {{Tenant}} at {{Address}} likely rolls in the next 12-18 months. That's a critical window where investors either capture the {{Pct}}% rent growth this submarket just printed, or miss out on NOI growth by renewing at yesterday's numbers. We should discuss how the lease structure impacts your actual returns, not just the asking rent. Let's talk for twenty minutes, no charge: {{Phone}}. A proper lease-up pays for itself.`},
 {t:"cre",ch:"vm",adv:"Ken McElroy",title:"CRE VM — The Expense Leak",body:
-`{{Owner}}, {{Agent}}. Quick one on {{Address}}: buildings your vintage in {{City}} are running expense ratios around {{Pct}}% — and when I see a long-held property with original systems and one owner, it's usually running well above that. Every point of expense ratio is real money off your NOI, and at today's cap rates, every NOI dollar is {{Multiple}} dollars of value. Free expense benchmark against your building's peers: {{Phone}}. Plug the leaks before you refi or sell — or just keep the cash flow.`},
+`{{Owner}}, {{Agent}}. Quick one on {{Address}}: properties like yours in {{City}} are typically seeing expense ratios around {{Pct}}%. With original systems and a long-term owner, I often find they're running higher. Remember, every dollar of NOI you add, at today's cap rates, creates {{Multiple}} dollars of value. That's forced appreciation through better management. Let's benchmark your building's expenses against its peers. My number is {{Phone}}. Let's get those leaks plugged before you refi or sell — or just keep that extra cash flow.`},
 {t:"cre",ch:"text",adv:"Bob Knakal",title:"CRE Text — The Deadline Buyer",body:
-`{{Owner}} — {{Agent}}, {{Brokerage}}. I represent a 1031 buyer on a 45-day identification clock who needs {{Asset Type}} in your submarket. Deadline buyers overpay for certainty. If {{Address}} has a number, this is the week it's worth the most. Coffee?`},
+`{{Owner}} — {{Agent}}, {{Brokerage}}. I represent a 1031 buyer on a 45-day clock seeking {{Asset Type}} in your territory. My data shows these buyers pay a premium for market certainty. If {{Address}} has a price, this is the week for its highest value. Coffee?`},
 {t:"cre",ch:"text",adv:"Tyler Cauble",title:"CRE Text — The Corridor Comp",body:
-`{{Owner}}, {{Agent}} here (commercial, {{City}}). Two spaces near {{Address}} just leased at {{Rate}}/sf — meaningfully above where your corridor was last year. If any of your leases roll in the next 18 months, that number changes your math. Want both comps? Free.`},
+`{{Owner}}, {{Agent}} here (commercial, {{City}}). Two spaces near {{Address}} just leased at {{Rate}}/sf — a significant bump from last year. If any of your leases roll soon, that new market rate changes your underwriting for renewals. Want both comps? Free.`},
 {t:"cre",ch:"text",adv:"Ken McElroy",title:"CRE Text — The Cash-Flow Check",body:
-`{{Owner}} — {{Agent}}. One-question audit for {{Address}}: is the building making you money, or are you making the building money? If you have to think about it, the free NOI benchmark I run for {{City}} owners is worth 10 minutes. Want it?`},
+`{{Owner}} — {{Agent}}. Is {{Address}} actually providing cash flow, or are you chasing it? If that question makes you pause, the free NOI audit I run for {{City}} owners shows where the profit is. 10 minutes. Want it?`},
 {t:"cre",ch:"email",adv:"Bob Knakal",title:"CRE Email — The Market Cycle Letter",body:
-`Subject: Where {{Submarket}} sits in the cycle — owner's brief
+`Subject: {{Submarket}} Territory Intelligence: Your Building's Position
 
 {{Owner}},
 
-The quarterly brief I send building owners, condensed to one screen:
+This is the granular market intelligence we provide owners, distilled for your {{Asset Type}} in {{Submarket}}.
 
-PRICING: {{Asset Type}} in {{Submarket}} is trading at {{CapRange}} caps — {{Direction}} from last year. Every 25bps of cap movement swings your building's value roughly {{Swing}}.
-VELOCITY: {{N}} closed sales this quarter; {{Days}} average marketing time. Buyers exist; they're just slower and pickier.
-THE 1031 FLOW: exchange money is {{Flow}} — deadline buyers remain the best bid in the market for sellers who can move quickly.
-BOTTOM LINE FOR YOU: owners at your basis and hold length are {{Position}}. The move worth pricing this quarter: {{Move}}.
+PRICING: We're tracking {{Asset Type}} in your territory trading at {{CapRange}} caps — a {{Direction}} from our view last year. Every 25bps of cap movement shifts your building's value roughly {{Swing}}.
+VELOCITY: {{N}} transactions closed this quarter; {{Days}} average marketing time. Buyers are specific, but they exist.
+THE 1031 FLOW: Exchange capital is {{Flow}} — these buyers remain the most motivated for sellers who can move quickly.
+BOTTOM LINE FOR YOU: Owners with your basis and hold length are {{Position}}. The move worth pricing this quarter: {{Move}}.
 
-The full version with your building's specific mark-to-market is a 20-minute meeting. Standing offer.
+The deeper insights, including your building's specific mark-to-market based on our block-by-block data, are a 20-minute meeting. My standing offer.
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`},
 {t:"cre",ch:"email",adv:"Tyler Cauble",title:"CRE Email — The NNN Upgrade Path",body:
-`Subject: {{Address}}: from hands-on to mailbox money
+`Subject: {{Address}}: from active management to mailbox money
 
 {{Owner}},
 
-You've owned {{Address}} long enough to have done every landlord job twice. Here's the upgrade path owners at your stage take:
+You've owned {{Address}} long enough to have done every landlord job twice. Here's the upgrade path for owners at your stage, turning active management into true passive income:
 
-STEP 1 — MAXIMIZE: get the current leases to market with escalations. (Your corridor just printed {{Rate}}/sf — comps attached.)
-STEP 2 — STABILIZE: a property with fresh, market-rate leases and 3+ years of term sells at a premium cap.
-STEP 3 — TRADE: 1031 the proceeds into true NNN — single tenant, corporate guarantee, tenant pays taxes/insurance/maintenance. Your involvement becomes depositing checks.
+STEP 1 — MAXIMIZE NOI: get your current leases to market with escalations. (Your area just printed {{Rate}}/sf – comps attached.) This is a key value-add lever.
+STEP 2 — STABILIZE: a building with fresh, market-rate leases and 3+ years of term sells at a premium cap rate. Cap rate is a snapshot of value, and we want to maximize it.
+STEP 3 — TRADE: 1031 the proceeds into a true NNN deal – single tenant, corporate guarantee, where the tenant pays taxes, insurance, and CAM. Your involvement becomes depositing checks.
 
-Owners skip step 1 and 2 constantly and leave six figures on the table by selling messy. The whole sequence takes 12-18 months and I quarterback all of it.
+Owners skip step 1 and 2 constantly and leave six figures of value on the table by selling messy. The whole sequence takes 12-18 months, and I quarterback all of it.
 
-Want the version with your actual numbers?
-
-{{Agent}} · {{Brokerage}} · {{Phone}}`},
+Want the version with your actual numbers?`},
 {t:"cre",ch:"email",adv:"Sharran Srivatsaa",title:"CRE Email — The Family Balance Sheet",body:
-`Subject: The building, the family, and the next 10 years
+`Subject: The family's commercial asset: a strategic choice
 
 {{Owner}},
 
-A pattern with family-held commercial property: the building outlives the plan for it. It was Dad's investment, then it was steady income, and now it's an asset nobody actively manages, held by default, waiting for a family meeting that never quite happens.
+A pattern I've observed with family-held commercial assets: the property often outlives the original plan for it. What began as an investment, then steady income, can become an asset held by default, waiting for a strategic decision that never quite happens.
 
-If any of that rings true for {{Address}}, three questions worth answering while every option is open:
+If that resonates with {{Address}}, there are three tactical questions to answer while every option is open:
 
-1. Does anyone in the next generation WANT to operate it? (Honest answers only — inheriting a job isn't a gift.)
-2. What's the step-up-in-basis math? Sometimes holding until transfer beats selling — your CPA and I can model both.
-3. If it were cash today, would the family buy THIS building with it? If no, the market is offering you an exit at premium pricing.
+1. Does anyone in the next generation genuinely WANT to operate this asset? (An honest assessment: inheriting a job isn't a gift.)
+2. What's the step-up-in-basis math? Sometimes holding until transfer is the right play; your CPA and I can model both scenarios.
+3. If it were cash today, would the family re-acquire THIS asset with it? If not, the market is offering a premium exit for a strategic reallocation.
 
-I facilitate these conversations for property families — numbers first, neutrally presented. It's the most valuable meeting most families never schedule.
+I facilitate these conversations for property families — numbers first, neutrally presented. It's a critical owner P&L discussion most families never schedule.
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`},
 
@@ -1833,65 +1811,68 @@ The 35% gap isn't greed — it's holding costs, selling costs, financing, risk, 
 
 Here's what that buys YOU: no repairs, no showings, no appraisal roulette, close on your date, moving help if you need it. Retail minus reality often nets less than my number — want me to show you THAT math too?`},
 {t:"invest",ch:"call",adv:"Pace Morby",title:"Invest — The Sub-To Explainer Call",body:
-`YOU: {{Owner}}, {{Agent}}. You said the payoff quote killed the last deal — low balance, low rate, and after fees there's nothing left at your price. Perfect setup for the tool most agents never mention: selling SUBJECT-TO.
+`YOU: {{Owner}}, {{Agent}}. You said the payoff quote killed your last deal — low balance, low rate, and after fees, nothing was left at your price. That's a common problem when you're trying to win on price. We need to get creative.
 
-Plain English: the buyer takes over your payments — your loan stays in place, they pay it every month, with paperwork that protects you: deed transfers, servicing agreement, catch-up of any arrears at closing.
+Here's the structure: a buyer takes over your payments, your loan stays in place, and they pay it every month. We transfer the deed, set up third-party servicing, and catch up any arrears at closing. You get debt relief, skip repairs, and can often get full price.
 
-Why would you do that? Because a buyer who inherits your {{Rate}}% rate can afford to pay you MORE for the house — often full price — since their monthly cost stays sane.
+Why does this work? Because a buyer inheriting your {{Rate}}% rate can afford to pay you MORE for the house, since their monthly cost stays sane. It's how we do 10-12 deals a month.
 
-Real risks exist — the due-on-sale clause, servicing discipline — and I'll walk you through every one with the actual documents, plus how the escrow protects you. It's not exotic; it's just unfamiliar. Twenty minutes, everything on the table?`},
+Yes, real risks exist — the due-on-sale clause, payment discipline — but we close through a title company, offer independent counsel, and I'll walk you through every document. Twenty minutes, everything on the table?`},
 {t:"invest",ch:"call",adv:"David Greene",title:"Invest — The Keep-vs-Sell Portfolio Call",body:
-`YOU: {{Owner}}, {{Agent}}. Before you sell {{Address}}, let me argue against my own commission for a minute — because you might be holding a keeper.
+`YOU: {{Owner}}, {{Agent}}. Before you sell {{Address}}, let's run the real numbers on this. You might be holding a true keeper, and I'm happy to argue against my own commission if it means you make a smarter move.
 
-The BRRRR math on your place: it's worth {{Value}}, you owe {{Debt}}. A cash-out refi at 75% pulls roughly {{CashOut}} TAX-FREE — versus selling, where the IRS takes its bite of the gain.
+Your place is worth around {{Value}}, with {{Debt}} owed. A cash-out refinance at 75% LTV could pull out roughly {{CashOut}} — tax-free. Compare that to selling, where the IRS takes its bite of your gain. This is how you keep your capital working.
 
-Rent covers the new payment at {{Rent}}, so the tenant services the debt while you redeploy the cash into the next property. That's how portfolios compound: never sell the golden goose, borrow the eggs.
+At {{Rent}}, the tenant covers the new payment, allowing you to redeploy that equity into the next acquisition. Don't sell the golden goose; borrow the eggs. That's how portfolios compound.
 
-Selling is still right if: you're done being a landlord, the property's a management headache, or the equity has a better home. So which are you — building, or simplifying? Both have a right answer, and I work both sides of it.`},
+Now, selling is still the right play if you're done being a landlord, the property's a management headache, or that equity has a better home. So, which path aligns with your vision: building your portfolio, or simplifying things? Both have a right answer, and I work both sides of it.`},
 {t:"invest",ch:"vm",adv:"Tarek El Moussa",title:"Invest VM — The Contractor Reality",body:
-`{{Owner}}, {{Agent}} — about {{Address}}. You mentioned fixing it up first, so real talk from someone who's renovated hundreds: the {{Reno}} you're planning runs {{Cost}} at today's contractor prices — if your contractor shows up, finishes on time, and doesn't find surprises, which is a lot of ifs. The market pays back barely more than that cost right now for that scope. Before you write checks: I'll tell you which two repairs actually return money and which to skip entirely. Free, 10 minutes, could save you {{Savings}}: {{Phone}}.`},
+`{{Owner}}, {{Agent}} here about {{Address}}. You're planning a {{Reno}} first. Look, after nearly a thousand flips, I know that {{Reno}} at {{Cost}} risks over-improving past what the comps support. That's donated money, plain and simple. Before you write any checks, let's talk for ten minutes. I'll show you where your rehab dollars actually return value for this neighborhood, and what to skip entirely. No cost, could save you {{Savings}}: {{Phone}}.`},
 {t:"invest",ch:"vm",adv:"Pace Morby",title:"Invest VM — The Full-Price Terms Offer",body:
-`{{Owner}}, {{Agent}} here about {{Street}}. You want {{Price}} and the cash buyers keep offering less — what if the problem is the STRUCTURE, not the number? On terms — payments over time, you as the bank — I can often meet a full asking price, because time is worth money and I'm buying with time. Better for taxes too, usually (ask your CPA about installment sales). Ten minutes, real paperwork samples, no pressure: {{Phone}}.`},
+`{{Owner}}, {{Agent}} here about {{Street}}. Cash buyers keep lowballing your {{Price}}, right? What if the problem isn't the number, but the actual structure of the offer? If you're free and clear, I can often pay full asking price through terms — you become the bank, taking payments over time. It's how I buy. Ten minutes, I can show you how the paperwork works, no pressure: {{Phone}}.`},
 {t:"invest",ch:"vm",adv:"David Greene",title:"Invest VM — The Out-of-Area Investor",body:
-`{{Name}}, {{Agent}} in {{City}}. You invest from out of the area, so one local heads-up: {{Neighborhood}} just {{Change}} — the kind of shift that changes buy-box math before the data sites catch it. My out-of-state investors get this stuff in real time, plus boots-on-ground for walkthroughs and rehab bids. If your buy-box includes {{City}}, let's sync it: {{Phone}}. Long-distance investing works — with the right eyes local.`},
+`YOU: (voicemail)
+{{Name}}, {{Agent}} in {{City}}. As a long-distance investor, you know making money happens when you buy. {{Neighborhood}} just {{Change}} — a shift that impacts your buy-box for distressed properties. I help investors like you identify properties at 75% ARV or less, with the right Core Four team local for rehab and management. If {{City}} is in your target, let's connect: {{Phone}}. Systems make distance irrelevant.`},
 {t:"invest",ch:"text",adv:"Tarek El Moussa",title:"Invest Text — The Two-Numbers Text",body:
-`{{Owner}} — {{Agent}}. Two numbers for {{Address}}, both free: (1) as-is cash number, close in 2 weeks, zero repairs. (2) fixed-up retail number minus realistic reno costs + 4 months of carrying. Most owners guess wrong about which nets more. Want both by Friday?`},
+`{{Owner}} — {{Agent}}. Two real numbers for {{Address}}, both free: (1) quick cash, zero repairs, close in 2 weeks. (2) the ARV after rehab, minus *all* costs. Most owners guess wrong on what nets more. Want both by Friday?`},
 {t:"invest",ch:"text",adv:"Jerry Norton",title:"Invest Text — The Proof-of-Funds Text",body:
 `Hi {{Owner}}, {{Agent}} here re: {{Street}}. Fair warning about cash buyers: half the "offers" out there are wholesalers with no money hoping to flip the contract. Any offer I bring comes with proof of funds attached, or it doesn't come. Want a real one this week?`},
 {t:"invest",ch:"text",adv:"David Greene",title:"Invest Text — The Rental Analysis",body:
-`{{Owner}} — {{Agent}}. Before you sell {{Address}}: it rents for ~{{Rent}}, which at your likely loan balance might cash-flow better than the sale nets you. I'll run sell-vs-rent side by side, free. 80% choose differently after seeing both. Want it?`},
+`{{Owner}} — {{Agent}}. Before selling {{Address}}, let's run the real numbers. Your ~{{Rent}} could cash-flow well after all expenses, making a hold more profitable than a sale. I'll show you the full sell-vs-rent math, free. Most owners choose differently after seeing it. Want that analysis?`},
 {t:"invest",ch:"email",adv:"Tarek El Moussa",title:"Invest Email — The Renovation ROI Letter",body:
-`Subject: {{Address}}: the repairs that pay and the ones that don't
+`Subject: {{Address}}: Where your rehab dollars actually go
 
 {{Owner}},
 
-Everyone tells sellers to "fix it up first." Nobody shows them the receipts. From hundreds of renovations, here's what actually returns money in this market:
+Look, everyone says "fix it up." But after close to 1,000 flips, I've got the numbers. You need to know what actually puts money back in your pocket and what's just donated cash.
 
-PAYS BACK 2-4X: paint (whole interior), landscaping the first impression, lighting fixtures, deep clean + staging.
-BREAKS EVEN-ISH: flooring, kitchen refresh (counters/hardware — NOT full remodel), bathroom vanities.
-LOSES MONEY AT SALE: full kitchen gut, room additions, high-end finishes in a mid-range neighborhood, anything structural you could disclose-and-credit instead.
+**PROFIT-DRIVERS (2-4X return):** Fresh paint (whole interior), curb appeal (first impression), updated lighting, deep clean + staging. These move the needle.
 
-For {{Address}} specifically: I'd do {{ShortList}} and nothing else — about {{Cost}} for roughly {{Return}} in added price.
+**BREAK-EVEN (mostly):** Flooring, kitchen refresh (counters, hardware – not a full gut), bathroom vanities. You get some value back, but not much margin.
 
-Or skip all of it and take the as-is number: {{AsIs}}. Sometimes the best renovation is none.
+**MONEY PITS (donated cash):** Full kitchen remodels, room additions, high-end finishes that blow past neighborhood comps, or major structural work you could just disclose and credit. Don't over-improve.
 
-Both paths priced honestly, one walkthrough: {{Phone}}.
+For {{Address}} specifically: I'd focus on {{ShortList}} – about {{Cost}} for roughly {{Return}} in added price. That's the smart play.
+
+Or, skip it all and take the as-is number: {{AsIs}}. Sometimes the best renovation is no renovation. Let's evaluate your situation honestly: {{Phone}}.
 
 {{Agent}} · {{Brokerage}}`},
 {t:"invest",ch:"email",adv:"Pace Morby",title:"Invest Email — The Creative Toolbox",body:
-`Subject: 5 ways to sell {{Address}} (4 of them nobody's shown you)
+`Subject: 5 ways to sell {{Address}} (and 4 of them actually solve problems)
 
 {{Owner}},
 
-Every agent shows you door #1. Here's the full toolbox:
+Most buyers only have one tool in their belt: cash. That's fine if your only problem is needing money fast. But if you have a real problem, you need creative solutions.
 
-1. RETAIL LISTING — top price, but repairs, showings, and 60-90 days.
-2. AS-IS CASH — fast and certain; the discount is the fee for certainty.
-3. SELLER FINANCE — you're the bank: full price or better, monthly income, big tax spreading (installment sale). Best when you don't need the lump sum.
-4. SUBJECT-TO — buyer takes over your payments; strongest when your rate is low and equity is thin. Paperwork protects you or the deal doesn't happen.
-5. HYBRID (wrap/partial) — some cash now, income after. The Swiss Army option.
+Here's how we get deals done, even when cash buyers walk away:
 
-Which fits depends on three things: your equity, your rate, and what the money is FOR. Tell me those three and I'll rank the five for your exact situation — no charge, no pressure, and I'll show real contracts so nothing is hand-wavy.
+1. RETAIL LISTING — Top dollar, but you do the repairs, the showings, and wait 60-90 days.
+2. AS-IS CASH — Quick and certain, but you pay a big discount for that certainty.
+3. SELLER FINANCE — You become the bank. You get full price, monthly income, and big tax savings. This is the play if you don't need all the money at once.
+4. SUBJECT-TO — We take over your current mortgage payments. Best if your rate is low and you need debt relief or speed. We close through a title company, so everyone's protected.
+5. HYBRID — We take over your loan AND you carry a small note for your equity. Some cash now, income later.
+
+Which structure works for you depends on what problem you're trying to solve. Tell me your situation and I'll show you exactly how these work with real contracts. No pressure, no cost.
 
 {{Agent}} · {{Phone}}`},
 {t:"invest",ch:"email",adv:"Jerry Norton",title:"Invest Email — The Wholesaler Defense",body:
@@ -1913,21 +1894,21 @@ Ask all five of everyone — including me. I'll answer them in my first email an
 
 /* -- ESPANOL: +3 each -- */
 {t:"espanol",ch:"call",adv:"Veronica Figueroa",title:"Llamada — Vendedor Primera Vez (ES)",body:
-`YOU: Buenas tardes {{Owner}}, le habla {{Agent}} de {{Brokerage}}. ¿Tiene un minutito? Le prometo que vale la pena.
+`YOU: Buenas tardes {{Owner}}, le habla Veronica Figueroa de The Fig Team. (Pause) Sé que su tiempo es valioso, ¿me regala un minuto? Esto es importante.
 
-Muchas familias aquí en {{Neighborhood}} compraron hace años y no se han dado cuenta de cuánto ha subido su casa. Su propiedad probablemente vale mucho más de lo que pagó — y ese dinero, esa plusvalía, es SUYA.
+Muchas familias aquí en {{Neighborhood}} compraron hace años y no se han dado cuenta de la fuerza que ha tomado su propiedad. Ese capital, esa plusvalía, es SUYA. Es el verdadero motor de crecimiento para su familia.
 
-No le llamo para presionarla a vender. Le llamo porque conocer su número le abre puertas: comprar algo más grande, ayudar a los hijos, invertir, o simplemente dormir tranquila sabiendo lo que tiene.
+No le llamo para presionarla a vender. Le llamo para darle claridad, para que sepa exactamente dónde está parada. Esa información abre caminos: comprar algo más grande, ayudar a los suyos, o simplemente dormir tranquila sabiendo su verdadero número.
 
-Le preparo el análisis gratis, por escrito, y se lo explico con calma — sin tecnicismos, sin letra chiquita. ¿Se lo mando esta semana? Y si prefiere que hablemos con toda la familia presente, mejor todavía — así se hacen bien estas decisiones.`},
+Le preparo el análisis sin complicaciones, directo al grano. ¿Le pido permiso para enviárselo esta semana? Y si prefiere que hablemos con toda la familia presente, mejor todavía — así se toman las decisiones grandes.`},
 {t:"espanol",ch:"call",adv:"Carlos Reyes",title:"Llamada — Casa Heredada (ES)",body:
-`YOU: {{Name}}? Habla {{Agent}}, agente local aquí en {{City}}. Primero — mi más sentido pésame por {{Deceased Name}}. Sé que esta llamada llega en un momento difícil, así que voy directo y con respeto:
+`YOU: {{Name}}? Soy {{Agent}}, aquí en {{City}}. Primero, mi más sentido pésame por {{Deceased Name}}. Sé que esta llamada llega en un momento difícil, así que voy directo y con respeto:
 
-Cuando una familia hereda una casa, aparecen tres caminos: quedársela, rentarla, o venderla. Y casi siempre aparece también el problema: los papeles. Sucesión, testamento, título — cosas que toman meses si no se empiezan bien.
+Cuando una familia hereda una casa, siempre aparecen tres opciones claras: quedarse con ella, rentarla, o venderla. Y la realidad es que casi siempre el problema son los papeles — sucesión, testamento, título. Esas cosas que, si no se manejan con un sistema, pueden tomar meses y costar dinero.
 
-Yo ayudo a familias con TODO eso, en español, paso a paso: los números de los tres caminos, los abogados correctos (conozco buenos que hablan español), y si al final deciden vender, me encargo de todo — hasta de la limpieza de la casa.
+Mi equipo y yo ayudamos a familias con TODO eso, en español, paso a paso. Les damos claridad sobre los números de cada opción, los conectamos con abogados expertos (conozco buenos que hablan español), y si deciden vender, nos encargamos de todo el proceso. Queremos que tomen la mejor decisión para su patrimonio familiar.
 
-Sin prisa y sin compromiso. ¿Qué es lo que más les preocupa ahorita — los papeles, o qué hacer con la propiedad?`},
+Sin prisa y sin compromiso. ¿Qué es lo que más les pesa ahorita — los papeles, o qué hacer con la propiedad?`},
 {t:"espanol",ch:"call",adv:"Rene Rodriguez",title:"Llamada — El Que Espera (ES/EN)",body:
 `YOU: {{Owner}}, habla {{Agent}}. Le llamo porque la última vez me dijo algo que escucho mucho: "estamos esperando a ver qué pasa con el mercado."
 
@@ -1937,51 +1918,48 @@ Esperar también es una decisión, y también tiene precio. La diferencia es que
 
 Eso es lo que ofrezco: los números de moverse HOY versus esperar un año — lado a lado, en una página, gratis. Si los números dicen "espérese," se lo digo con gusto. Pero que la decisión sea con números, no con miedo. ¿Se los preparo?`},
 {t:"espanol",ch:"vm",adv:"Loida Velasquez",title:"Buzón — Vecina de Confianza (ES)",body:
-`{{Owner}}, le habla {{Agent}}, agente aquí en {{Neighborhood}}. Le dejo este mensajito porque acabamos de vender una casa en su calle y los valores subieron otra vez. Muchos vecinos me preguntan "¿y la mía cuánto vale?" — y esa respuesta siempre es gratis conmigo, sin ningún compromiso. En español o inglés, como guste. Cuando quiera su número: {{Phone}}. Que Dios la bendiga y buen día.`},
+`Hola {{Owner}}, le habla {{Agent}}, su agente local aquí en {{Neighborhood}}. Le dejo este mensaje porque acabamos de vender una propiedad en su calle y los valores han subido. Muchos vecinos me preguntan: "¿cuánto vale mi casa?" Mi meta es ayudarle. Esa respuesta es siempre gratis conmigo, sin compromiso. En español o inglés, como guste. Cuando quiera saberlo: {{Phone}}. Que Dios la bendiga y buen día.`},
 {t:"espanol",ch:"vm",adv:"Veronica Figueroa",title:"Buzón — Programas de Compra (ES)",body:
-`Hola {{Name}}, le habla {{Agent}} de {{Brokerage}}. Le llamo porque preguntó sobre comprar casa — y quiero que sepa algo antes de que se desanime: hay programas de ayuda aquí en {{County}} con enganches desde 3%, ayuda para el pago inicial, y sí — opciones para compradores con ITIN. Cientos de familias como la suya ya lo lograron con nuestro equipo. La consulta es gratis, en español, y sin compromiso: {{Phone}}. Su casa propia está más cerca de lo que cree.`},
+`Hola {{Name}}, le habla {{Agent}} de {{Brokerage}}. Sé que preguntó sobre comprar casa, y quiero que sepa algo: aquí en {{County}}, nuestro equipo domina los programas de ayuda con enganches bajos, asistencia para el pago inicial, y sí, ¡caminos claros para compradores con ITIN! Es una ventaja que pocos conocen. Hemos ayudado a cientos de familias como la suya a lograrlo. La consulta es gratis, en español, y sin compromiso: {{Phone}}. Su casa propia está más cerca de lo que cree.`},
 {t:"espanol",ch:"vm",adv:"Carlos Reyes",title:"Buzón — Compra Directa (ES)",body:
-`{{Owner}}, habla {{Agent}}, inversionista y agente local en {{City}}. Mensaje corto: si algún día quiere vender su propiedad en {{Street}} TAL COMO ESTÁ — sin arreglar nada, sin enseñarla a extraños, sin esperar meses — yo le doy un número real, por escrito, y cerramos cuando usted diga. Sin trucos y sin presión: si el número no le sirve, quedamos como amigos. {{Phone}}. Buen día.`},
+`Hola {{Owner}}, aquí {{Agent}}. Mi equipo y yo compramos propiedades en {{City}}. Mensaje corto: si un día piensa vender su casa en {{Street}} TAL COMO ESTÁ — sin arreglar nada, sin enseñarla a extraños, sin esperar meses — yo le doy un número real, por escrito. Cerramos cuando usted diga. Sin trucos y sin presión: si el número no le sirve, quedamos como amigos. {{Phone}}. Buen día.`},
 {t:"espanol",ch:"text",adv:"Loida Velasquez",title:"Texto — El Valor de Su Casa (ES)",body:
-`Hola {{Owner}}, soy {{Agent}}, agente aquí en {{Neighborhood}} 🏡 Se vendió una casa en su calle y su valor cambió. ¿Le mando su número actualizado? Es gratis y sin compromiso — en español o inglés, como prefiera.`},
+`Hola {{Owner}}, soy {{Agent}}, su agente local en {{Neighborhood}}. 🏡 Se vendió una casa cerca y el valor de su propiedad ha cambiado. ¿Le gustaría saberlo? Es gratis, sin compromiso. Lo puedo enviar en español o inglés.`},
 {t:"espanol",ch:"text",adv:"Veronica Figueroa",title:"Texto — Primera Casa (ES)",body:
-`Hola {{Name}}, soy {{Agent}} de {{Brokerage}} 😊 ¿Sabía que hay programas con enganche desde 3% y ayudas aquí en {{County}} — incluso con ITIN? La consulta es gratis y en español. ¿Le mando la información o prefiere una llamadita de 10 minutos?`},
+`Hola {{Name}}, soy {{Agent}} de {{Brokerage}}. Mi equipo se especializa en programas de asistencia para comprar casa, incluso con ITIN o para extranjeros. Hay opciones que hacen la compra posible aquí en {{County}}. ¿Le mando un mensaje con más detalles o hablamos 10 minutos?`},
 {t:"espanol",ch:"text",adv:"Rene Rodriguez",title:"Texto — La Pregunta Correcta (ES)",body:
 `{{Owner}}, soy {{Agent}}. Una pregunta nada más: si supiera EXACTAMENTE cuánto vale su casa hoy y cuánto le quedaría limpio si vendiera — ¿cambiaría algún plan de este año? Si la respuesta es "tal vez," le preparo los números gratis. Un texto y listo.`},
 {t:"espanol",ch:"email",adv:"Loida Velasquez",title:"Email — Reporte del Barrio (ES/EN)",body:
-`Subject: Su calle: lo que se vendió y lo que significa / Your street: what sold & what it means
+`Subject: Su casa: Lo que se vendió y lo que significa / Your home: What sold & what it means
 
 Estimada familia {{Owner}},
 
-Cada mes les mando a mis vecinos de {{Neighborhood}} un resumen corto del mercado — porque su casa es su patrimonio, y ustedes merecen saber lo que tienen.
+Mi nombre es Loida y soy una agente local. Les envío esto porque su casa es una de sus mayores inversiones, y merecen saber lo que pasa en {{Neighborhood}}.
 
-ESTE MES:
-- Se vendió: {{Address}} en {{Price}}
-- Su valor estimado subió a: {{Value}}
-- Qué significa: los compradores siguen pagando bien por casas cuidadas en nuestra zona.
+Este mes, la propiedad en {{Address}} se vendió por {{Price}}. Esto significa que el valor estimado de su casa subió a {{Value}}. Los compradores siguen muy activos y buscan casas como la suya.
 
-(English summary: A home on your street sold for {{Price}}, which moves your estimated value to {{Value}}. Buyers are still paying strong prices for well-kept homes here.)
+(English summary: A home on your street sold for {{Price}}, moving your estimated value to {{Value}}. Buyers are still very active for homes like yours.)
 
-Si quiere el análisis completo de SU casa — gratis, por escrito, sin compromiso — responda este correo o mándeme un texto: {{Phone}}.
+Si quieren saber el valor exacto de SU casa, y si les gustaría venderla rápido y por buen precio, respondan este correo o mándenme un texto a {{Phone}}. Quiero ayudarles a entender su situación.
 
 Con cariño y respeto,
 {{Agent}} · {{Brokerage}}`},
 {t:"espanol",ch:"email",adv:"Carlos Reyes",title:"Email — Vender Sin Arreglar (ES)",body:
-`Subject: Vender su casa tal como está — sin gastar un peso
+`Subject: Su casa, sin arreglos, sin dolores de cabeza
 
 Estimado {{Owner}},
 
-Muchos dueños no venden porque creen que primero hay que gastar: pintura, techo, cocina... miles de dólares que no tienen a la mano. La verdad es que existe otro camino:
+Sé que muchos dueños no venden porque piensan: "primero tengo que gastar miles en arreglos, pintura, la cocina... dinero que no tengo." Créame, entiendo esa situación. Pero hay otra forma, una que usamos para cerrar cientos de propiedades:
 
-VENTA TAL-COMO-ESTÁ:
-- Cero reparaciones — yo compro (o traigo al comprador) con la casa como esté
-- Cero limpieza — llévese lo que quiera, lo demás lo resolvemos nosotros
-- Usted escoge la fecha de cierre — 2 semanas o 3 meses
-- Número real por escrito, con fondos comprobados — no promesas
+VENTA DIRECTA, CERO ARREGLOS:
+- No gaste un centavo en reparaciones — compramos su casa como esté.
+- No limpie nada — llévese lo que quiera, nosotros nos encargamos del resto.
+- Usted elige el día de cierre — podemos cerrar en 2 semanas o 3 meses.
+- Le damos un número real, por escrito, con fondos comprobados. No promesas.
 
-¿El precio es menor que arreglando todo? Sí, un poco. Pero cuando suma lo que costarían las reparaciones, los meses de espera y el estrés, muchas veces el número limpio gana.
+¿Es un poco menos que si la arregla usted? Sí. Pero cuando ve el costo de esos arreglos, los meses de espera y el estrés, el número neto muchas veces es mejor. Aquí somos de números claros.
 
-Le doy ambos números — arreglada y tal-como-está — gratis, para que decida con todo sobre la mesa.
+Le doy ambas opciones — arreglada y tal-como-está — sin compromiso, para que tenga la información y decida lo mejor para usted y su patrimonio.
 
 {{Agent}} · {{Brokerage}} · {{Phone}}`},
 {t:"espanol",ch:"email",adv:"Rene Rodriguez",title:"Email — La Carta de las Dos Familias (ES)",body:
@@ -2007,19 +1985,19 @@ La moraleja no es "vendan." Es: LOS NÚMEROS PRIMERO, la decisión después. Los
 /* ===== EXPANSION E: top-ups ===== */
 SCRIPTS.push(
 {t:"social",ch:"vm",adv:"Chelsea Peitz",title:"Social VM — The Voice Behind the Content",body:
-`{{Name}}! It's {{Agent}} — yes, the one from your feed, with an actual human voice! You sent that DM about {{Their Question}} and it deserved more than typing. Short version: {{One-Line Answer}} — and the longer version comes with a story that didn't make it into the post. No agenda here, I just believe DMs that matter deserve voices. Call or text back whenever: {{Phone}}. And thanks for being part of my little corner of the internet — it means more than the algorithm knows.`},
+`{{Name}}! It's {{Agent}} — yes, the one from your feed, with an actual human voice! You sent that DM about {{Their Question}} and some things just need more than typing. Short version: {{One-Line Answer}}. But the *lived experience* and the full story behind that didn't make it into the post. That's the context, right? The money is in these DMs, and I believe real conversations deserve voices. Call or text back whenever: {{Phone}}. And thanks for being part of my corner of the internet — it means more than the algorithm knows.`},
 {t:"luxury",ch:"call",adv:"Joanna Gaines",title:"Luxury — The Story-of-the-Home Call",body:
-`YOU: {{Owner}}, this is {{Agent}} — I'll tell you exactly why I'm calling, because it's a little different.
+`YOU: {{Owner}}, this is {{Agent}} — I'm calling about {{Address}}, and I hope you'll find my approach a little different.
 
-Before I ever list a home like {{Address}}, I ask the owner for its story. Not the square footage — the story. The room where every holiday happened. The reading spot that gets the morning light. What you fixed, what you saved, what you'd never change.
+Before I ever help a family find the next chapter for a home, I ask for its story. Not the dimensions, but the heart. The space where every holiday happened. The quiet nook that catches the morning light. What you nurtured, what you brought back to life, what you'd never change.
 
-Here's why it matters commercially: buyers at this level aren't comparing spec sheets — they're auditioning lives. The home whose story is told beautifully — in the photography, the staging, the listing itself — is the one they fall for. And people pay full price for what they've fallen for.
+This matters so much: buyers at this level aren't just comparing floor plans — they're imagining a life. The home whose personal journey is felt deeply — in the images, the styling, the way it's presented — that's the one they truly fall for. And people pay full price for a home they've fallen for.
 
-So: if you ever decide to pass this home to its next chapter, give me one walk-through and one hour of stories. The marketing writes itself from there. Would sometime this month work, even just for the conversation?`},
+So: if you ever decide to pass this home to its next family, give me one walk-through and one hour of stories. We'll find its perfect match from there. Would sometime this month work, even just for the conversation?`},
 {t:"luxury",ch:"vm",adv:"Cheryl Eisen",title:"Luxury VM — The Five-Second Test",body:
-`{{Owner}}, {{Agent}} here. A truth from the top of the market: luxury buyers decide in the first five seconds — the entry, the light, the first sightline. Everything after is justification. {{Address}} has extraordinary bones, and if a sale is ever on your horizon, those five seconds deserve professional design before a single photo is taken. Staged properly, homes at your level are commanding meaningfully more and selling in half the time. The walk-through where I show you exactly what I'd do is complimentary: {{Phone}}.`},
+`{{Owner}}, {{Agent}} here. In luxury, buyers fall in love in the first five seconds — that initial emotional connection, the story they see. {{Address}} has incredible bones, but vacant luxury reads cold and small. Before a single photo, those first moments need magazine-worthy design. Our projects sell faster and for more money because we stage to the target buyer's aspirational life. I can show you exactly how to create those 'moments' for your property. My walk-through is complimentary: {{Phone}}.`},
 {t:"luxury",ch:"text",adv:"Sharran Srivatsaa",title:"Luxury Text — The Annual Private Valuation",body:
-`{{Owner}} — {{Agent}}, {{Brokerage}}. Owners at your level get an annual private valuation from me: the real number ({{Enclave}} moved again this year), off-market interest if any, and zero obligation. Yours is ready whenever you want it. Shall I send it over?`}
+`{{Owner}} — {{Agent}}, {{Brokerage}}. I prepare an annual private valuation for owners in {{Enclave}}. It includes market shifts, any off-market interest, and a clear, real number. No obligation, just data. Yours is ready. May I send it?`}
 );
 
 /* ============ ADVISOR ROSTER (voice selector) ============ */
