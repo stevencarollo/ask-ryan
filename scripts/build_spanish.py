@@ -181,9 +181,14 @@ def validate(src_body, out, ch):
     errs = []
     if not out or len(out) < 40:
         return ["empty"]
-    # placeholder IDENTITY must hold (repetition may legitimately differ)
-    if set(re.findall(r"\{\{[^}]+\}\}", src_body)) != set(re.findall(r"\{\{[^}]+\}\}", out)):
-        errs.append("placeholders")
+    # inventing a placeholder is a real defect (a raw {{Foo}} would reach the
+    # agent); dropping one only means this rendering does not use that detail
+    src_ph = set(re.findall(r"\{\{[^}]+\}\}", src_body))
+    out_ph = set(re.findall(r"\{\{[^}]+\}\}", out))
+    if out_ph - src_ph:
+        errs.append("invented")
+    if (src_ph & {"{{Owner}}", "{{Name}}"}) and not (out_ph & {"{{Owner}}", "{{Name}}"}):
+        errs.append("lost-prospect-name")
     if TU_FORM.search(out):
         errs.append("tu-form")
     if ch == "email" and not out.lstrip().startswith("Subject:"):

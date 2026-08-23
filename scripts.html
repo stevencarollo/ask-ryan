@@ -398,7 +398,7 @@ body.hasmkt .abtn.gold{display:inline-block}
 <button id="pickGo" onclick="tailorPicks()">✦ Tailor picks</button>
 <div id="toast"></div>
 
-<script src="/scripts_data.js?v=3"></script>
+<script src="/scripts_data.js?v=4-reground"></script>
 <script>
 const API_URL = 'https://ask-ryan-nb3w.onrender.com';
 
@@ -1055,10 +1055,11 @@ async function setSpanish(on){
     SCRIPTS.forEach((s, i) => {
       const hit = REVOICE_CACHE.get(cacheKey(i));
       if (hit){ s.local = hit.script; s.why = hit.why; if (VOICE) s.voicedBy = VOICE.n; return; }
-      // prewritten Spanish covers the default voice; a chosen advisor voice
-      // still needs a live pass to be that advisor IN Spanish
-      const es = !VOICE && lib[skey(s)];
-      if (es){ s.local = es.script; s.why = ''; s.preOnly = !!MARKET; pre++; }
+      // Always show the prewritten Spanish immediately — instant Spanish beats
+      // waiting on the engine. If a specific advisor voice or a market is also
+      // set, mark it preOnly so Tailor can still upgrade it live.
+      const es = lib[skey(s)];
+      if (es){ s.local = es.script; s.why = ''; s.preOnly = !!(MARKET || VOICE); pre++; }
     });
     syncGold(); render(); syncSetupSum();
     if (pre){
