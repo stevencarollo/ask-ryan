@@ -25,3 +25,4 @@ scripts_data.PRE-*.js
 scripts_data.BACKUP-*.js
 scripts/regrounded*.json
 logs/
+voices.BACKUP-*/

@@ -43,22 +43,42 @@ def main():
     if not scripts:
         sys.exit("No Spanish scripts built yet - run scripts/build_spanish.py first.")
 
-    # stratify: one per topic x channel, calls and texts first (spoken = riskiest)
-    order = {"call": 0, "text": 1, "vm": 2, "email": 3}
-    seen, sample = set(), []
-    for s in sorted(scripts, key=lambda x: (order.get(x["ch"], 9), x["t"])):
-        cell = (x := (s["t"], s["ch"]))
-        if cell in seen:
+    # Stratify properly: every format must be represented, and within a format
+    # spread across as many different lead types as possible. Calls and texts get
+    # a slightly bigger share - spoken naturalness is where a translated-sounding
+    # line actually costs a conversation - but vm and email are never zero.
+    weight = {"call": 0.32, "text": 0.28, "vm": 0.20, "email": 0.20}
+    by_ch = {}
+    for s in scripts:
+        by_ch.setdefault(s["ch"], []).append(s)
+
+    sample, used_topics = [], set()
+    for ch, share in weight.items():
+        pool = by_ch.get(ch, [])
+        if not pool:
             continue
-        seen.add(cell)
-        sample.append(s)
-        if len(sample) >= args.rows:
-            break
-    for s in scripts:                      # top up if the grid was small
+        want = max(1, round(args.rows * share))
+        # prefer lead types not already covered, so the grid spreads
+        pool = sorted(pool, key=lambda s: (s["t"] in used_topics, s["t"]))
+        picked, seen_t = [], set()
+        for s in pool:
+            if s["t"] in seen_t:
+                continue
+            seen_t.add(s["t"])
+            picked.append(s)
+            used_topics.add(s["t"])
+            if len(picked) >= want:
+                break
+        sample.extend(picked)
+
+    for s in scripts:                      # top up to the requested row count
         if len(sample) >= args.rows:
             break
         if s not in sample:
             sample.append(s)
+    sample = sample[:args.rows]
+    order = {"call": 0, "text": 1, "vm": 2, "email": 3}
+    sample.sort(key=lambda s: (order.get(s["ch"], 9), s["t"]))
 
     wb = Workbook()
     ws = wb.active

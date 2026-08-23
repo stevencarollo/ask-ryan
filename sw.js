@@ -2,7 +2,7 @@
  * Strategy: network-first for pages/data (deploys show up immediately),
  * cache-first for heavy static assets (fast repeat loads in the field).
  * Bump CACHE_V on breaking asset changes. */
-const CACHE_V = 'rt-v1';
+const CACHE_V = 'rt-v2-reground';
 const STATIC_FIRST = [/\/xlsx\.full\.min\.js$/, /\/voices\/.+\.json$/, /\/icons\/.+\.png$/, /fonts\.(googleapis|gstatic)\.com/];
 
 self.addEventListener('install', (e) => self.skipWaiting());
