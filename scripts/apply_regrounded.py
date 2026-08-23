@@ -44,8 +44,19 @@ def main():
 
     swapped = [0]
 
+    # These advisors were deliberately reverted to their originals: the rewrite
+    # churned already-good scripts for no measurable gain (see revert_churn.py).
+    # Re-applying the staged set used to silently undo that decision - it wiped
+    # all 69 the second time this script ran. Never touch them again.
+    KEEP_ORIGINAL = {"Rene Rodriguez", "Brian Buffini", "Jerry Norton",
+                     "Laurel Starks", "Chris Voss", "Ryan Serhant"}
+    skipped = [0]
+
     def repl(m):
         t, ch, adv, title, body = m.groups()
+        if adv in KEEP_ORIGINAL:
+            skipped[0] += 1
+            return m.group(0)
         key = bs.skey(title, adv, ch, t)
         new = staged.get(key)
         if not new:
@@ -60,6 +71,7 @@ def main():
     print("scripts in library : %d" % before)
     print("staged rewrites    : %d" % len(staged))
     print("swapped in         : %d" % swapped[0])
+    print("left as original   : %d  (deliberately reverted advisors)" % skipped[0])
     print("scripts after swap : %d" % after)
     if after != before:
         sys.exit("ABORT - script count changed (%d -> %d)" % (before, after))

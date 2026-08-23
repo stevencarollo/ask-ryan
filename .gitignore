@@ -26,3 +26,4 @@ scripts_data.BACKUP-*.js
 scripts/regrounded*.json
 logs/
 voices.BACKUP-*/
+skill-backups/

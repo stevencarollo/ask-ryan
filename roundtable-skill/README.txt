@@ -35,7 +35,11 @@ WHAT YOU GET
 - Ask for scripts, objection handling, deal analysis, staging plans,
   flyer critiques - or paste any document for review.
 
-Free forever. Full web version at https://ask-ryan.vercel.app also includes
-a 274+ script Script Vault (with live local-market tailoring and instant
-advisor-voice switching), a Flyer Studio (paste a listing link, get 8
-print-ready templates), and a Podcast Studio (real audio episodes).
+This skill is yours to keep and works on its own.
+
+There is also a members-only web version at https://roundtablehq.vercel.app
+(activation code required - request one on the sign-in page). It adds the
+Script Vault: all 274 scripts, an advisor-voice switch that re-voices the
+whole library instantly, 258 prewritten Spanish scripts, this week's local
+market data woven into any script, and a lead-list upload that hands your
+own spreadsheet back with personalised scripts written into it.

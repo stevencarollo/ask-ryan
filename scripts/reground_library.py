@@ -28,9 +28,17 @@ OUT = ROOT / "scripts" / "regrounded.json"
 LOG = ROOT / "logs" / "reground.log"
 
 # generic filler that betrays a script written by a machine rather than a broker
-BANNED = ["corridor", "unlock", "optimize", "landscape", "realm", "seamless",
+# Scaffolding from the research write-ups, not anybody's speech. "Doctrine"
+# appears in 25 of the 34 dossiers as a SECTION LABEL - the model was reading my
+# analysis vocabulary as the advisor's own words and saying it out loud.
+# Deliberately NOT banned: protocol, playbook, philosophy, proven system - real
+# people do say those, and over-sanitising is its own kind of damage.
+META = ["doctrine", "our machine", "the machine", "listing machine", "my machine",
+        "methodology", "our framework", "the framework", "core teaching",
+        "signature move", "tenets", "blueprint"]
+BANNED = META + ["corridor", "unlock", "optimize", "landscape", "realm", "seamless",
           "robust", "elevate", "streamline", "curated", "synergy", "holistic",
-          "navigate the complexit", "in today's market", "at the end of the day",
+          "navigate the complexit",
           "value proposition", "best-in-class", "game-chang", "cutting-edge",
           "deep dive", "circle back", "myriad", "plethora", "tapestry",
           "testament to", "ever-changing"]
@@ -76,6 +84,10 @@ JUDGEMENT - this matters more than jargon coverage:
   principals and other professionals - and their plain words everywhere else.
 - The goal is that THIS PERSON would recognise the script as theirs, not that it
   contains the most keywords.
+- NEVER announce the method. Nobody says "our doctrine", "our machine", "our
+  proven system". The research is written ABOUT this person; its labels are not
+  their words and must never appear in a script.
+- Their signature phrases are seasoning, not the meal: at most ONE per script.
 - USE the method; never NAME it. The homeowner should feel the technique working,
   not hear its label. Writing "influence is about giving you information" or
   "this is a calibrated question" is worse than the generic script you started

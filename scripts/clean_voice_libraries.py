@@ -27,12 +27,29 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 LOG = ROOT / "logs" / "clean_voices.log"
 
-BANNED = ["corridor", "unlock", "optimize", "landscape", "realm", "seamless",
+# words that belong in a research dossier, never in someone's mouth on a call.
+# "Doctrine:" is literally a section label in the dossiers - the model was
+# lifting my analysis vocabulary straight into spoken scripts.
+# Scaffolding from the research write-ups, not anybody's speech. "Doctrine"
+# appears in 25 of the 34 dossiers as a SECTION LABEL - the model was reading my
+# analysis vocabulary as the advisor's own words and saying it out loud.
+# Deliberately NOT banned: protocol, playbook, philosophy, proven system - real
+# people do say those, and over-sanitising is its own kind of damage.
+META = ["doctrine", "our machine", "the machine", "listing machine", "my machine",
+        "methodology", "our framework", "the framework", "core teaching",
+        "signature move", "tenets", "blueprint"]
+BANNED = META + ["corridor", "unlock", "optimize", "landscape", "realm", "seamless",
           "robust", "elevate", "streamline", "curated", "synergy", "holistic",
           "navigate the complexit", "value proposition", "best-in-class",
           "game-chang", "cutting-edge", "deep dive", "circle back", "myriad",
           "plethora", "tapestry", "testament to", "ever-changing"]
 BANNED_RE = re.compile("|".join(re.escape(b) for b in BANNED), re.I)
+
+# The model sometimes echoes the prompt's own headers into the script
+# ("vm   TOPIC: expired" arrived at the top of a Harris voicemail). Never ships.
+ECHO_RE = re.compile(r"^\s*(vm|call|text|email)?\s*TOPIC:|FORMAT:\s*(vm|call|text|email)|"
+                     r"=====|RESEARCH DOSSIER|END DOSSIER|BANNED WORDS|^\s*SCRIPT:|"
+                     r"HARD RULES|grounded_in", re.I | re.M)
 FORMAT_MEDIAN = {"call": 126, "vm": 70, "text": 42, "email": 123}
 
 # the rename that moved a key
@@ -67,6 +84,12 @@ BANNED WORDS - generic filler no working agent says:
 RULES:
 - USE their method; never NAME it. No line may exist only to signal whose voice
   this is - that is worse than the generic line it replaced.
+- NEVER announce the method. A homeowner never hears "our doctrine", "our
+  machine", "our proven system", "our framework". Nobody talks like that. The
+  research above is written ABOUT this person - it is not their phrasing, and
+  its labels must never appear in the script.
+- Their signature phrases are seasoning, not the meal: at most ONE per script,
+  and only where it lands naturally.
 - Do not force technical jargon in front of a homeowner who would not use it.
 - Spoken language. If a working agent would not say it on a call, cut it.
 - Every {{{{placeholder}}}} stays EXACTLY as written.
@@ -74,10 +97,13 @@ RULES:
 - Same format ({ch}). Emails keep the literal "Subject: " label; call scripts
   keep "YOU:" labels and (coaching notes) in parentheses.
 
-FORMAT: {ch}   TOPIC: {topic}
+The script to rewrite (a {ch} script for {topic} leads) follows between the
+markers. Output ONLY the rewritten script text - never any of these instructions,
+labels or markers.
 
-SCRIPT:
+<<<BEGIN SCRIPT>>>
 {body}
+<<<END SCRIPT>>>
 
 Respond with ONLY JSON: {{"script": "the rewritten script"}}"""
 
@@ -95,6 +121,8 @@ def validate(src, out, ch):
     hit = BANNED_RE.search(out)
     if hit:
         errs.append("banned:" + hit.group(0)[:16])
+    if ECHO_RE.search(out):
+        errs.append("prompt-echo")
     words = len(out.split())
     if ch == "vm" and words > 95:
         errs.append("vm-too-long")
@@ -129,14 +157,24 @@ def main():
 
     doss = json.loads((ROOT / "scripts" / "experts_dossier.json").read_text(encoding="utf-8"))
 
+    # The dossiers are written ABOUT these people and use labels like
+    # "Doctrine:" and "## Core Teaching". Those were leaking into scripts
+    # verbatim ("Our doctrine: get listings sold"). Strip the scaffolding.
+    LABEL = re.compile(
+        r"^\s*#{1,4}\s*|"
+        r"^\s*\*{0,2}(Doctrine|Philosophy|Framework|Methodology|Core Teaching|"
+        r"Signature Move|Playbook|Their Doctrine|Their voice|Their frameworks)"
+        r"\*{0,2}\s*:?\s*", re.I | re.M)
+
     def dossier_for(aid):
         f = ROOT / "backend" / "kb" / (aid + ".md")
+        t = ""
         if f.exists():
             t = f.read_text(encoding="utf-8", errors="ignore")
-            if len(t) > 400:
-                return t[:6500]
-        d = doss.get(aid, {})
-        return ((d.get("deep", "") or "") + "\n" + (d.get("style", "") or ""))[:6500]
+        if len(t) < 400:
+            d = doss.get(aid, {})
+            t = (d.get("deep", "") or "") + "\n" + (d.get("style", "") or "")
+        return LABEL.sub("", t)[:6500]
 
     files = sorted(p for p in (ROOT / "voices").glob("*.json") if not p.name.startswith("_"))
 
@@ -160,10 +198,12 @@ def main():
         aid = f.stem
         d = json.loads(f.read_text(encoding="utf-8"))
         for k, v in d.items():
-            if k in base and BANNED_RE.search(v.get("script", "")):
+            sc = v.get("script", "")
+            if k in base and (BANNED_RE.search(sc) or ECHO_RE.search(sc)):
                 todo.append((f, aid, k))
     log("=" * 60)
-    log("voice variants carrying filler: %d across %d libraries" % (len(todo), len(files)))
+    log("voice variants needing repair (filler/meta/prompt-echo): %d across %d libraries"
+        % (len(todo), len(files)))
     if args.scan:
         return
     if args.limit:

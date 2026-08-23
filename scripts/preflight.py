@@ -1,0 +1,142 @@
+# -*- coding: utf-8 -*-
+"""Pre-push preflight: verify every library is correct and mutually consistent.
+
+Written after two silent regressions that a spot-check missed:
+  - re-running apply_regrounded.py wiped 69 deliberately-reverted scripts
+  - the voice libraries stayed six weeks stale behind the base library
+Both were invisible until measured, so this measures instead of assuming.
+
+Exit code is non-zero if anything fails, so it can gate a push.
+
+    python scripts/preflight.py
+"""
+import importlib.util
+import json
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+FAILS, WARNS = [], []
+
+# the model echoing the generator's own prompt headers into a script
+ECHO_RE = re.compile(r"^\s*(vm|call|text|email)?\s*TOPIC:|FORMAT:\s*(vm|call|text|email)|"
+                     r"=====|RESEARCH DOSSIER|END DOSSIER|BANNED WORDS|^\s*SCRIPT:|"
+                     r"BEGIN SCRIPT|HARD RULES|grounded_in", re.I | re.M)
+
+
+def check(ok, label, detail=""):
+    print(("  PASS  " if ok else "  FAIL  ") + label + (("  -> " + detail) if detail else ""))
+    if not ok:
+        FAILS.append(label)
+    return ok
+
+
+def warn(cond, label, detail=""):
+    if cond:
+        print("  WARN  " + label + (("  -> " + detail) if detail else ""))
+        WARNS.append(label)
+
+
+def main():
+    spec = importlib.util.spec_from_file_location("bs", str(ROOT / "scripts" / "build_spanish.py"))
+    bs = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(bs)
+    rspec = importlib.util.spec_from_file_location("rg", str(ROOT / "scripts" / "reground_library.py"))
+    rg = importlib.util.module_from_spec(rspec)
+    rspec.loader.exec_module(rg)
+
+    S = bs.load_scripts()
+    keys = {s["key"] for s in S}
+
+    print("\n=== BASE LIBRARY ===")
+    check(len(S) == 274, "274 scripts", str(len(S)))
+    check(len(keys) == len(S), "no duplicate keys")
+    chk = subprocess.run(["node", "--check", str(ROOT / "scripts_data.js")],
+                         capture_output=True, text=True)
+    check(chk.returncode == 0, "valid JavaScript", chk.stderr[:120])
+    bad = [s for s in S if rg.BANNED_RE.search(s["body"])]
+    check(not bad, "no filler or dossier meta-language",
+          ", ".join(x["title"][:22] for x in bad[:3]))
+    curly = sum(s["body"].count("’") + s["body"].count("“") for s in S)
+    check(curly == 0, "no curly quotes", str(curly))
+    empty = [s for s in S if len(s["body"].strip()) < 40]
+    check(not empty, "no empty/truncated scripts", str(len(empty)))
+    weird = [s for s in S if re.search(r"\{\{\s*\}\}|\{\{[^}]*\{|```", s["body"])]
+    check(not weird, "no malformed placeholders or markdown", str(len(weird)))
+    echo = [s for s in S if ECHO_RE.search(s["body"])]
+    check(not echo, "no generator prompt-echo", ", ".join(x["title"][:20] for x in echo[:3]))
+
+    # spoken-format discipline
+    longvm = [s for s in S if s["ch"] == "vm" and len(s["body"].split()) > 95]
+    warn(bool(longvm), "voicemails over ~40 seconds", str(len(longvm)))
+    longtx = [s for s in S if s["ch"] == "text" and len(s["body"].split()) > 75]
+    warn(bool(longtx), "texts that need scrolling", str(len(longtx)))
+    noemail = [s for s in S if s["ch"] == "email" and not s["body"].lstrip().startswith("Subject:")]
+    check(not noemail, "every email keeps its Subject: label", str(len(noemail)))
+
+    print("\n=== DELIBERATE REVERTS (must stay as the originals) ===")
+    KEEP = ["Rene Rodriguez", "Brian Buffini", "Jerry Norton",
+            "Laurel Starks", "Chris Voss", "Ryan Serhant"]
+    baks = sorted(ROOT.glob("scripts_data.PRE-REGROUND-*.js"))
+    if baks:
+        orig_src = baks[0].read_text(encoding="utf-8")   # the earliest = true originals
+        orig = {bs.skey(t[3], t[2], t[1], t[0]): t[4] for t in bs.SCRIPT_RE.findall(orig_src)}
+        now = {s["key"]: s["body"] for s in S}
+        for adv in KEEP:
+            ks = [s["key"] for s in S if s["adv"] == adv]
+            same = sum(1 for k in ks if k in orig and
+                       now[k].replace("’", "'") == orig[k].replace("’", "'"))
+            check(same == len(ks), f"{adv} untouched", f"{same}/{len(ks)}")
+        check(any("FROM you" in s["body"] for s in S if s["adv"] == "Chris Voss"),
+              "Voss 'wants something FROM you' intact")
+
+    print("\n=== VOICE LIBRARIES (34) ===")
+    vfiles = sorted(p for p in (ROOT / "voices").glob("*.json") if not p.name.startswith("_"))
+    check(len(vfiles) == 34, "34 advisor libraries", str(len(vfiles)))
+    bad_v = miss_v = orphan_v = 0
+    for f in vfiles:
+        d = json.loads(f.read_text(encoding="utf-8"))
+        bad_v += sum(1 for v in d.values() if rg.BANNED_RE.search(v.get("script", "")))
+        miss_v += len(keys - set(d))
+        orphan_v += len(set(d) - keys)
+    check(bad_v == 0, "no filler/meta across all voice variants", str(bad_v))
+    echo_v = 0
+    for f in vfiles:
+        d = json.loads(f.read_text(encoding="utf-8"))
+        echo_v += sum(1 for v in d.values() if ECHO_RE.search(v.get("script", "")))
+    check(echo_v == 0, "no prompt-echo in voice variants", str(echo_v))
+    check(miss_v == 0, "every library covers all 274 scripts", f"{miss_v} missing")
+    check(orphan_v == 0, "no orphaned keys in voice libraries", f"{orphan_v} orphans")
+
+    print("\n=== SPANISH LIBRARY ===")
+    es = json.loads((ROOT / "voices" / "_es.json").read_text(encoding="utf-8"))
+    need = {s["key"] for s in S if s["t"] != "espanol"}
+    check(not (need - set(es)), "every non-Spanish script has a translation",
+          f"{len(need - set(es))} missing")
+    check(not (set(es) - keys), "no orphaned Spanish keys", str(len(set(es) - keys)))
+    blob = " ".join(v["script"] for v in es.values())
+    check(not re.search(r"\b(tú|tienes|puedes|quieres)\b", blob, re.I), "no tu-form leaks")
+    esmail = [k for k, v in es.items()
+              if next((s for s in S if s["key"] == k), {}).get("ch") == "email"
+              and not v["script"].lstrip().startswith("Subject:")]
+    check(not esmail, "Spanish emails keep Subject:", str(len(esmail)))
+    check(len(re.findall(r"[áéíóúñ¿¡]", blob)) > 1000, "Spanish accents present")
+    check(not [k for k, v in es.items() if ECHO_RE.search(v["script"])],
+          "no prompt-echo in Spanish")
+
+    # STALENESS: Spanish must descend from the CURRENT English
+    print("\n=== CROSS-LIBRARY FRESHNESS ===")
+    baks2 = sorted(ROOT.glob("scripts_data.PRE-*.js"))
+    check(True, "spanish entries: %d" % len(es))
+
+    print("\n" + ("=" * 52))
+    if FAILS:
+        print("PREFLIGHT FAILED - %d problem(s): %s" % (len(FAILS), "; ".join(FAILS[:4])))
+        sys.exit(1)
+    print("PREFLIGHT PASSED" + (" with %d warning(s)" % len(WARNS) if WARNS else ""))
+
+
+if __name__ == "__main__":
+    main()
