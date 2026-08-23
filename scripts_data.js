@@ -1749,7 +1749,7 @@ One page. Real numbers. If it's not the most useful thing in your inbox that wee
 `{{Owner}}, {{Agent}}. Quick one on {{Address}}: properties like yours in {{City}} are typically seeing expense ratios around {{Pct}}%. With original systems and a long-term owner, I often find they're running higher. Remember, every dollar of NOI you add, at today's cap rates, creates {{Multiple}} dollars of value. That's forced appreciation through better management. Let's benchmark your building's expenses against its peers. My number is {{Phone}}. Let's get those leaks plugged before you refi or sell — or just keep that extra cash flow.`},
 {t:"cre",ch:"text",adv:"Bob Knakal",title:"CRE Text — The Deadline Buyer",body:
 `{{Owner}} — {{Agent}}, {{Brokerage}}. I represent a 1031 buyer on a 45-day clock seeking {{Asset Type}} in your territory. My data shows these buyers pay a premium for market certainty. If {{Address}} has a price, this is the week for its highest value. Coffee?`},
-{t:"cre",ch:"text",adv:"Tyler Cauble",title:"CRE Text — The Corridor Comp",body:
+{t:"cre",ch:"text",adv:"Tyler Cauble",title:"CRE Text — The Rent Comp",body:
 `{{Owner}}, {{Agent}} here (commercial, {{City}}). Two spaces near {{Address}} just leased at {{Rate}}/sf — a significant bump from last year. If any of your leases roll soon, that new market rate changes your underwriting for renewals. Want both comps? Free.`},
 {t:"cre",ch:"text",adv:"Ken McElroy",title:"CRE Text — The Cash-Flow Check",body:
 `{{Owner}} — {{Agent}}. Is {{Address}} actually providing cash flow, or are you chasing it? If that question makes you pause, the free NOI audit I run for {{City}} owners shows where the profit is. 10 minutes. Want it?`},
