@@ -447,15 +447,35 @@ function mergePairs(L = ACTIVE_LEAD){
   if (city){ p.push([RX_CITY, city]); p.push([RX_HOOD, city]); }
   return p;
 }
+/* Whatever the row could not fill still has to read like something a person
+   wrote. A raw {{Cure}} sitting in a client's call sheet looks like broken
+   software; a bracketed blank reads as "your number goes here". And a lead with
+   no name on file gets a greeting repaired, never a token spoken out loud. */
+function tidyMerge(s){
+  const OWNER = '\\{\\{?(?:Owner|Name)\\}?\\}';
+  // "Hi {{Owner}}," -> "Hi there,"
+  s = s.replace(new RegExp('\\b(Hi|Hello|Hey)[ ,]+' + OWNER, 'g'), '$1 there');
+  // "YOU: {{Owner}}, this is..." -> "YOU: This is..."
+  s = s.replace(new RegExp('(^|\\n)([ \\t]*(?:YOU:|ME:|AGENT:)?[ \\t]*)' + OWNER + '[ ,]+([a-z])', 'g'),
+                (m, nl, pre, c) => nl + pre + c.toUpperCase());
+  // "{{Owner}}? My name is..." - the name-confirmation open. Without a name
+  // there is nothing to confirm, so drop the question rather than ask "there?"
+  s = s.replace(new RegExp('(^|\\n)([ \\t]*(?:YOU:|ME:|AGENT:)?[ \\t]*)' + OWNER + '\\?[ ]*', 'g'),
+                (m, nl, pre) => nl + pre);
+  s = s.replace(new RegExp(OWNER, 'g'), 'there');
+  // every other unfilled token becomes a visible fill-in blank
+  return s.replace(/\{\{([^{}\n]+)\}\}/g, (m, w) =>
+    '[' + String(w).replace(/([a-z])([A-Z])/g, '$1 $2').trim().toLowerCase() + ']');
+}
 function fillPlain(t, lead){
   let out = t;
   for (const [rx, v] of mergePairs(lead === undefined ? ACTIVE_LEAD : lead)) out = out.replace(rx, v);
-  return out;
+  return tidyMerge(out);
 }
 function fillHTML(t){                    // escape first, then decorate the filled fields
   let out = esc(t);
   for (const [rx, v] of mergePairs()) out = out.replace(rx, '<span class="mf">' + esc(v) + '</span>');
-  return out;
+  return tidyMerge(out);
 }
 
 /* ---- open a script in the agent's own email / texting app ---- */
@@ -575,7 +595,9 @@ async function exportLeadScripts(){
     const topicsInPlay = [...new Set(LEADS.filter(l => l.topic).map(l => l.topic))];
     const availFor = ch => topicsInPlay.reduce((n, t) =>
       Math.max(n, SCRIPTS.filter(s => s.t === t && s.ch === ch).length), 0);
-    const NAME = {call: 'Call Script', vm: 'Voicemail', text: 'Text', email: 'Email'};
+    // every added column reads "<Format> <n> Script" so the header row scans
+    // consistently next to the email Subject columns
+    const NAME = {call: 'Call', vm: 'Voicemail', text: 'Text', email: 'Email'};
     const COLS = [];
     for (const c of chans){
       const n = Math.min(VARIANTS, availFor(c));       // never emit empty columns
@@ -584,7 +606,7 @@ async function exportLeadScripts(){
           COLS.push({ch: 'email', part: 'subject', idx: i, label: 'Email ' + (i+1) + ' Subject'});
           COLS.push({ch: 'email', part: 'body', idx: i, label: 'Email ' + (i+1) + ' Script'});
         } else {
-          COLS.push({ch: c, part: 'body', idx: i, label: NAME[c] + ' ' + (i+1)});
+          COLS.push({ch: c, part: 'body', idx: i, label: NAME[c] + ' ' + (i+1) + ' Script'});
         }
       }
     }
@@ -604,6 +626,24 @@ async function exportLeadScripts(){
     LEADS.forEach(l => { if (l.srcIdx !== undefined) byIdx[l.srcIdx] = l; });
     const base = (RAW && RAW.name ? RAW.name.replace(/\.(xlsx|xlsm|xls|csv)$/i, '') : 'My Leads');
     const hdr = (RAW && RAW.hdr) || 0;
+
+    // An .xlsx upload MUST go through the format-preserving path. Rebuilding it
+    // from the parsed grid drops title rows and sparse columns, which silently
+    // shifts every script onto the wrong lead - a call sheet that greets people
+    // by the previous row's name. Refuse rather than hand that to an agent.
+    if (!RAW_BUF && RAW && /\.(xlsx|xlsm|xls)$/i.test(RAW.name || '')){
+      if (!RAW_BUF) RAW_BUF = await loadRawBytes();
+      if (!RAW_BUF){
+        btn.disabled = false; btn.textContent = '📥 Download Excel with Scripts';
+        document.getElementById('leadSum').innerHTML =
+          '<b style="color:var(--gold-bright)">Re-upload ' + esc(RAW.name) + ' to export.</b> ' +
+          'The original file is needed to write scripts into it without disturbing your layout ' +
+          '(this happens after a refresh). Your lead list and settings are unchanged.';
+        document.getElementById('leadFile').scrollIntoView({behavior:'smooth', block:'center'});
+        toast('Re-upload the file to export — your list is still here');
+        return;
+      }
+    }
 
     if (RAW_BUF){
       // ===== format-preserving path: inject cells straight into the original
@@ -755,10 +795,11 @@ function mapTopic(t){
   if (/expired|withdrawn|cancel/.test(s)) return 'expired';
   if (/fsbo|by owner/.test(s)) return 'fsbo';
   if (/tax/.test(s)) return 'tax';
-  if (/nod|default|foreclos|lates|delinq/.test(s)) return 'nod';
+  // foreclosure ladder: NOD, notice of sale / trustee sale / auction, lates
+  if (/nod|default|foreclos|notice of sale|trustee sale|auction|nts|lis pendens|reinstat|lates|delinq|behind on/.test(s)) return 'nod';
   if (/probate|aod|affidavit|heir|estate|inherit|death|deceased|trust/.test(s)) return 'probate';
   if (/divorce|dissolution/.test(s)) return 'divorce';
-  if (/absentee|investor|out.of.state|non.?owner|rental|tenant/.test(s)) return 'absentee';
+  if (/absentee|investor|out.of.state|non.?owner|rental|tenant|lives elsewhere/.test(s)) return 'absentee';
   if (/luxur|high.end/.test(s)) return 'luxury';
   if (/commercial|multifam|apartment|cre/.test(s)) return 'cre';
   if (/sphere|referral|past.client|soi/.test(s)) return 'soi';
@@ -768,10 +809,52 @@ function mapTopic(t){
 function topicName(tid){ if (!tid) return 'Unassigned'; const t = TOPICS.find(t => t[0] === tid); return t ? t[1] : tid; }
 
 function normH(h){ return String(h || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); }
+
+/* Lead exports routinely arrive ALL CAPS (title data usually is). Dropping that
+   straight into a script makes it shout - "Hey JOYCE", "about TORRANCE" - which
+   reads like a broken mail merge. Title-case only when the value is entirely
+   uppercase, so genuine casing like McDonald or O'Brien is never touched. */
+/* Street ordinals arrive mangled from upstream tools ("W 177Th St", "248Th St").
+   Unambiguous and worth repairing whatever the surrounding case, because a
+   script reads this out loud. */
+function fixOrdinals(s){ return s.replace(/(\d)(St|Nd|Rd|Th)\b/g, (m, d, o) => d + o.toLowerCase()); }
+
+function niceCase(v){
+  const t = fixOrdinals(String(v == null ? '' : v).trim());
+  if (!t || /[a-z]/.test(t)) return t;                 // already has lowercase: leave alone
+  const KEEP_UPPER = {llc:1, inc:1, ii:1, iii:1, iv:1, jr:1, sr:1};
+  // The leading (^|non-alphanumeric) guard keeps street ordinals intact:
+  // "W 177TH ST" must become "W 177th St", never "W 177Th St".
+  return t.toLowerCase().replace(/(^|[^a-z0-9])([a-z][a-z'\u2019\-]*)/g, function(m, pre, w){
+    return pre + one(w);
+  });
+  function one(w){
+    if (KEEP_UPPER[w]) return w.toUpperCase();
+    var out = w.charAt(0).toUpperCase() + w.slice(1);
+    out = out.replace(/^(Mc)([a-z])/, function(x,p,c){ return p + c.toUpperCase(); })
+             .replace(/^(O['\u2019])([a-z])/, function(x,p,c){ return p + c.toUpperCase(); })
+             .replace(/-([a-z])/g, function(x,c){ return '-' + c.toUpperCase(); });
+    return out;
+  }
+}
+
+
 function pickCol(hs, cands){
   for (const c of cands){ const i = hs.indexOf(c); if (i > -1) return i; }
   for (const c of cands){ const i = hs.findIndex(h => h.includes(c)); if (i > -1) return i; }
   return -1;
+}
+
+/* Every column matching the candidates, best first - not just the winner.
+   Farm exports often carry two name families side by side ("Owner 1 First Name"
+   AND "Owner First"), and the preferred one is blank on some rows. Picking one
+   column and stopping is how 34 leads ended up addressed as "{{Owner}}". */
+function pickCols(hs, cands){
+  const out = [];
+  for (const c of cands){ const i = hs.indexOf(c); if (i > -1 && out.indexOf(i) < 0) out.push(i); }
+  for (const c of cands)
+    hs.forEach((h, i) => { if (h.includes(c) && out.indexOf(i) < 0) out.push(i); });
+  return out;
 }
 
 /* deal sheets often carry title/byline rows above the real headers —
@@ -795,12 +878,36 @@ function leadsFromRows(rows){
   LAST_HDR = detectHeaderRow(rows);
   rows = rows.slice(LAST_HDR);
   const hs = rows[0].map(normH);
-  const cFirst = pickCol(hs, ['owner 1 first name', 'first name', 'owner first name', 'first']);
-  const cLast  = pickCol(hs, ['owner 1 last name', 'last name', 'owner last name', 'last']);
-  const cFull  = pickCol(hs, ['owner name', 'full name', 'owner 1', 'owner', 'name', 'contact']);
+  // NOTE: 'tax bill name' is deliberately never a name source - on a farm export
+  // that is the LLC or the prior owner, not the person answering the phone.
+  const cFirsts = pickCols(hs, ['owner 1 first name', 'owner first name', 'owner first', 'first name', 'first'])
+                    .filter(i => !/tax bill|taxpayer|llc|agent/.test(hs[i]));
+  const cLasts  = pickCols(hs, ['owner 1 last name', 'owner last name', 'owner last', 'last name', 'last'])
+                    .filter(i => !/tax bill|taxpayer|llc|agent/.test(hs[i]));
+  const cFulls  = pickCols(hs, ['owner name', 'full name', 'owner 1', 'owner', 'name', 'contact'])
+                    .filter(i => !/tax bill|taxpayer|llc|agent|first|last|verified|age|raw/.test(hs[i]));
   const cAddr  = pickCol(hs, ['property address', 'situs address', 'site address', 'street address', 'address', 'situs']);
   const cCity  = pickCol(hs, ['property city', 'situs city', 'site city', 'city']);
   const cType  = pickCol(hs, ['lead type', 'list type', 'lead source', 'list', 'type', 'category', 'source']);
+  // Farm exports scatter a lead's situation across several columns: an explicit
+  // Lead Type, a Distress Doc Type, a Tier ("T2 RECENT NOD"), a Tax Status. Any
+  // one may be blank on a given row, so consult them all instead of giving up on
+  // the first empty cell. The column NAME also disambiguates - "DELINQUENT"
+  // under Tax Status means taxes, not a missed mortgage payment.
+  const TYPE_HINTS = [['lead type', null], ['list type', null],
+                      ['distress doc current', 'nod'], ['distress doc type', 'nod'],
+                      ['tier', null], ['tax status', 'tax'], ['lead status', null]];
+  const typeCols = [];
+  for (const th of TYPE_HINTS) {
+    const i = hs.indexOf(th[0]) > -1 ? hs.indexOf(th[0]) : hs.findIndex(h => h.includes(th[0]));
+    if (i > -1 && !typeCols.some(c => c.i === i)) typeCols.push({i: i, hint: th[1]});
+  }
+  // Last resort: a free-prose "signals" column ("recent buyer who lives
+  // elsewhere; adjustable loan..."). Prose is read with a NARROW pattern, never
+  // the full mapTopic - a sentence mentioning a family trust or a tax bill is
+  // not a probate or tax lead, and a wrong topic is worse than no topic.
+  const proseCols = ['signals plain', 'signals'].map(n => hs.indexOf(n)).filter(i => i > -1);
+  const PROSE_RE = /lives elsewhere|out.of.state|absentee|non.?owner/;
   const cPhone = pickCol(hs, ['cell 1', 'cell', 'mobile', 'phone 1', 'phone', 'cell phone']);
   const cMail  = pickCol(hs, ['email 1', 'email', 'email address']);
   const out = [];
@@ -808,19 +915,40 @@ function leadsFromRows(rows){
   for (const r of rows.slice(1)){
     srcIdx++;
     if (!r || !r.some(v => String(v || '').trim())) continue;
+    // walk every name family until one actually has something on THIS row
     let name = '';
-    if (cFirst > -1 || cLast > -1)
-      name = [r[cFirst], r[cLast]].map(v => String(v || '').trim()).filter(Boolean).join(' ');
-    if (!name && cFull > -1) name = String(r[cFull] || '').trim();
-    const type = cType > -1 ? String(r[cType] || '').trim() : '';
+    for (let k = 0; k < Math.max(cFirsts.length, cLasts.length) && !name; k++){
+      const f = k < cFirsts.length ? r[cFirsts[k]] : '';
+      const l = k < cLasts.length ? r[cLasts[k]] : '';
+      name = [f, l].map(v => niceCase(v)).filter(Boolean).join(' ');
+    }
+    for (let k = 0; k < cFulls.length && !name; k++) name = niceCase(r[cFulls[k]]);
+    let type = cType > -1 ? String(r[cType] || '').trim() : '';
+    let topic = mapTopic(type);
+    if (!topic) {
+      for (const tc of typeCols) {
+        const v = String(r[tc.i] || '').trim();
+        if (!v || /^(paid|none|n\/a|clear)/i.test(v)) continue;
+        // the column NAME outranks the cell text: "DELINQUENT" under Tax Status
+        // is a tax bill, not a missed mortgage payment.
+        const t = tc.hint || mapTopic(v);
+        if (t) { topic = t; if (!type) type = v; break; }
+      }
+    }
+    if (!topic) {
+      for (const pi of proseCols) {
+        const v = String(r[pi] || '').trim().toLowerCase();
+        if (PROSE_RE.test(v)) { topic = 'absentee'; if (!type) type = 'Absentee owner'; break; }
+      }
+    }
     out.push({
       name: name || '(no name)',
       first: (name.split(/\s+/)[0] || '').replace(/[^A-Za-z'\-].*$/, ''),
-      address: cAddr > -1 ? String(r[cAddr] || '').trim() : '',
-      city: cCity > -1 ? String(r[cCity] || '').trim() : '',
+      address: cAddr > -1 ? niceCase(r[cAddr]) : '',
+      city: cCity > -1 ? niceCase(r[cCity]) : '',
       type: type,
-      topic: mapTopic(type),               // null = row didn't say; picker fills it
-      rowSure: mapTopic(type) !== null,
+      topic: topic,                        // null = row didn't say; picker fills it
+      rowSure: topic !== null,
       phone: cPhone > -1 ? String(r[cPhone] || '').trim() : '',
       email: cMail > -1 ? String(r[cMail] || '').trim() : '',
       srcIdx: srcIdx
@@ -907,6 +1035,47 @@ function syncSubjectPicker(fileNameHint){
 
 let RAW_BUF = null;   // the untouched uploaded workbook — the export edits THIS in place
 
+/* The original bytes are what make the export format-preserving. Keeping them
+   only in memory meant a page reload silently downgraded the next export to a
+   rebuilt-from-scratch file: title rows dropped, columns lost, and every
+   script shifted onto the wrong lead. They now survive in IndexedDB. */
+function idb(){
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('rt_files', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('files');
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => rej(r.error);
+  });
+}
+async function saveRawBytes(buf){
+  try{
+    const db = await idb();
+    await new Promise((res, rej) => {
+      const tx = db.transaction('files', 'readwrite');
+      tx.objectStore('files').put(buf, 'lead_upload');
+      tx.oncomplete = res; tx.onerror = () => rej(tx.error);
+    });
+  }catch(e){ /* private mode / quota: export will ask for a re-upload instead */ }
+}
+async function loadRawBytes(){
+  try{
+    const db = await idb();
+    return await new Promise((res) => {
+      const tx = db.transaction('files', 'readonly');
+      const q = tx.objectStore('files').get('lead_upload');
+      q.onsuccess = () => res(q.result || null);
+      q.onerror = () => res(null);
+    });
+  }catch(e){ return null; }
+}
+async function clearRawBytes(){
+  try{
+    const db = await idb();
+    const tx = db.transaction('files', 'readwrite');
+    tx.objectStore('files').delete('lead_upload');
+  }catch(e){}
+}
+
 async function processLeadFile(name, csvText, arrayBuf){
   const sum = document.getElementById('leadSum');
   let rows;
@@ -918,6 +1087,7 @@ async function processLeadFile(name, csvText, arrayBuf){
     const wb = XLSX.read(arrayBuf, {type: 'array'});
     rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1, raw: false, defval: ''});
     RAW_BUF = arrayBuf;
+    saveRawBytes(arrayBuf);
   }
   LEADS = leadsFromRows(rows);
   if (!LEADS.length){ sum.textContent = 'No leads found — I looked for headers like Name / Address / Lead Type in the first 10 rows.'; return false; }
@@ -998,7 +1168,7 @@ function clearLead(){
 }
 document.getElementById('xpGo').onclick = exportLeadScripts;
 document.getElementById('leadClear').onclick = () => {
-  LEADS = []; RAW = null; RAW_BUF = null; clearLead();
+  LEADS = []; RAW = null; RAW_BUF = null; clearRawBytes(); clearLead();
   localStorage.removeItem('rt_leads');
   localStorage.removeItem('rt_leads_raw');
   document.getElementById('leadExport').style.display = 'none';
@@ -1011,7 +1181,10 @@ document.getElementById('leadClear').onclick = () => {
 document.getElementById('leadUseName').addEventListener('change', render);
 try{
   const saved = JSON.parse(localStorage.getItem('rt_leads'));
-  if (Array.isArray(saved) && saved.length){ LEADS = saved; renderLeads(); syncSubjectPicker(null); }
+  if (Array.isArray(saved) && saved.length){
+    LEADS = saved; renderLeads(); syncSubjectPicker(null);
+    loadRawBytes().then(b => { if (b && !RAW_BUF) RAW_BUF = b; });   // keeps exports format-preserving across reloads
+  }
 }catch(e){}
 
 /* TOPICS + SCRIPTS load from scripts_data.js */
