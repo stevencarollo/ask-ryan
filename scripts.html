@@ -505,6 +505,22 @@ const RX_STREET= rxTok(['Street']);
 const RX_CITY  = rxTok(['City']);
 const RX_HOOD  = rxTok(['Neighborhood']);
 
+/* Nobody says "your W Cassidy St home" out loud - they say "your Cassidy St
+   home". Title data carries the directional; spoken scripts should not.
+   Only ever drops it when a real street name survives, so "West St" and
+   "100 E Ave" stay intact. The uploaded file's own columns are untouched -
+   this is purely how the address reads inside a script. */
+const DIR_RE = /^(n|s|e|w|ne|nw|se|sw|north|south|east|west|northeast|northwest|southeast|southwest)\.?$/i;
+function dropDirectional(addr){
+  const parts = String(addr == null ? '' : addr).trim().split(/\s+/);
+  if (parts.length < 3) return String(addr == null ? '' : addr);   // too short to lose a word safely
+  const i = /^[\d-]+[A-Za-z]?$/.test(parts[0]) ? 1 : 0;            // step past a house number
+  if (parts[i] && DIR_RE.test(parts[i]) && parts.length - i >= 3) parts.splice(i, 1);
+  const last = parts.length - 1;
+  if (last > i + 1 && DIR_RE.test(parts[last])) parts.splice(last, 1);
+  return parts.join(' ');
+}
+
 /* every merge value active right now: agent profile + a lead
    (defaults to the selected lead; export passes each lead explicitly) */
 function mergePairs(L = ACTIVE_LEAD){
@@ -518,8 +534,8 @@ function mergePairs(L = ACTIVE_LEAD){
   if (L){
     if (L.first && document.getElementById('leadUseName').checked) p.push([RX_OWNER, L.first]);
     if (L.address){
-      p.push([RX_ADDR, L.address]);
-      p.push([RX_STREET, L.address.replace(/^[\d\-]+\s+/, '').replace(/,.*$/, '')]);
+      p.push([RX_ADDR, dropDirectional(L.address)]);
+      p.push([RX_STREET, dropDirectional(L.address.replace(/^[\d\-]+\s+/, '').replace(/,.*$/, ''))]);
     }
   }
   const city = (L && L.city) || mktCity;
