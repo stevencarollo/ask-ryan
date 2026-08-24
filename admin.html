@@ -53,7 +53,21 @@ tr:hover td{background:rgba(201,168,92,.04)}
 .muted{color:var(--muted)}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(90px);background:var(--gold);color:var(--ink);font-weight:800;font-size:.84em;padding:11px 22px;border-radius:8px;transition:transform .25s;z-index:90}
 #toast.on{transform:translateX(-50%) translateY(0)}
-@media(max-width:720px){ .newcode{flex-direction:column;align-items:stretch} .nc-f input{width:100%} }
+/* invite composer */
+.ovl{position:fixed;inset:0;background:rgba(11,11,13,.82);backdrop-filter:blur(4px);z-index:80;display:flex;align-items:flex-start;justify-content:center;padding:24px 14px;overflow-y:auto}
+.inv{width:100%;max-width:620px;background:var(--charcoal);border:1px solid var(--gold);border-radius:12px;padding:18px}
+.inv h3{font-family:'Cinzel',serif;font-size:1.05em;color:var(--gold-bright);letter-spacing:.06em;margin-bottom:3px}
+.inv .who{font-size:.8em;color:var(--muted);margin-bottom:14px}
+.inv label{display:block;font-size:.68em;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin:12px 0 5px}
+.inv input,.inv textarea{width:100%;padding:11px 13px;background:var(--ink);border:1px solid var(--line);border-radius:6px;color:var(--ivory);font-family:'Inter',sans-serif;font-size:16px;line-height:1.6}
+.inv textarea{min-height:250px;resize:vertical}
+.inv .lang{display:flex;gap:8px;margin-bottom:2px}
+.inv .lang button{flex:0 0 auto;padding:7px 14px;background:transparent;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-family:'Inter',sans-serif;font-size:.84em;font-weight:600;cursor:pointer;min-height:36px}
+.inv .lang button.on{background:rgba(201,168,92,.15);border-color:var(--gold);color:var(--gold-bright)}
+.inv .btns{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}
+.inv .btns .go{flex:1 1 auto}
+.inv .hint{margin-top:11px;font-size:.76em;color:var(--muted);line-height:1.55}
+@media(max-width:720px){ .newcode{flex-direction:column;align-items:stretch} .nc-f input{width:100%} .inv .btns .go,.inv .btns .act{width:100%;justify-content:center;min-height:46px} }
 </style></head>
 <body>
 <nav>
@@ -141,6 +155,7 @@ function renderCodes(){
       <td>${c.max_tailors ? c.max_tailors + '/mo' : '<span class="muted">unlimited</span>'}</td>
       <td>${c.revoked ? '<span class="pill bad">revoked</span>' : '<span class="pill ok">active</span>'}</td>
       <td>${c.admin ? '<span class="muted">—</span>' : `
+        <button class="act" onclick="openInvite('${esc(code)}')">✉️ Invite</button>
         <button class="act ${c.revoked ? '' : 'danger'}" onclick="setCode('${esc(code)}',{revoked:${!c.revoked}})">${c.revoked ? 'Restore' : 'Revoke'}</button>
         <button class="act danger" onclick="if(confirm('Delete code ${esc(code)} permanently?'))setCode('${esc(code)}',{delete:true})">Delete</button>`}
       </td>
@@ -227,6 +242,144 @@ async function setCode(code, patch){
   const d = await api('/api/admin/code', Object.assign({code}, patch));
   toast(d.status === 'ok' ? 'Updated ' + code : 'Update failed'); load();
 }
+
+/* ===== Invite composer =====
+   Writes the whole invite for a code - editable, copyable, and openable in
+   whatever mail app the machine uses. Spanish included because several
+   members work Spanish-speaking farms. */
+const SITE = 'https://roundtablehq.vercel.app';
+let INV = {code: '', lang: 'en'};
+
+function inviteText(code, lang){
+  const c = (DATA.codes || {})[code] || {};
+  const forever = c.days === null;
+  const days = c.days || 7;
+  if (lang === 'es'){
+    return {
+      subject: 'Su acceso a The Roundtable',
+      body:
+'Hola,\n\n' +
+'Le comparto acceso a The Roundtable, una plataforma privada de coaching para agentes de bienes raices.\n\n' +
+'Adentro encontrara 274 guiones de llamada, buzon de voz, texto y correo — cada uno escrito en la voz de uno de 34 asesores reconocidos de la industria, y 258 de ellos ya estan en espanol. Tambien puede subir su lista de prospectos en Excel y le devuelve el mismo archivo con los guiones ya escritos, personalizados para cada persona.\n\n' +
+'Como entrar:\n' +
+'1. Vaya a ' + SITE + '\n' +
+'2. Ponga su correo electronico\n' +
+'3. Use este codigo de acceso: ' + code + '\n\n' +
+(forever ? 'Su acceso no tiene fecha de vencimiento.\n\n'
+         : 'Su acceso dura ' + days + ' dias desde que active el codigo.\n\n') +
+'Funciona igual en la computadora y en el telefono — y se puede instalar como aplicacion.\n\n' +
+'Cualquier pregunta, aqui estoy.\n\n' +
+'— The Roundtable'
+    };
+  }
+  return {
+    subject: 'Your access to The Roundtable',
+    body:
+'Hi,\n\n' +
+'I want to give you access to The Roundtable — a private coaching platform for real estate agents.\n\n' +
+'Inside you get 274 call, voicemail, text and email scripts, each written in the voice of one of 34 researched industry advisors. Pick an advisor and the whole library re-voices instantly. You can also upload your lead list as an Excel file and it hands the same file back with scripts written in, personalised to each lead by name and address.\n\n' +
+'To get in:\n' +
+'1. Go to ' + SITE + '\n' +
+'2. Enter your email\n' +
+'3. Use this activation code: ' + code + '\n\n' +
+(forever ? 'Your access does not expire.\n\n'
+         : 'Your access runs for ' + days + ' days from the moment you activate it.\n\n') +
+'It works the same on a laptop or a phone, and it installs as an app on your home screen.\n\n' +
+'Any questions, just reply.\n\n' +
+'— The Roundtable'
+  };
+}
+
+function openInvite(code){
+  INV = {code: code, lang: 'en'};
+  const ovl = document.createElement('div');
+  ovl.className = 'ovl'; ovl.id = 'invOvl';
+  ovl.onclick = e => { if (e.target === ovl) closeInvite(); };
+  ovl.innerHTML =
+    '<div class="inv">' +
+      '<h3>Invite — ' + esc(code) + '</h3>' +
+      '<div class="who">Edit anything below, then copy it or open it in your email app.</div>' +
+      '<div class="lang">' +
+        '<button id="invEn" class="on" onclick="setInvLang(\'en\')">English</button>' +
+        '<button id="invEs" onclick="setInvLang(\'es\')">Español</button>' +
+      '</div>' +
+      '<label for="invCode">Activation code</label>' +
+      '<input id="invCode" readonly value="' + esc(code) + '" onclick="this.select()" ' +
+        'style="font-weight:700;letter-spacing:.1em;color:var(--gold-bright)">' +
+      '<label for="invTo">Send to (optional)</label>' +
+      '<input id="invTo" type="email" placeholder="agent@brokerage.com" autocomplete="off">' +
+      '<label for="invSub">Subject</label>' +
+      '<input id="invSub">' +
+      '<label for="invBody">Message</label>' +
+      '<textarea id="invBody"></textarea>' +
+      '<div class="btns">' +
+        '<button class="go" onclick="inviteMail()">✉️ Open in email</button>' +
+        '<button class="act" onclick="inviteCopy()">📋 Copy message</button>' +
+        '<button class="act" onclick="inviteCopyCode()">Copy code only</button>' +
+        '<button class="act" onclick="closeInvite()">Close</button>' +
+      '</div>' +
+      '<div class="hint">“Open in email” launches your default mail app with everything filled in. If nothing opens, your machine has no default mail app set — use Copy instead and paste into webmail.</div>' +
+    '</div>';
+  document.body.appendChild(ovl);
+  fillInvite();
+  document.addEventListener('keydown', invEsc);
+}
+function invEsc(e){ if (e.key === 'Escape') closeInvite(); }
+function closeInvite(){
+  const o = document.getElementById('invOvl');
+  if (o) o.remove();
+  document.removeEventListener('keydown', invEsc);
+}
+function setInvLang(l){
+  INV.lang = l;
+  document.getElementById('invEn').classList.toggle('on', l === 'en');
+  document.getElementById('invEs').classList.toggle('on', l === 'es');
+  fillInvite();
+}
+function fillInvite(){
+  const t = inviteText(INV.code, INV.lang);
+  document.getElementById('invSub').value = t.subject;
+  document.getElementById('invBody').value = t.body;
+}
+function inviteMail(){
+  const to = document.getElementById('invTo').value.trim();
+  const sub = document.getElementById('invSub').value;
+  const body = document.getElementById('invBody').value;
+  // mailto has a practical length ceiling in some clients; the invite sits well
+  // under it, but warn rather than silently truncate if someone pastes an essay
+  const url = 'mailto:' + encodeURIComponent(to) +
+              '?subject=' + encodeURIComponent(sub) + '&body=' + encodeURIComponent(body);
+  if (url.length > 1900) return toast('Message too long for the mail app — use Copy instead');
+  window.location.href = url;
+  toast('Opening your email app…');
+}
+/* Clipboard writes need a secure context AND a focused document, and some
+   browsers refuse them outright. Never dead-end on that: fall back to the old
+   execCommand path, and if even that is refused, select the visible field so
+   Ctrl+C still works. */
+async function copyText(txt, msg, selId){
+  try{
+    await navigator.clipboard.writeText(txt);
+    return toast(msg);
+  }catch(e){ /* fall through */ }
+  try{
+    const ta = document.createElement('textarea');
+    ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    const ok = document.execCommand('copy');
+    ta.remove();
+    if (ok) return toast(msg);
+  }catch(e){ /* fall through */ }
+  const el = selId && document.getElementById(selId);
+  if (el){ el.focus(); el.select(); return toast('Selected it — press Ctrl+C to copy'); }
+  toast('Copy blocked — select the text and copy manually');
+}
+function inviteCopy(){
+  const sub = document.getElementById('invSub').value;
+  const body = document.getElementById('invBody').value;
+  copyText('Subject: ' + sub + '\n\n' + body, 'Invite copied — paste into any email', 'invBody');
+}
+function inviteCopyCode(){ copyText(INV.code, 'Code ' + INV.code + ' copied', 'invCode'); }
 async function member(email, action, extra){
   const d = await api('/api/admin/member', Object.assign({email, action}, extra || {}));
   toast(d.status === 'ok' ? 'Updated ' + email : 'Update failed'); load();
