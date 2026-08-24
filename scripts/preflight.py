@@ -131,6 +131,37 @@ def main():
     baks2 = sorted(ROOT.glob("scripts_data.PRE-*.js"))
     check(True, "spanish entries: %d" % len(es))
 
+    # The service worker serves voices/*.json CACHE-FIRST, so a stale entry is
+    # served forever. Shipping a voice fix without bumping CACHE_V means every
+    # installed app keeps the broken scripts - which is exactly what happened
+    # when 33 libraries were cleaned of dossier scaffolding and this string
+    # stood still. The cache key must be newer than the files it caches.
+    print("\n=== PWA CACHE KEY ===")
+    sw = (ROOT / "sw.js").read_text(encoding="utf-8")
+    m = re.search(r"CACHE_V\s*=\s*['\"]([^'\"]+)['\"]", sw)
+    if not m:
+        check(False, "sw.js declares CACHE_V")
+    else:
+        cache_v = m.group(1)
+
+        def last_commit(*args):
+            r = subprocess.run(["git", "log", "-1", "--format=%ct"] + list(args),
+                               cwd=str(ROOT), capture_output=True, text=True)
+            out = r.stdout.strip()
+            return int(out) if out.isdigit() else None
+
+        voices_at = last_commit("--", "voices")
+        key_at = last_commit("-S", cache_v, "--", "sw.js")
+        if key_at is None:
+            check(True, "CACHE_V is new this commit", cache_v)
+        elif voices_at is None:
+            check(True, "no voice history to compare", cache_v)
+        else:
+            check(key_at >= voices_at,
+                  "CACHE_V newer than voices/ (%s)" % cache_v,
+                  "voices/ changed after the cache key was set - bump CACHE_V "
+                  "or installed apps keep serving the old libraries")
+
     print("\n" + ("=" * 52))
     if FAILS:
         print("PREFLIGHT FAILED - %d problem(s): %s" % (len(FAILS), "; ".join(FAILS[:4])))

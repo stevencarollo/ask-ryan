@@ -59,7 +59,7 @@ tr:hover td{background:rgba(201,168,92,.04)}
 .inv h3{font-family:'Cinzel',serif;font-size:1.05em;color:var(--gold-bright);letter-spacing:.06em;margin-bottom:3px}
 .inv .who{font-size:.8em;color:var(--muted);margin-bottom:14px}
 .inv label{display:block;font-size:.68em;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin:12px 0 5px}
-.inv input,.inv textarea{width:100%;padding:11px 13px;background:var(--ink);border:1px solid var(--line);border-radius:6px;color:var(--ivory);font-family:'Inter',sans-serif;font-size:16px;line-height:1.6}
+.inv input,.inv textarea,.inv select{width:100%;padding:11px 13px;background:var(--ink);border:1px solid var(--line);border-radius:6px;color:var(--ivory);font-family:'Inter',sans-serif;font-size:16px;line-height:1.6;min-height:46px}
 .inv textarea{min-height:250px;resize:vertical}
 .inv .lang{display:flex;gap:8px;margin-bottom:2px}
 .inv .lang button{flex:0 0 auto;padding:7px 14px;background:transparent;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-family:'Inter',sans-serif;font-size:.84em;font-weight:600;cursor:pointer;min-height:36px}
@@ -313,14 +313,21 @@ function openInvite(code){
       '<label for="invBody">Message</label>' +
       '<textarea id="invBody"></textarea>' +
       '<div class="btns">' +
-        '<button class="go" onclick="inviteMail()">✉️ Open in email</button>' +
+        '<button class="go" onclick="inviteSend()">✉️ Open in ' + esc(MAILER_NAME[invMailer()]) + '</button>' +
         '<button class="act" onclick="inviteCopy()">📋 Copy message</button>' +
         '<button class="act" onclick="inviteCopyCode()">Copy code only</button>' +
         '<button class="act" onclick="closeInvite()">Close</button>' +
       '</div>' +
-      '<div class="hint">“Open in email” launches your default mail app with everything filled in. If nothing opens, your machine has no default mail app set — use Copy instead and paste into webmail.</div>' +
+      '<label for="invMailer">Send it with</label>' +
+      '<select id="invMailer" onchange="setMailer(this.value)">' +
+        '<option value="gmail">Gmail (opens in a browser tab)</option>' +
+        '<option value="outlookweb">Outlook on the web</option>' +
+        '<option value="default">Whatever app my computer uses (mailto)</option>' +
+      '</select>' +
+      '<div class="hint">Gmail and Outlook-web open a compose tab and ignore whatever your computer has set as its default mail app. Pick “mailto” only if you want the desktop app. Your choice is remembered.</div>' +
     '</div>';
   document.body.appendChild(ovl);
+  document.getElementById('invMailer').value = invMailer();
   fillInvite();
   document.addEventListener('keydown', invEsc);
 }
@@ -341,17 +348,48 @@ function fillInvite(){
   document.getElementById('invSub').value = t.subject;
   document.getElementById('invBody').value = t.body;
 }
-function inviteMail(){
+/* mailto: always hands off to whatever the OS registered - which is Outlook on
+   most Windows machines, whether or not that is the mail you actually use.
+   Gmail and Outlook-web have their own compose URLs that skip the OS entirely,
+   so offer those directly and remember the choice. */
+const MAILER_NAME = {gmail: 'Gmail', outlookweb: 'Outlook web', default: 'my mail app'};
+function invMailer(){
+  const m = localStorage.getItem('rt_mailer');
+  return MAILER_NAME[m] ? m : 'gmail';
+}
+function setMailer(m){
+  localStorage.setItem('rt_mailer', MAILER_NAME[m] ? m : 'gmail');
+  const btn = document.querySelector('.inv .btns .go');
+  if (btn) btn.textContent = '✉️ Open in ' + MAILER_NAME[invMailer()];
+}
+function inviteSend(){
   const to = document.getElementById('invTo').value.trim();
   const sub = document.getElementById('invSub').value;
   const body = document.getElementById('invBody').value;
-  // mailto has a practical length ceiling in some clients; the invite sits well
-  // under it, but warn rather than silently truncate if someone pastes an essay
-  const url = 'mailto:' + encodeURIComponent(to) +
-              '?subject=' + encodeURIComponent(sub) + '&body=' + encodeURIComponent(body);
-  if (url.length > 1900) return toast('Message too long for the mail app — use Copy instead');
-  window.location.href = url;
-  toast('Opening your email app…');
+  const m = invMailer();
+  const q = (k, v) => k + '=' + encodeURIComponent(v);
+  let url, ceiling;
+  if (m === 'gmail'){
+    // authuser pins the compose window to the account that owns the platform,
+    // so an invite never goes out from a personal address by accident
+    url = 'https://mail.google.com/mail/?view=cm&fs=1&' +
+          q('authuser', ADMIN.adminEmail) + '&' + q('to', to) + '&' + q('su', sub) + '&' + q('body', body);
+    ceiling = 7000;
+  } else if (m === 'outlookweb'){
+    url = 'https://outlook.office.com/mail/deeplink/compose?' +
+          q('to', to) + '&' + q('subject', sub) + '&' + q('body', body);
+    ceiling = 7000;
+  } else {
+    url = 'mailto:' + encodeURIComponent(to) + '?' + q('subject', sub) + '&' + q('body', body);
+    ceiling = 1900;   // desktop clients truncate well before browsers do
+  }
+  if (url.length > ceiling) return toast('Message too long for ' + MAILER_NAME[m] + ' — use Copy instead');
+  if (m === 'default'){ window.location.href = url; }
+  else {
+    const w = window.open(url, '_blank', 'noopener');
+    if (!w) return toast('Popup blocked — allow popups, or use Copy message');
+  }
+  toast('Opening ' + MAILER_NAME[m] + '…');
 }
 /* Clipboard writes need a secure context AND a focused document, and some
    browsers refuse them outright. Never dead-end on that: fall back to the old
