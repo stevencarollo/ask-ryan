@@ -2023,12 +2023,16 @@ function revert(i){
    globals (never a second copy of the setting) right where the file is built,
    and add the one genuinely new choice: which scripts to write in. */
 
+/* Always opens on the best 3 per lead type. Deliberately NOT remembered:
+   picking scripts by hand is a choice made for a particular list, and having
+   the panel silently reopen in that mode weeks later is how someone exports a
+   farm against a selection they no longer remember making. Their picks below
+   ARE remembered, so switching back restores them instantly. */
 let XMODE = 'auto';                 // 'auto' = best 3 per lead type, 'fav' = agent picks
 let XOFF = new Set();               // favorites deliberately left OUT of this export
 let XADD = new Set();               // non-favorites deliberately added to it
 try{ XOFF = new Set(JSON.parse(localStorage.getItem('rt_xoff')) || []); }catch(e){}
 try{ XADD = new Set(JSON.parse(localStorage.getItem('rt_xadd')) || []); }catch(e){}
-try{ XMODE = localStorage.getItem('rt_xmode') === 'fav' ? 'fav' : 'auto'; }catch(e){}
 
 /* Automatic mode picks a sensible 3 per format. Hand-picked mode is NOT capped:
    writing 5 of the 8 scripts an agent deliberately checked would be a lie about
@@ -2082,7 +2086,7 @@ function xSaveState(){
   try{
     localStorage.setItem('rt_xoff', JSON.stringify([...XOFF]));
     localStorage.setItem('rt_xadd', JSON.stringify([...XADD]));
-    localStorage.setItem('rt_xmode', XMODE);
+    localStorage.removeItem('rt_xmode');      // mode is per-session, see XMODE above
   }catch(e){}
 }
 
