@@ -353,7 +353,7 @@ body.hasmkt .abtn.gold{display:inline-block}
       <button class="la-btn si" onclick="setSpanish(true)">Sí — en español</button>
       <button class="la-btn" onclick="setSpanish(false)">Keep English</button>
     </span>
-    <button class="lang-chip" id="langChip" style="display:none" onclick="setSpanish(!SPANISH)">🌎 Español: OFF</button>
+    <button class="lang-chip" id="langChip" onclick="setSpanish(!SPANISH)">🌎 Español: OFF</button>
     <span class="vhint" id="vhint">Default: each script answers in the voice of the specialty's own expert.</span>
   </div>
   <details class="custom-topic" id="marketPanel">
@@ -1365,21 +1365,21 @@ function convertVisible(limit){
   if (todo.length){ AUTOQ.push(...todo); pumpQueue(); }
   return todo.length;
 }
+/* Espanol is a STANDALONE switch, always visible. It used to appear only after
+   an agent picked one of the four bilingual advisors, which made the whole
+   Spanish library undiscoverable - and hid the best route of all: with no voice
+   selected, all 258 prewritten Spanish scripts apply instantly with no AI call.
+   Picking a bilingual advisor still OFFERS Spanish once, as a nudge; it is no
+   longer the only door, and switching to another voice no longer silently
+   turns Spanish back off. */
 function syncLangControls(){
   const ask = document.getElementById('langAsk');
   const chip = document.getElementById('langChip');
-  if (VOICE && isBilingual(VOICE.id)){
-    if (!langAsked){ ask.style.display = 'inline-flex'; chip.style.display = 'none'; }
-    else {
-      chip.style.display = '';
-      chip.classList.toggle('on', SPANISH);
-      chip.textContent = '🌎 Español: ' + (SPANISH ? 'ON' : 'OFF');
-    }
-  } else {
-    ask.style.display = 'none';
-    chip.style.display = 'none';
-    if (SPANISH){ SPANISH = false; }
-  }
+  const offer = !!(VOICE && isBilingual(VOICE.id)) && !langAsked && !SPANISH;
+  ask.style.display = offer ? 'inline-flex' : 'none';
+  chip.style.display = offer ? 'none' : '';
+  chip.classList.toggle('on', SPANISH);
+  chip.textContent = '🌎 Español: ' + (SPANISH ? 'ON' : 'OFF');
 }
 
 function goldLabel(){
@@ -1784,7 +1784,7 @@ document.getElementById('ctGo').onclick = async () => {
   try{
     const payload = {niche, channels};
     if (v) payload.voice = {id:v.id, name:v.n};
-    if (SPANISH && v && isBilingual(v.id)) payload.lang = 'es';
+    if (SPANISH) payload.lang = 'es';       // Spanish no longer requires a bilingual advisor
     if (PROFILE.email) payload.member = {email: PROFILE.email};
     if (document.getElementById('ctLocal').checked && MARKET)
       payload.market = {name:MARKET.name, p:MARKET.p, dom:MARKET.dom, cut:MARKET.cut, inv:MARKET.inv, mai:MARKET.mai, rent:MARKET.rent};
@@ -2276,8 +2276,7 @@ function syncXSettings(){
   const row = document.getElementById('xLangRow');
   const chip = document.getElementById('xLangChip');
   if (row && chip){
-    const canEs = !!(VOICE && isBilingual(VOICE.id));
-    row.style.display = canEs ? '' : 'none';
+    row.style.display = '';                 // always offered, no advisor required
     chip.classList.toggle('on', SPANISH);
     chip.textContent = '🌎 Español: ' + (SPANISH ? 'ON' : 'OFF');
   }
