@@ -204,7 +204,11 @@ body.hasmkt .abtn.gold{display:inline-block}
 .xfav-list{max-height:340px;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .xfav-grp{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:.68em;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin:12px 0 5px}
 .xfav-grp:first-child{margin-top:0}
-.xfav-grp .gn{font-weight:600;letter-spacing:.04em;text-transform:none;color:var(--muted);white-space:nowrap}
+.xfav-grp .gt{min-width:0}
+.xfav-grp .gn{display:flex;align-items:center;gap:7px;font-weight:600;letter-spacing:.04em;text-transform:none;color:var(--muted);white-space:nowrap;flex:none}
+.xfav-hd .n{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.xfav-hd button,.xfav-grp button{background:transparent;border:1px solid var(--line);border-radius:5px;color:var(--gold);font-family:'Inter',sans-serif;font-size:.92em;font-weight:600;padding:5px 9px;min-height:30px;cursor:pointer;letter-spacing:.03em}
+.xfav-hd button:hover,.xfav-grp button:hover{background:rgba(201,168,92,.15);border-color:var(--gold);color:var(--gold-bright)}
 .xfav-row{display:flex;align-items:center;gap:9px;border-bottom:1px solid rgba(201,168,92,.1);min-height:44px}
 .xfav-row.open{border-bottom-color:transparent}
 .xfav-row input{accent-color:var(--gold);width:18px;height:18px;flex:none;cursor:pointer}
@@ -225,6 +229,7 @@ body.hasmkt .abtn.gold{display:inline-block}
 /* plain-english receipt of what the download will actually contain */
 .xp-sum{margin:10px 0 0;padding:9px 11px;background:var(--ink);border-left:2px solid var(--gold);font-size:.78em;color:var(--muted);line-height:1.55}
 .xp-sum b{color:var(--gold-bright);font-weight:600}
+.xp-sum .per{color:var(--ivory)}
 .xp-sum .warn{color:var(--ivory)}
 @media(max-width:560px){.xset-grid{grid-template-columns:1fr}}
 /* On a phone the checkbox, format badge and Sample link leave the title only a
@@ -238,6 +243,7 @@ body.hasmkt .abtn.gold{display:inline-block}
   .xp{padding:11px 9px}
   .xset{padding:10px 8px}
   .xfav{padding:9px 7px}
+  .xfav-hd button,.xfav-grp button{min-height:36px;padding:6px 11px}
 }
 #leadSearch{width:100%;background:var(--charcoal);border:1px solid var(--line);border-radius:8px;color:var(--ivory);font-family:'Inter',sans-serif;font-size:.92em;padding:9px 13px;margin-bottom:9px}
 #leadSearch:focus{border-color:var(--gold);outline:none}
@@ -2024,7 +2030,14 @@ try{ XOFF = new Set(JSON.parse(localStorage.getItem('rt_xoff')) || []); }catch(e
 try{ XADD = new Set(JSON.parse(localStorage.getItem('rt_xadd')) || []); }catch(e){}
 try{ XMODE = localStorage.getItem('rt_xmode') === 'fav' ? 'fav' : 'auto'; }catch(e){}
 
-const XP_VARIANTS = {auto: 3, fav: 5};   // hand-picked lists may run deeper than the default 3
+/* Automatic mode picks a sensible 3 per format. Hand-picked mode is NOT capped:
+   writing 5 of the 8 scripts an agent deliberately checked would be a lie about
+   what is in the file. (The old cap of 5 happened to equal the deepest
+   type/format pair in the library, so nothing was being dropped yet - but it
+   was an invisible ceiling waiting for the library to grow past it.)
+   Past WIDE_AT columns the summary explains the width instead of hiding it. */
+const XP_VARIANTS = {auto: 3, fav: Infinity};
+const WIDE_AT = 16;
 
 /* What the agent has actually chosen: their stars, minus anything unchecked
    here, plus anything they added from the full list. Two sets rather than one
@@ -2109,8 +2122,10 @@ function renderXFav(){
     all.sort((a, b) => (PICKS.has(skey(b)) ? 1 : 0) - (PICKS.has(skey(a)) ? 1 : 0));
     const mine = all.filter(s => PICKS.has(skey(s))).length;
     const chosen = all.filter(s => keys.has(skey(s))).length;
-    rows += '<div class="xfav-grp">' + esc(topicName(t)) + ' · ' + (counts[t] || 0) + ' lead' + ((counts[t] || 0) === 1 ? '' : 's') +
-            '<span class="gn">' + (chosen ? chosen + ' chosen' : 'using best 3') + '</span></div>';
+    rows += '<div class="xfav-grp"><span class="gt">' + esc(topicName(t)) + ' · ' + (counts[t] || 0) + ' lead' + ((counts[t] || 0) === 1 ? '' : 's') + '</span>' +
+            '<span class="gn">' + (chosen ? chosen + ' chosen' : 'using best 3') +
+            ' <button type="button" class="grpall" data-t="' + esc(t) + '" data-on="' + (chosen < all.length ? '1' : '0') + '">' +
+            (chosen < all.length ? 'All' : 'None') + '</button></span></div>';
     if (!mine && !chosen)
       rows += '<div class="xfav-none">Nothing picked for this type — these leads get the best 3 automatically. Check any below to choose for yourself.</div>';
     for (const s of all){
@@ -2129,9 +2144,15 @@ function renderXFav(){
     }
   }
   box.innerHTML =
-    '<div class="xfav-hd"><b>Pick the scripts to write in</b><span class="n">' + on + ' of ' + total + ' chosen</span></div>' +
+    '<div class="xfav-hd"><b>Pick the scripts to write in</b>' +
+      '<span class="n">' + on + ' of ' + total + ' chosen' +
+      ' <button type="button" id="xAll">Select all</button>' +
+      ' <button type="button" id="xNone">Clear</button>' +
+      (PICKS.size ? ' <button type="button" id="xFavOnly">Just my ★</button>' : '') +
+      '</span></div>' +
     '<div class="xfav-list">' + rows + '</div>' +
-    '<div class="xfav-foot">★ are your favorites — already checked. Uncheck to leave one out, or check anything else you want in the file.</div>';
+    '<div class="xfav-foot">★ are your favorites — already checked. Uncheck to leave one out, or check anything else you want in the file. ' +
+      'Columns follow whichever lead type you picked the most for, not your total checks.</div>';
 
   box.querySelectorAll('.xfav-ck').forEach(ck => {
     ck.onchange = () => {
@@ -2144,6 +2165,30 @@ function renderXFav(){
   box.querySelectorAll('.ti').forEach(b => {
     b.onclick = () => { XOPEN = XOPEN === b.dataset.k ? null : b.dataset.k; renderXFav(); };
   });
+
+  // bulk selection. setKey mirrors the single-checkbox logic so a starred
+  // script cleared in bulk lands in XOFF, not silently back on next render.
+  const setKey = (k, want) => {
+    if (want){ XOFF.delete(k); if (!PICKS.has(k)) XADD.add(k); }
+    else { XADD.delete(k); if (PICKS.has(k)) XOFF.add(k); }
+  };
+  const bulk = (scripts, want) => {
+    scripts.forEach(s => setKey(skey(s), want));
+    xSaveState(); renderXFav(); xSummary();
+  };
+  const inPlay = SCRIPTS.filter(s => topics.includes(s.t));
+  const all$ = box.querySelector('#xAll');
+  if (all$) all$.onclick = () => bulk(inPlay, true);
+  const none$ = box.querySelector('#xNone');
+  if (none$) none$.onclick = () => bulk(inPlay, false);
+  const fav$ = box.querySelector('#xFavOnly');
+  if (fav$) fav$.onclick = () => {          // back to exactly what they starred
+    XOFF.clear(); XADD.clear();
+    xSaveState(); renderXFav(); xSummary();
+  };
+  box.querySelectorAll('.grpall').forEach(b => {
+    b.onclick = () => bulk(SCRIPTS.filter(s => s.t === b.dataset.t), b.dataset.on === '1');
+  });
 }
 
 /* --- plain-english receipt, so nobody finds out what they got after the fact --- */
@@ -2154,20 +2199,28 @@ function xSummary(){
   el.style.display = '';
   const chans = xChans();
   const cap = XP_VARIANTS[XMODE];
-  let cols = 0;
+  const NAME = {call: 'Call', vm: 'Voicemail', text: 'Text', email: 'Email'};
+  let cols = 0, widest = 0;
+  const per = [];
   for (const ch of chans){
     const n = Math.min(cap, xDepth(ch));
+    if (!n) continue;
+    widest = Math.max(widest, n);
     cols += ch === 'email' ? n * 2 : n;
+    per.push(n + ' ' + NAME[ch]);
   }
   const topics = xTopicsInPlay();
   const bits = [];
   bits.push('<b>' + LEADS.length + '</b> lead' + (LEADS.length === 1 ? '' : 's') +
             ' · ' + topics.length + ' lead type' + (topics.length === 1 ? '' : 's') +
-            ' · <b>' + cols + '</b> script column' + (cols === 1 ? '' : 's'));
+            ' · <b>' + cols + '</b> script column' + (cols === 1 ? '' : 's') +
+            (per.length ? ' <span class="per">(' + per.join(' · ') + ')</span>' : ''));
   const how = [];
   if (XMODE === 'fav' && PICKS.size){
     const keys = xChosenKeys();
-    how.push('your ' + keys.size + ' chosen favorite' + (keys.size === 1 ? '' : 's') + ' first');
+    const stars = [...keys].filter(k => PICKS.has(k)).length;
+    how.push('your ' + keys.size + ' chosen script' + (keys.size === 1 ? '' : 's') +
+             (stars && stars < keys.size ? ' (' + stars + ' starred)' : '') + ' first');
     const bare = topics.filter(t => !SCRIPTS.some(s => s.t === t && keys.has(skey(s))));
     if (bare.length) how.push('<span class="warn">best 3 automatically for ' + bare.map(t => esc(topicName(t))).join(', ') + '</span>');
   } else {
@@ -2177,6 +2230,12 @@ function xSummary(){
   if (SPANISH) how.push('in Spanish');
   if (MARKET) how.push('tailored to ' + esc(MARKET.name));
   bits.push(how.join(' · '));
+  // The count is set by the DEEPEST single lead type, not the total number of
+  // checks - which is the part that surprises people, so spell it out once the
+  // sheet actually gets wide rather than leaving them to work it out in Excel.
+  if (XMODE === 'fav' && cols > WIDE_AT)
+    bits.push('<span class="warn">' + cols + ' columns is a wide sheet. The count follows whichever lead ' +
+              'type you picked the most for (' + widest + ' deep), not your total checks — uncheck a few to narrow it.</span>');
   if (!chans.length)
     bits.push('<span class="warn">Nothing to write yet — pick at least one format' + (XMODE === 'fav' ? ' or check a favorite' : '') + '.</span>');
   el.innerHTML = bits.join('<br>');
