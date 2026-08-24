@@ -187,6 +187,58 @@ body.hasmkt .abtn.gold{display:inline-block}
 .xp-chans input{accent-color:var(--gold);width:18px;height:18px;cursor:pointer}
 .xp .go{padding:12px 20px}
 .xp-note{display:block;margin-top:9px;font-size:.76em;color:var(--muted);line-height:1.5}
+/* voice / language / which-scripts, mirrored down here so the agent never has
+   to scroll back to the top of the page to find out what the file will say */
+.xset{background:var(--charcoal);border:1px solid var(--line);border-radius:8px;padding:11px 13px;margin-bottom:11px}
+.xset-hd{font-size:.7em;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:9px}
+.xset-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.xset-f label{display:block;font-size:.72em;color:var(--muted);margin-bottom:4px}
+.xset-f select{width:100%;padding:10px 32px 10px 11px;background:var(--ink);border:1px solid var(--line);border-radius:6px;color:var(--ivory);font-family:'Inter',sans-serif;font-size:.87em;min-height:42px;appearance:none;-webkit-appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23C9A85C' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;text-overflow:ellipsis}
+.xset-f select.custom{border-color:var(--gold);color:var(--gold-bright)}
+.xset-lang{margin-top:9px}
+/* the favorites picker: everything starred, already on, uncheck to leave out */
+.xfav{margin-top:10px;background:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px 11px}
+.xfav-hd{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.xfav-hd b{font-size:.82em;font-weight:600;color:var(--ivory)}
+.xfav-hd .n{font-size:.74em;color:var(--gold-bright);white-space:nowrap}
+.xfav-list{max-height:340px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.xfav-grp{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:.68em;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin:12px 0 5px}
+.xfav-grp:first-child{margin-top:0}
+.xfav-grp .gn{font-weight:600;letter-spacing:.04em;text-transform:none;color:var(--muted);white-space:nowrap}
+.xfav-row{display:flex;align-items:center;gap:9px;border-bottom:1px solid rgba(201,168,92,.1);min-height:44px}
+.xfav-row.open{border-bottom-color:transparent}
+.xfav-row input{accent-color:var(--gold);width:18px;height:18px;flex:none;cursor:pointer}
+.xfav-row .ch{flex:none;background:rgba(201,168,92,.14);color:var(--gold-bright);border-radius:4px;padding:3px 7px;font-size:.66em;font-weight:700;letter-spacing:.04em;text-transform:uppercase;cursor:pointer}
+.xfav-row .ti{flex:1 1 auto;display:flex;align-items:center;gap:7px;background:none;border:none;padding:9px 0;font-family:'Inter',sans-serif;font-size:.85em;color:var(--ivory);line-height:1.35;text-align:left;min-width:0;cursor:pointer}
+.xfav-row .ti .star{flex:none;color:var(--gold)}
+/* The title must be its own shrinkable item - as a bare text node it cannot go
+   below min-content and clips the Sample label on a narrow phone. Deliberately
+   break-word, NOT anywhere: `anywhere` drops min-content to one character and
+   that collapse propagates up, shrinking the whole settings panel to ~28px. */
+.xfav-row .ti .tx{flex:1 1 auto;min-width:0;overflow-wrap:break-word}
+.xfav-row .ti .peek{flex:none;font-size:.76em;color:var(--gold);text-transform:uppercase;letter-spacing:.06em}
+.xfav-row input:not(:checked) + .ch + .ti{color:var(--muted)}
+.xfav-samp{margin:0 0 8px 27px;padding:9px 11px;background:rgba(201,168,92,.06);border-left:2px solid var(--gold);font-size:.8em;color:var(--ivory);line-height:1.6;white-space:pre-wrap}
+.xfav-none{background:rgba(201,168,92,.07);border-left:2px solid var(--gold);padding:8px 10px;font-size:.78em;color:var(--muted);line-height:1.5;margin-bottom:4px}
+.xfav-foot{margin-top:9px;padding-top:8px;border-top:1px solid rgba(201,168,92,.12);font-size:.74em;color:var(--muted);line-height:1.5}
+.xfav-empty{font-size:.82em;color:var(--muted);line-height:1.55}
+/* plain-english receipt of what the download will actually contain */
+.xp-sum{margin:10px 0 0;padding:9px 11px;background:var(--ink);border-left:2px solid var(--gold);font-size:.78em;color:var(--muted);line-height:1.55}
+.xp-sum b{color:var(--gold-bright);font-weight:600}
+.xp-sum .warn{color:var(--ivory)}
+@media(max-width:560px){.xset-grid{grid-template-columns:1fr}}
+/* On a phone the checkbox, format badge and Sample link leave the title only a
+   few characters of width, so give the title its own full-width line. */
+@media(max-width:430px){
+  .xfav-row{flex-wrap:wrap;row-gap:0;padding:4px 0}
+  .xfav-row .ti{flex:1 1 100%;padding:2px 0 9px}
+  .xfav-samp{margin-left:0}
+  /* four nested boxes were charging ~120px of padding on a 320px screen and
+     leaving the sample text in a narrow gutter - claw most of it back */
+  .xp{padding:11px 9px}
+  .xset{padding:10px 8px}
+  .xfav{padding:9px 7px}
+}
 #leadSearch{width:100%;background:var(--charcoal);border:1px solid var(--line);border-radius:8px;color:var(--ivory);font-family:'Inter',sans-serif;font-size:.92em;padding:9px 13px;margin-bottom:9px}
 #leadSearch:focus{border-color:var(--gold);outline:none}
 .lead-rows{max-height:290px;overflow:auto;border:1px solid var(--line);border-radius:8px;display:none}
@@ -359,14 +411,35 @@ body.hasmkt .abtn.gold{display:inline-block}
       <div class="lead-rows" id="leadRows"></div>
       <div class="xp" id="leadExport" style="display:none">
         <div class="xp-title">📥 Get your file back — scripts written in, lead by lead</div>
-        <div class="xp-chans">
+        <div class="xset">
+          <div class="xset-hd">Script settings</div>
+          <div class="xset-grid">
+            <div class="xset-f">
+              <label for="xVoice">🎙 Script voice</label>
+              <select id="xVoice"></select>
+            </div>
+            <div class="xset-f">
+              <label for="xWhich">Which scripts</label>
+              <select id="xWhich">
+                <option value="auto">Best 3 for each lead type</option>
+                <option value="fav">My favorites — pick them myself</option>
+              </select>
+            </div>
+          </div>
+          <div class="xset-lang" id="xLangRow" style="display:none">
+            <button class="lang-chip" type="button" id="xLangChip">🌎 Español: OFF</button>
+          </div>
+          <div class="xfav" id="xFav" style="display:none"></div>
+        </div>
+        <div class="xp-chans" id="xpChans">
           <label><input type="checkbox" class="xp-ch" value="call" checked> 📞 Call</label>
           <label><input type="checkbox" class="xp-ch" value="vm" checked> 🎙 Voicemail</label>
           <label><input type="checkbox" class="xp-ch" value="text" checked> 💬 Text</label>
           <label><input type="checkbox" class="xp-ch" value="email" checked> ✉️ Email</label>
         </div>
         <button class="go" id="xpGo">📥 Download Excel with Scripts</button>
-        <span class="xp-note">Your original file, untouched, plus <b>three variations of every format you pick</b> — each lead's script matches their lead type and fills in their name, address, and your details automatically. Set a market and tailor first if you want the market-tailored versions in the file.</span>
+        <div class="xp-sum" id="xpSum"></div>
+        <span class="xp-note">Your original file comes back untouched with the script columns added — each lead's script matches their lead type and fills in their name, address, and your details automatically. Set a market and tailor first if you want the market-tailored versions in the file.</span>
       </div>
     </div>
   </details>
@@ -578,8 +651,10 @@ try{ RAW = JSON.parse(localStorage.getItem('rt_leads_raw')); }catch(e){}
 
 /* ---- export: hand the agent their own file back with scripts written in ---- */
 async function exportLeadScripts(){
-  const chans = [...document.querySelectorAll('.xp-ch:checked')].map(c => c.value);
-  if (!chans.length) return toast('Pick at least one script format first');
+  const chans = xChans();
+  if (!chans.length) return toast(XMODE === 'fav'
+    ? 'Check at least one script to write in'
+    : 'Pick at least one script format first');
   if (!LEADS.length) return;
   const unassigned = LEADS.filter(l => !l.topic).length;
   if (unassigned === LEADS.length){
@@ -590,11 +665,10 @@ async function exportLeadScripts(){
   btn.disabled = true; btn.textContent = 'Writing your file…';
   try{
     // three variations of every chosen format, so each lead gets options to
-    // work through instead of one take-it-or-leave-it script
-    const VARIANTS = 3;
-    const topicsInPlay = [...new Set(LEADS.filter(l => l.topic).map(l => l.topic))];
-    const availFor = ch => topicsInPlay.reduce((n, t) =>
-      Math.max(n, SCRIPTS.filter(s => s.t === t && s.ch === ch).length), 0);
+    // work through instead of one take-it-or-leave-it script - or as many as
+    // the agent checked, when they picked the scripts themselves
+    const VARIANTS = XP_VARIANTS[XMODE];
+    const availFor = xDepth;
     // every added column reads "<Format> <n> Script" so the header row scans
     // consistently next to the email Subject columns
     const NAME = {call: 'Call', vm: 'Voicemail', text: 'Text', email: 'Email'};
@@ -616,7 +690,7 @@ async function exportLeadScripts(){
     };
     const cellFor = (lead, col) => {
       if (!lead || !lead.topic) return '';
-      const pool = SCRIPTS.filter(s => s.t === lead.topic && s.ch === col.ch);
+      const pool = xPool(lead.topic, col.ch);
       const s = pool[col.idx || 0];
       if (!s) return '';
       const filled = fillPlain(s.local || s.body, lead);
@@ -1125,6 +1199,7 @@ function renderLeads(){
   document.getElementById('leadSearch').style.display = 'block';
   document.getElementById('leadClear').style.display = '';
   document.getElementById('leadExport').style.display = 'block';
+  syncXSettings();                    // the picker only knows this file's lead types
   box.classList.add('on');
   box.innerHTML = '';
   LEADS.forEach((l, idx) => {
@@ -1535,7 +1610,7 @@ function togglePick(i){
   localStorage.setItem('rt_picks', JSON.stringify([...PICKS]));
   const card = document.querySelector(`.card[data-i="${i}"] .pick`);
   if (card){ card.classList.toggle('on', PICKS.has(k)); card.textContent = PICKS.has(k) ? '★' : '☆'; }
-  syncPickGo(); syncFavBtn();
+  syncPickGo(); syncFavBtn(); syncXSettings();   // a new star belongs in the export picker too
   if (FAVONLY && !PICKS.has(k)) render();      // unstarred while viewing favorites
   if (FAVONLY && !PICKS.size){ FAVONLY = false; syncFavBtn(); render(); }
 }
@@ -1591,6 +1666,9 @@ function syncSetupSum(){
     mEl.textContent = '📍 Market — not set · tap to localize your scripts';
   }
   syncPickGo();
+  // voice, language and market all change what the exported file will say, so
+  // the mirrored controls and the summary follow them everywhere
+  if (typeof syncXSettings === 'function') syncXSettings();
 }
 
 async function pumpQueue(){
@@ -1932,10 +2010,226 @@ function revert(i){
   updateCard(i);
 }
 
+/* ===== My Lead List: script settings =====
+   Voice and Espanol already decided what the exported file said, but the only
+   controls for them sat at the top of the page - so an agent could export a
+   whole farm without ever knowing which voice wrote it. These mirror the SAME
+   globals (never a second copy of the setting) right where the file is built,
+   and add the one genuinely new choice: which scripts to write in. */
+
+let XMODE = 'auto';                 // 'auto' = best 3 per lead type, 'fav' = agent picks
+let XOFF = new Set();               // favorites deliberately left OUT of this export
+let XADD = new Set();               // non-favorites deliberately added to it
+try{ XOFF = new Set(JSON.parse(localStorage.getItem('rt_xoff')) || []); }catch(e){}
+try{ XADD = new Set(JSON.parse(localStorage.getItem('rt_xadd')) || []); }catch(e){}
+try{ XMODE = localStorage.getItem('rt_xmode') === 'fav' ? 'fav' : 'auto'; }catch(e){}
+
+const XP_VARIANTS = {auto: 3, fav: 5};   // hand-picked lists may run deeper than the default 3
+
+/* What the agent has actually chosen: their stars, minus anything unchecked
+   here, plus anything they added from the full list. Two sets rather than one
+   frozen selection so a script starred later still arrives already checked. */
+function xChosenKeys(){
+  const out = new Set();
+  for (const k of PICKS) if (!XOFF.has(k)) out.add(k);
+  for (const k of XADD) out.add(k);
+  return out;
+}
+/* Scripts for one lead type + format, best first. In favorites mode the
+   agent's picks lead and the rest of the library backfills, so a type they
+   starred only two scripts for still fills every column instead of going
+   blank halfway across the sheet. */
+function xPool(topic, ch){
+  const lib = SCRIPTS.filter(s => s.t === topic && s.ch === ch);
+  if (XMODE !== 'fav') return lib;
+  const keys = xChosenKeys();
+  const picked = lib.filter(s => keys.has(skey(s)));
+  if (!picked.length) return lib;                       // nothing starred for this type
+  return picked.concat(lib.filter(s => !keys.has(skey(s))));
+}
+function xTopicsInPlay(){
+  return [...new Set(LEADS.filter(l => l.topic).map(l => l.topic))];
+}
+/* how many columns a format earns: in favorites mode the picks decide, so a
+   format nobody starred simply does not appear in the file */
+function xDepth(ch){
+  const topics = xTopicsInPlay();
+  if (XMODE !== 'fav')
+    return topics.reduce((n, t) => Math.max(n, SCRIPTS.filter(s => s.t === t && s.ch === ch).length), 0);
+  const keys = xChosenKeys();
+  return topics.reduce((n, t) =>
+    Math.max(n, SCRIPTS.filter(s => s.t === t && s.ch === ch && keys.has(skey(s))).length), 0);
+}
+function xChans(){
+  if (XMODE === 'fav') return ['call','vm','text','email'].filter(ch => xDepth(ch) > 0);
+  return [...document.querySelectorAll('.xp-ch:checked')].map(c => c.value);
+}
+
+function xSaveState(){
+  try{
+    localStorage.setItem('rt_xoff', JSON.stringify([...XOFF]));
+    localStorage.setItem('rt_xadd', JSON.stringify([...XADD]));
+    localStorage.setItem('rt_xmode', XMODE);
+  }catch(e){}
+}
+
+/* --- the picker: every script available for the lead types in THIS file,
+   grouped by type, favorites pinned to the top and already checked. Tap any
+   row to read a sample - written in the voice and language currently set, and
+   filled with a real lead off the list, so the choice is made on the actual
+   words rather than the title. --- */
+let XOPEN = null;                      // skey of the row whose sample is showing
+
+function xSampleFor(s, topic){
+  const lead = LEADS.find(l => l.topic === topic) || null;
+  let txt = fillPlain(s.local || s.body, lead);
+  if (txt.length > 460) txt = txt.slice(0, 460).replace(/\s+\S*$/, '') + '…';
+  return txt;
+}
+
+function renderXFav(){
+  const box = document.getElementById('xFav');
+  if (!box) return;
+  if (XMODE !== 'fav'){ box.style.display = 'none'; return; }
+  box.style.display = '';
+  const topics = xTopicsInPlay();
+  if (!topics.length){
+    box.innerHTML = '<div class="xfav-empty">Upload your leads first — then every script for the lead types in your file shows up here to pick from.</div>';
+    return;
+  }
+  const keys = xChosenKeys();
+  const counts = {};
+  LEADS.forEach(l => { if (l.topic) counts[l.topic] = (counts[l.topic] || 0) + 1; });
+  const order = topics.slice().sort((a, b) => (counts[b] || 0) - (counts[a] || 0));
+
+  let rows = '', on = 0, total = 0;
+  for (const t of order){
+    const all = SCRIPTS.filter(s => s.t === t);
+    // favorites first, then the rest of that type's library
+    all.sort((a, b) => (PICKS.has(skey(b)) ? 1 : 0) - (PICKS.has(skey(a)) ? 1 : 0));
+    const mine = all.filter(s => PICKS.has(skey(s))).length;
+    const chosen = all.filter(s => keys.has(skey(s))).length;
+    rows += '<div class="xfav-grp">' + esc(topicName(t)) + ' · ' + (counts[t] || 0) + ' lead' + ((counts[t] || 0) === 1 ? '' : 's') +
+            '<span class="gn">' + (chosen ? chosen + ' chosen' : 'using best 3') + '</span></div>';
+    if (!mine && !chosen)
+      rows += '<div class="xfav-none">Nothing picked for this type — these leads get the best 3 automatically. Check any below to choose for yourself.</div>';
+    for (const s of all){
+      const k = skey(s), checked = keys.has(k), fav = PICKS.has(k);
+      total++; if (checked) on++;
+      rows += '<div class="xfav-row' + (XOPEN === k ? ' open' : '') + '">' +
+                '<input type="checkbox" class="xfav-ck" id="xck_' + k + '" value="' + k + '"' + (checked ? ' checked' : '') + '>' +
+                '<label class="ch" for="xck_' + k + '">' + esc(CH_LABEL[s.ch]) + '</label>' +
+                '<button type="button" class="ti" data-k="' + k + '" data-t="' + esc(t) + '" aria-expanded="' + (XOPEN === k ? 'true' : 'false') + '">' +
+                  (fav ? '<span class="star">★</span>' : '') +
+                  '<span class="tx">' + esc(s.title) + '</span>' +
+                  '<span class="peek">' + (XOPEN === k ? 'Hide' : 'Sample') + '</span>' +
+                '</button>' +
+              '</div>' +
+              (XOPEN === k ? '<div class="xfav-samp">' + esc(xSampleFor(s, t)) + '</div>' : '');
+    }
+  }
+  box.innerHTML =
+    '<div class="xfav-hd"><b>Pick the scripts to write in</b><span class="n">' + on + ' of ' + total + ' chosen</span></div>' +
+    '<div class="xfav-list">' + rows + '</div>' +
+    '<div class="xfav-foot">★ are your favorites — already checked. Uncheck to leave one out, or check anything else you want in the file.</div>';
+
+  box.querySelectorAll('.xfav-ck').forEach(ck => {
+    ck.onchange = () => {
+      const k = ck.value;
+      if (ck.checked){ XOFF.delete(k); if (!PICKS.has(k)) XADD.add(k); }
+      else { XADD.delete(k); if (PICKS.has(k)) XOFF.add(k); }
+      xSaveState(); renderXFav(); xSummary();
+    };
+  });
+  box.querySelectorAll('.ti').forEach(b => {
+    b.onclick = () => { XOPEN = XOPEN === b.dataset.k ? null : b.dataset.k; renderXFav(); };
+  });
+}
+
+/* --- plain-english receipt, so nobody finds out what they got after the fact --- */
+function xSummary(){
+  const el = document.getElementById('xpSum');
+  if (!el) return;
+  if (!LEADS.length){ el.style.display = 'none'; return; }
+  el.style.display = '';
+  const chans = xChans();
+  const cap = XP_VARIANTS[XMODE];
+  let cols = 0;
+  for (const ch of chans){
+    const n = Math.min(cap, xDepth(ch));
+    cols += ch === 'email' ? n * 2 : n;
+  }
+  const topics = xTopicsInPlay();
+  const bits = [];
+  bits.push('<b>' + LEADS.length + '</b> lead' + (LEADS.length === 1 ? '' : 's') +
+            ' · ' + topics.length + ' lead type' + (topics.length === 1 ? '' : 's') +
+            ' · <b>' + cols + '</b> script column' + (cols === 1 ? '' : 's'));
+  const how = [];
+  if (XMODE === 'fav' && PICKS.size){
+    const keys = xChosenKeys();
+    how.push('your ' + keys.size + ' chosen favorite' + (keys.size === 1 ? '' : 's') + ' first');
+    const bare = topics.filter(t => !SCRIPTS.some(s => s.t === t && keys.has(skey(s))));
+    if (bare.length) how.push('<span class="warn">best 3 automatically for ' + bare.map(t => esc(topicName(t))).join(', ') + '</span>');
+  } else {
+    how.push('the best 3 for each lead type');
+  }
+  if (VOICE) how.push("in " + esc(VOICE.n) + "'s voice");
+  if (SPANISH) how.push('in Spanish');
+  if (MARKET) how.push('tailored to ' + esc(MARKET.name));
+  bits.push(how.join(' · '));
+  if (!chans.length)
+    bits.push('<span class="warn">Nothing to write yet — pick at least one format' + (XMODE === 'fav' ? ' or check a favorite' : '') + '.</span>');
+  el.innerHTML = bits.join('<br>');
+}
+
+/* --- keep the mirrored controls honest in both directions --- */
+function syncXSettings(){
+  const vs = document.getElementById('voiceSel');
+  const xv = document.getElementById('xVoice');
+  if (xv && vs){
+    if (!xv.options.length){                       // clone the real selector once
+      xv.innerHTML = vs.innerHTML;
+      xv.onchange = () => { vs.value = xv.value; vs.onchange(); };
+    }
+    xv.value = vs.value;
+    xv.classList.toggle('custom', !!VOICE);
+  }
+  const row = document.getElementById('xLangRow');
+  const chip = document.getElementById('xLangChip');
+  if (row && chip){
+    const canEs = !!(VOICE && isBilingual(VOICE.id));
+    row.style.display = canEs ? '' : 'none';
+    chip.classList.toggle('on', SPANISH);
+    chip.textContent = '🌎 Español: ' + (SPANISH ? 'ON' : 'OFF');
+  }
+  const chans = document.getElementById('xpChans');
+  if (chans) chans.style.display = XMODE === 'fav' ? 'none' : '';   // picks already carry their format
+  renderXFav();
+  xSummary();
+}
+
+(function(){
+  const which = document.getElementById('xWhich');
+  if (!which) return;
+  which.value = XMODE;
+  which.classList.toggle('custom', XMODE === 'fav');
+  which.onchange = () => {
+    XMODE = which.value === 'fav' ? 'fav' : 'auto';
+    which.classList.toggle('custom', XMODE === 'fav');
+    if (XMODE === 'fav' && !PICKS.size)
+      toast('Star scripts with the ☆ above and they land here');
+    xSaveState(); syncXSettings();
+  };
+  const chip = document.getElementById('xLangChip');
+  if (chip) chip.onclick = () => setSpanish(!SPANISH);
+  document.querySelectorAll('.xp-ch').forEach(c => c.addEventListener('change', xSummary));
+})();
+
 syncProf();
 render();
 syncSetupSum();
 syncFavBtn();
+syncXSettings();
 </script>
 </body>
 </html>
