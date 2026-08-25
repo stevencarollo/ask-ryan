@@ -2592,20 +2592,72 @@ async function ccLoadIndex(){
    so we know which file to open (no geocoder in a static site - the comps'
    own parcel centroids are the map). ---- */
 let CC_SUBJ = null;
-// LA County cap-rate benchmarks, all classes combined, refreshed quarterly
-// from published institutional broker research (Q2 2026: Kidder Mathews,
-// CoStar/Matthews aggregates; CBRE's own survey is semiannual and gated).
-// Office is deliberately null - LA office volume is too thin for an honest
-// number, and shipping a guess would be worse than saying so.
+// LA cap-rate benchmarks, refreshed quarterly from published institutional
+// broker research (Q2 2026 metro averages; Q1 2026 multifamily submarket
+// survey rows; class deltas shaped from the national class curve). CBRE and
+// peers publish METRO x type x class only - nothing free exists per city -
+// so unnamed cities get an ESTIMATE: metro base adjusted by how the city's
+// own recorded-sale pricing compares to the county (clamped, labeled).
 const CC_BENCH = {
   asof: 'Q2 2026',
   types: {
-    'Multifamily 5+': {avg: 5.8, note: 'up 30 bps year-over-year'},
-    'Industrial':     {avg: 5.8, lo: 5.5, hi: 6.0},
-    'Retail':         {avg: 5.96, lo: 5.6, hi: 6.1},
-    'Office':         null
+    'Multifamily 5+': {avg: 5.8, note: 'up 30 bps year-over-year', cls: {A: -0.30, B: 0, C: 0.45}},
+    'Industrial':     {avg: 5.8,  lo: 5.5, hi: 6.0, cls: {A: -0.25, B: 0, C: 0.40}},
+    'Retail':         {avg: 5.96, lo: 5.6, hi: 6.1, cls: {A: -0.30, B: 0, C: 0.50}},
+    // LA office is bifurcated by 300-500 bps on leasing health - one blended
+    // number would mislead, so office quotes per-class ranges only
+    'Office':         {classOnly: {A: [6.5, 8.0], B: [8.5, 11.0], C: [9.5, 12.0]}}
+  },
+  mfCities: {   // Q1 2026 published multifamily submarket ranges, named cities only
+    'Beverly Hills': [4.7, 5.5], 'Santa Monica': [4.7, 5.5],
+    'West Hollywood': [4.75, 5.75], 'Pasadena': [4.75, 5.75], 'Glendale': [4.75, 5.75],
+    'Torrance': [4.75, 5.75], 'Redondo Beach': [4.75, 5.75], 'Hermosa Beach': [4.75, 5.75],
+    'Manhattan Beach': [4.75, 5.75], 'El Segundo': [4.75, 5.75]
   }
 };
+let CC_CLS = 'All';        // property class filter for the cap benchmark
+let CC_CLS_AUTO = false;   // true when the class was inferred from the subject
+function ccClsFromYb(yb){
+  return yb >= 2000 ? 'A' : yb >= 1975 ? 'B' : yb > 0 ? 'C' : null;
+}
+function ccSetCls(c){
+  CC_CLS = c; CC_CLS_AUTO = false;
+  ccRender();
+}
+// The benchmark cap for one type at the current class + city scope.
+// quality: 'city' = published submarket row · 'est' = pricing-adjusted
+// estimate · 'metro' = metro benchmark as-is · null = nothing defensible.
+function ccCapFor(t){
+  const b = CC_BENCH.types[t];
+  if (!b) return null;
+  const cd = b.cls ? (CC_CLS === 'All' ? 0 : b.cls[CC_CLS]) : 0;
+  if (b.classOnly){
+    if (CC_CLS === 'All') return {needsClass: true};
+    const r = b.classOnly[CC_CLS];
+    return {lo: r[0], hi: r[1], cap: (r[0] + r[1]) / 2, quality: 'metro',
+            note: 'wide range — leasing health dominates'};
+  }
+  const cityName = CC_CITY && CC_CITY.city;
+  // 1) a published submarket row for this exact city (multifamily only)
+  if (t === 'Multifamily 5+' && cityName && CC_BENCH.mfCities[cityName]){
+    const r = CC_BENCH.mfCities[cityName];
+    return {lo: +(r[0] + cd).toFixed(2), hi: +(r[1] + cd).toFixed(2),
+            cap: +(((r[0] + r[1]) / 2) + cd).toFixed(2), quality: 'city'};
+  }
+  const base = b.avg + cd;
+  // 2) estimate: shift the metro base by the city's own pricing vs county
+  const cs = (CC_INDEX && CC_INDEX.countyStats && CC_INDEX.countyStats[t]) || {};
+  const st = (CC_CITY && CC_CITY.stats && CC_CITY.stats[t]) || {};
+  const metric = t === 'Multifamily 5+' ? 'medPpu' : 'medPsf';
+  if (cityName && !/^ZIP /.test(cityName) && st.n >= 5 && st[metric] && cs[metric]){
+    const est = base * Math.sqrt(cs[metric] / st[metric]);
+    const shift = Math.max(-0.75, Math.min(0.75, est - base));
+    return {cap: +(base + shift).toFixed(2), quality: 'est'};
+  }
+  return {cap: +base.toFixed(2), lo: b.lo ? +(b.lo + cd).toFixed(2) : null,
+          hi: b.hi ? +(b.hi + cd).toFixed(2) : null,
+          quality: 'metro', note: CC_CLS === 'All' ? b.note : null};
+}
 function ccCapCalc(){
   const noi = parseFloat(document.getElementById('capNoi').value) || 0;
   const price = parseFloat(document.getElementById('capPrice').value) || 0;
@@ -2746,6 +2798,11 @@ async function ccPickCity(name){
                  sf: exact ? exact[2] : (roll ? roll[2] : 0),
                  lat: exact && exact[10] ? exact[10] : (roll && roll[5] ? roll[5] : null),
                  lon: exact && exact[11] ? exact[11] : (roll && roll[6] ? roll[6] : null)};
+      // the subject's own year built suggests its class (age proxy - the
+      // broker can tap a different class if the building was renovated)
+      const subjYb = exact ? exact[5] : (roll ? roll[4] : 0);
+      const subjCls = ccClsFromYb(subjYb);
+      if (subjCls){ CC_CLS = subjCls; CC_CLS_AUTO = true; }
       // the subject's own type is the natural default view
       const first = exact ? CC_CITY.types[exact[6]]
         : roll ? CC_CITY.types[roll[1]]
@@ -2942,27 +2999,36 @@ function ccRender(){
         (s.screened ? ' · ' + s.screened + ' allocated/distressed shown but not averaged' : '') +
         '</div></div>';
     }).join('');
-  // benchmark cap rates for the selected types (quarterly survey layer)
+  // benchmark cap rates for the selected types (quarterly survey layer),
+  // matched to the scoped city and the chosen property class
   const cb = document.getElementById('capBench');
   if (cb){
+    const chips = ['All','A','B','C'].map(c =>
+      '<button type="button" class="ccr' + (CC_CLS===c?' on':'') +
+      '" onclick="ccSetCls(\'' + c + '\')">' + (c==='All'?'All classes':'Class '+c) + '</button>').join('');
     const parts = [];
-    let firstAvg = null;
+    let firstCap = null;
     for (const t of CC_SEL){
-      const b = CC_BENCH.types[t];
-      if (b === null) parts.push(esc(t) + ': sales volume too thin for a reliable benchmark');
-      else if (b){
-        parts.push(esc(t) + ' <b>~' + b.avg + '%</b>' +
-          (b.lo ? ' (' + b.lo + '–' + b.hi + '%)' : '') + (b.note ? ' · ' + b.note : ''));
-        if (firstAvg === null) firstAvg = b.avg;
-      }
+      const r = ccCapFor(t);
+      if (!r){ parts.push(esc(t) + ': no published benchmark'); continue; }
+      if (r.needsClass){ parts.push(esc(t) + ': pick a class — LA office is too bifurcated for one number'); continue; }
+      const range = (r.lo && r.hi) ? ' (' + r.lo + '–' + r.hi + '%)' : '';
+      const tag = r.quality === 'city' ? esc(CC_CITY.city) + ' submarket survey'
+                : r.quality === 'est' ? 'est. for ' + esc(CC_CITY.city) + ' from local pricing'
+                : 'LA metro';
+      parts.push(esc(t) + ' <b>~' + r.cap + '%</b>' + range + ' · ' + tag +
+        (r.note ? ' · ' + r.note : ''));
+      if (firstCap === null) firstCap = r.cap;
     }
-    cb.innerHTML = parts.length
-      ? 'LA County benchmark cap rates, all classes — ' + CC_BENCH.asof +
-        ' institutional surveys:<br>' + parts.join(' · ')
+    const clsNote = CC_CLS_AUTO && CC_SUBJ
+      ? ' <span class="cc-hint">class estimated from the subject — tap to change</span>' : '';
+    cb.innerHTML = '<span class="cc-radius">' + chips + '</span>' + clsNote + '<br>' +
+      (parts.length ? parts.join('<br>') +
+        '<br>' + CC_BENCH.asof + ' institutional surveys · estimates are a guide, not an appraisal'
       : 'No published cap-rate benchmark for the selected type' + (CC_SEL.size===1?'':'s') +
-        ' — enter your own rate below.';
+        ' — enter your own rate below.');
     const cr = document.getElementById('capRate');
-    if (cr) cr.placeholder = firstAvg !== null ? String(firstAvg) : '5.8';
+    if (cr) cr.placeholder = firstCap !== null ? String(firstCap) : '5.8';
   }
   // subject banner: the address the broker typed anchors the whole view
   const sb = document.getElementById('ccSubj');
