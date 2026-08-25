@@ -272,7 +272,7 @@ body.hasmkt .abtn.gold{display:inline-block}
 .tgrid-t{font-size:.7em;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
 .tgrid-clr{background:transparent;border:1px solid var(--line);border-radius:6px;color:var(--muted);font-family:'Inter',sans-serif;font-size:.76em;font-weight:600;padding:6px 11px;min-height:32px;cursor:pointer;letter-spacing:.04em}
 .tgrid-clr:hover{border-color:var(--gold);color:var(--gold-bright)}
-.tgrid-clr.on{background:rgba(201,168,92,.14);border-color:var(--gold);color:var(--gold-bright)}
+.tgrid-clr{background:rgba(201,168,92,.14);border-color:var(--gold);color:var(--gold-bright)}
 .tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(146px,1fr));gap:7px}
 .ttile{display:flex;flex-direction:column;gap:2px;text-align:left;background:var(--charcoal);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-height:50px;cursor:pointer;font-family:'Inter',sans-serif;transition:border-color .18s,background .18s,color .18s}
 .ttile:hover{background:rgba(201,168,92,.08);border-color:var(--gold)}
@@ -518,7 +518,7 @@ body.hasmkt .abtn.gold{display:inline-block}
        went looking. Tiles drive the SAME tSel set as the dropdown. -->
   <section class="tgrid-wrap">
     <div class="tgrid-hd">
-      <span class="tgrid-t">Browse by situation</span>
+      <span class="tgrid-t" id="tgridT">Browse by situation</span>
       <button class="tgrid-clr" id="tgridClr" onclick="clearTopics()">Show all</button>
     </div>
     <div class="tgrid collapsed" id="tGrid"></div>
@@ -1648,10 +1648,22 @@ function buildTopicGrid(){
     };
     g.appendChild(b);
   }
+  // Only exists when it has a job. It used to sit there permanently AND light up
+  // when nothing was filtered - i.e. highlighted exactly when clicking it could
+  // do nothing, which reads as a broken button.
   const clr = document.getElementById('tgridClr');
   if (clr){
-    clr.classList.toggle('on', tSel.size === 0);
-    clr.textContent = tSel.size ? 'Show all (' + tSel.size + ' selected)' : 'Show all';
+    clr.style.display = tSel.size ? '' : 'none';
+    clr.textContent = '✕ Clear ' + (tSel.size === 1 ? 'filter' : tSel.size + ' filters');
+  }
+  // say what the filter is doing, so the grid is not silent about it
+  const hd = document.getElementById('tgridT');
+  if (hd){
+    let n = 0;
+    SCRIPTS.forEach(s => { if (!tSel.size || tSel.has(s.t)) n++; });
+    hd.textContent = tSel.size
+      ? 'Showing ' + n + ' of ' + SCRIPTS.length + ' scripts'
+      : 'Browse by situation';
   }
   syncTopicMore();
   const vc = document.getElementById('vaultCount');
