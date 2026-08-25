@@ -428,8 +428,10 @@ def validate(out, ch, adv=None):
         if phrase in out.lower():
             errs.append("coach-talk:" + phrase[:20])
     # segment labels said to the client's face
+    # NOTE: "prospect" is deliberately NOT here - "prospective buyers" and "the
+    # prospect of moving" are ordinary English, and banning it mangles good lines.
     for phrase in ("last-time seller", "last time seller", "downsizer",
-                   "senior lead", "prospect"):
+                   "senior lead"):
         if phrase in out.lower():
             errs.append("segment-label:" + phrase[:18])
     # mortality, however gently meant
@@ -454,3 +456,27 @@ def validate(out, ch, adv=None):
 
 if __name__ == "__main__":
     main()
+
+
+def tone_errors(body):
+    """Tone rules that must hold however a script was produced - authored fresh
+    or re-voiced from someone else's. Lives here so both pipelines share one
+    definition instead of drifting apart, which is how "last-time seller" ended
+    up spoken to clients in 82 voice variants."""
+    errs = []
+    low = body.lower()
+    for phrase in ("doing the right thing has its advantages", "commission is secondary",
+                   "not typical real estate agents", "knowledge is power",
+                   "clients' needs and goals come first", "avoid crisis mode"):
+        if phrase in low:
+            errs.append("coach-talk:" + phrase[:20])
+    for phrase in ("last-time seller", "last time seller", "downsizer", "senior lead"):
+        if phrase in low:
+            errs.append("segment-label:" + phrase[:18])
+    for w in BANNED_EXTRA:
+        if re.search(r"" + re.escape(w) + r"", low):
+            errs.append("condescending:" + w)
+    if re.search(r"end of (their|your|his|her) li(fe|ves)|remaining years|"
+                 r"while (you|they) still can|final years", body, re.I):
+        errs.append("mortality-reference")
+    return errs

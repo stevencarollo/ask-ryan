@@ -26,8 +26,9 @@ ECHO_RE = re.compile(r"^\s*(vm|call|text|email)?\s*TOPIC:|FORMAT:\s*(vm|call|tex
                      r"BEGIN SCRIPT|HARD RULES|grounded_in", re.I | re.M)
 
 
-def check(ok, label, detail=""):
-    print(("  PASS  " if ok else "  FAIL  ") + label + (("  -> " + detail) if detail else ""))
+def check(ok, label, detail="", detail_on_fail_only=False):
+    show = detail and not (ok and detail_on_fail_only)
+    print(("  PASS  " if ok else "  FAIL  ") + label + (("  -> " + detail) if show else ""))
     if not ok:
         FAILS.append(label)
     return ok
@@ -126,6 +127,31 @@ def main():
     check(miss_v == 0, "every library covers all %d scripts" % EXPECT_SCRIPTS, f"{miss_v} missing")
     check(orphan_v == 0, "no orphaned keys in voice libraries", f"{orphan_v} orphans")
 
+    # Tone rules held in the AUTHORING pipeline but not the re-voicing one, so
+    # "what I call last-time sellers" reached the client in 82 variants - an
+    # internal segment label applied to somebody's mother. Both generators now
+    # share tone_errors(); this is the backstop.
+    tone_v, tone_eg = 0, []
+    for f in vfiles:
+        for v in json.loads(f.read_text(encoding="utf-8")).values():
+            e = au.tone_errors(v.get("script", ""))
+            if e:
+                tone_v += 1
+                if len(tone_eg) < 3:
+                    tone_eg.append("%s:%s" % (f.stem, e[0]))
+    check(tone_v == 0, "no coach-talk, segment labels or condescension in variants",
+          ", ".join(tone_eg) if tone_eg else str(tone_v))
+    selfn_v = 0
+    for f in vfiles:
+        adv = next((a["n"] for a in json.loads(
+            (ROOT / "scripts" / "scripts_dump.json").read_text(encoding="utf-8"))["advisors"]
+            if a["id"] == f.stem), None)
+        if not adv:
+            continue
+        selfn_v += sum(1 for v in json.loads(f.read_text(encoding="utf-8")).values()
+                       if au.names_self(v.get("script", ""), adv))
+    check(selfn_v == 0, "no variant introduces the member as the advisor", str(selfn_v))
+
     print("\n=== SPANISH LIBRARY ===")
     es = json.loads((ROOT / "voices" / "_es.json").read_text(encoding="utf-8"))
     need = {s["key"] for s in S if s["t"] != "espanol"}
@@ -176,7 +202,8 @@ def main():
             check(key_at >= voices_at,
                   "CACHE_V newer than voices/ (%s)" % cache_v,
                   "voices/ changed after the cache key was set - bump CACHE_V "
-                  "or installed apps keep serving the old libraries")
+                  "or installed apps keep serving the old libraries",
+                  detail_on_fail_only=True)
 
     print("\n" + ("=" * 52))
     if FAILS:

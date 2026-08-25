@@ -90,6 +90,14 @@ Rules:
   fine; introducing yourself as them is not.
 - {chan_rule}
 - BANNED - generic filler no working agent says: {banned}
+- Industry SEGMENT LABELS stay in your notes, never in the client's ear. Never
+  say "last-time seller", "downsizer", "senior lead" or "prospect" TO the person
+  you are speaking to - describe their situation instead ("the home you have
+  been in for decades"). Use the idea; do not name the category.
+- Do not repeat coaching maxims aimed at AGENTS to a client ("doing the right
+  thing has its advantages", "avoid crisis mode", "knowledge is power"). Never
+  reference the end of someone's life, however kindly. Never "sweetie" or
+  "dear" - speak to a competent adult.
 
 ORIGINAL SCRIPT:
 {script['body']}
@@ -133,6 +141,19 @@ def _names_self(body, adv):
         spec.loader.exec_module(_AU)
     return _AU.names_self(body, adv)
 
+
+
+def _tone(body):
+    import importlib.util
+    global _AU
+    try:
+        _AU
+    except NameError:
+        spec = importlib.util.spec_from_file_location(
+            "au", os.path.join(HERE, "author_scripts.py"))
+        _AU = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(_AU)
+    return _AU.tone_errors(body)
 
 
 def _banned_words():
@@ -191,6 +212,12 @@ def rewrite(script, voice, attempt=0):
         hit = _banned().search(flat)
         if hit:
             raise RuntimeError("filler: %s" % hit.group(0)[:20])
+        # Tone rules are shared with author_scripts.py. Without them here, a
+        # re-voiced script said "what I call last-time sellers" to the client in
+        # 82 variants - an internal segment label applied to someone's mother.
+        tone = _tone(flat)
+        if tone:
+            raise RuntimeError("tone: %s" % ", ".join(tone[:2]))
         return {"script": flat, "why": reword(out.get("why", ""))}
     except urllib.error.HTTPError as e:
         body_err = e.read().decode(errors="replace")[:200]
