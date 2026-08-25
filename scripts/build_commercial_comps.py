@@ -205,14 +205,15 @@ def load_gap(con, path):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--stats", action="store_true")
-    ap.add_argument("--gap", help="TitlePro CSV/XLSX of sales after the history window")
+    ap.add_argument("--gap", action="append",
+                help="TitlePro CSV/XLSX of sales after the history window (repeatable)")
     args = ap.parse_args()
 
     con = duckdb.connect()
     df = load(con)
-    if args.gap:
+    for gp in (args.gap or []):
         import pandas as pd
-        g = load_gap(con, args.gap)
+        g = load_gap(con, gp)
         g["sd"] = g["sd"].astype(str)
         df = pd.concat([df, g], ignore_index=True)
     print(f"loaded {len(df):,} priced sales (>= ${MIN_PRICE:,})")
@@ -299,7 +300,14 @@ def main():
                       lot_=g["lot_sf"].astype(float).fillna(0),
                       units_=g["units"].astype(float).fillna(0),
                       yb_=g["yb"].astype(float).fillna(0),
-                      pn_=g["parcelnumb"].fillna(""))
+                      # a gap row that missed the Regrid join still has its
+                      # 10-digit key - display it dashed (LA is 4-3-3) so the
+                      # broker can pull the deed either way
+                      pn_=g["parcelnumb"].fillna("").where(
+                          g["parcelnumb"].notna(),
+                          g["ap"].str.replace(r"^(\d{4})(\d{3})(\d{3})$",
+                                              lambda m: m.group(1)+"-"+m.group(2)+"-"+m.group(3),
+                                              regex=True)))
         comps = [[r.sd, int(r.price),
                   int(r.sf_) if r.sf_ > 0 else 0,
                   int(r.lot_) if r.lot_ > 0 else 0,
