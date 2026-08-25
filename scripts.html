@@ -892,7 +892,14 @@ function mapTopic(t){
   if (/fsbo|by owner/.test(s)) return 'fsbo';
   if (/tax/.test(s)) return 'tax';
   // foreclosure ladder: NOD, notice of sale / trustee sale / auction, lates
-  if (/nod|default|foreclos|notice of sale|trustee sale|auction|nts|lis pendens|reinstat|lates|delinq|behind on/.test(s)) return 'nod';
+  // \b on the short abbreviations: unbounded "nts" matched inside "pareNTS",
+  // and would equally hit "payments", "documents", "tenants", "residents".
+  if (/\bnod\b|default|foreclos|notice of sale|trustee sale|auction|\bnts\b|lis pendens|reinstat|lates|delinq|behind on|missed payment/.test(s)) return 'nod';
+  // Senior lives BEFORE probate on purpose: these owners are alive and deciding,
+  // and "estate sale" / "trust" in a downsizing list would otherwise route them
+  // into probate scripts written for a family that has just lost someone.
+  if (/adult child|aging parent|elderly parent|mom or dad|parents home/.test(s)) return 'adultchild';
+  if (/senior|55\+|55 plus|downsiz|right ?siz|aging in place|assisted living|independent living|retirement community|sres|last.time seller/.test(s)) return 'senior';
   if (/probate|aod|affidavit|heir|estate|inherit|death|deceased|trust/.test(s)) return 'probate';
   if (/divorce|dissolution/.test(s)) return 'divorce';
   if (/absentee|investor|out.of.state|non.?owner|rental|tenant|lives elsewhere/.test(s)) return 'absentee';
