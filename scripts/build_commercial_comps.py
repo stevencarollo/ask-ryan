@@ -7,8 +7,11 @@ Sources (both local, both APN-keyed, 99.7% join verified):
      -> 362,116 sales, 2021-05-05 .. 2026-04-22, ~29k of them commercial.
   2. The LA Regrid parquet (2.4M parcels, assessor attributes):
      building SF, lot SF, units, year built, use code, site city -
-     plus last-sale rows AFTER the history window (through ~2026-07-08),
-     which extend freshness by ~11 weeks.
+     plus last-sale rows AFTER the history window, which extend freshness.
+  3. Optional --gap: a TitlePro export of sales recorded after the history
+     window (first drop: commercial-bucket sales 2026-04-23 .. 2026-08-14).
+     The gap file and the Regrid tail overlap on purpose; dedupe on
+     (APN, date) AFTER date normalisation keeps one copy of each deed.
 
 The site is static and the Render backend sleeps, so nothing is served live:
 this precomputes per-city JSON (comps + medians by type and year) that the
@@ -141,17 +144,85 @@ def load(con):
     """).fetchdf()
 
 
+def load_gap(con, path):
+    """A TitlePro gap drop (CSV or XLSX) closing the window after the 5-year
+    history ends: needs APN, a sale/recording date, a price; land use and
+    address/city/zip help but the Regrid join fills most of it. Column names
+    are matched loosely because every TitlePro export names them differently."""
+    import pandas as pd
+    raw = pd.read_excel(path) if str(path).lower().endswith((".xlsx", ".xls")) else pd.read_csv(path)
+    cols = {c.lower().strip(): c for c in raw.columns}
+
+    def pick(*frags):
+        for f in frags:
+            for lc, c in cols.items():
+                if f in lc:
+                    return c
+        return None
+
+    c_apn = pick("apn", "parcel")
+    c_dt = pick("recording date", "sale date", "saledate", "date")
+    c_pr = pick("sale price", "price", "amount")
+    c_lu = pick("land use", "use")
+    c_st = pick("street", "address", "situs")
+    c_ct = pick("city")
+    c_zp = pick("zip")
+    if not (c_apn and c_dt and c_pr):
+        raise SystemExit(f"gap file must carry APN, date and price - found: {list(raw.columns)}")
+    out = pd.DataFrame({
+        "ap": raw[c_apn].astype(str).str.replace(r"[^0-9]", "", regex=True).str[:10],
+        "sd": pd.to_datetime(raw[c_dt], errors="coerce").dt.date,
+        "price": pd.to_numeric(raw[c_pr], errors="coerce"),
+        # .astype(str) turns a missing cell into the literal string "nan",
+        # which then title-cases into an address of "Nan" - keep NaN as NaN
+        "land_use": raw[c_lu].where(raw[c_lu].notna(), None).astype(object) if c_lu else None,
+        "h_addr": raw[c_st].where(raw[c_st].notna(), None).astype(object) if c_st else None,
+        "h_city": raw[c_ct].where(raw[c_ct].notna(), None).astype(object) if c_ct else None,
+        "h_zip": raw[c_zp].where(raw[c_zp].notna(), None).astype(object) if c_zp else None,
+    })
+    out = out[(out["price"] >= MIN_PRICE) & out["sd"].notna() & (out["ap"].str.len() == 10)]
+    print(f"gap file: {len(out):,} usable sales, "
+          f"{out['sd'].min()} .. {out['sd'].max()}")
+    # attach Regrid attributes exactly like the history rows get
+    con.register("gap", out)
+    return con.execute(f"""
+      WITH r AS (
+        SELECT lpad(CAST(CAST(parcelnumb_no_formatting AS BIGINT) AS VARCHAR),10,'0') ap,
+               parcelnumb, usedesc, scity, szip5, address,
+               TRY_CAST(area_building AS DOUBLE)  bldg_sf,
+               TRY_CAST(recrdareano AS DOUBLE)    rec_sf,
+               TRY_CAST(ll_gissqft AS DOUBLE)     lot_sf,
+               TRY_CAST(numunits AS DOUBLE)       units,
+               TRY_CAST(yearbuilt AS INTEGER)     yb
+        FROM read_parquet('{REGRID}') WHERE parcelnumb_no_formatting IS NOT NULL)
+      SELECT g.ap, CAST(g.sd AS VARCHAR) sd, g.price, g.land_use, g.h_addr, g.h_city, g.h_zip,
+             r.parcelnumb, r.usedesc, r.scity, r.szip5, r.address,
+             r.bldg_sf, r.rec_sf, r.lot_sf, r.units, r.yb
+      FROM gap g LEFT JOIN r USING (ap)
+    """).fetchdf()
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--stats", action="store_true")
+    ap.add_argument("--gap", help="TitlePro CSV/XLSX of sales after the history window")
     args = ap.parse_args()
 
     con = duckdb.connect()
     df = load(con)
+    if args.gap:
+        import pandas as pd
+        g = load_gap(con, args.gap)
+        g["sd"] = g["sd"].astype(str)
+        df = pd.concat([df, g], ignore_index=True)
     print(f"loaded {len(df):,} priced sales (>= ${MIN_PRICE:,})")
 
     df["type"] = [classify(u, l) for u, l in zip(df["usedesc"], df["land_use"])]
     df = df[df["type"].notna()].copy()
+    # normalise the date BEFORE deduping: the history rows carry Timestamps and
+    # the gap rows carry strings, and Timestamp('2026-07-06') != '2026-07-06' -
+    # the same deed from both sources would otherwise survive as two comps
+    df["sd"] = df["sd"].astype(str).str[:10]
     df = df.drop_duplicates(subset=["ap", "sd"], keep="first")
     print(f"commercial universe: {len(df):,} sales")
 
@@ -164,7 +235,6 @@ def main():
                   # .title() capitalises street ordinals ("227Th St") - undo it
                   .str.replace(r"(\d)(St|Nd|Rd|Th)\b", lambda m: m.group(1)+m.group(2).lower(), regex=True))
     df["zip"] = df["szip5"].fillna(df["h_zip"]).fillna("")
-    df["sd"] = df["sd"].astype(str)
     df["yr"] = df["sd"].str[:4].astype(int)
 
     # derived metrics, rails applied at computation - a wild number is shown as
