@@ -235,7 +235,9 @@ def main():
     df["addr"] = (df["address"].fillna(df["h_addr"]).fillna("").str.strip().str.title()
                   # .title() capitalises street ordinals ("227Th St") - undo it
                   .str.replace(r"(\d)(St|Nd|Rd|Th)\b", lambda m: m.group(1)+m.group(2).lower(), regex=True))
-    df["zip"] = df["szip5"].fillna(df["h_zip"]).fillna("")
+    # szip5 arrives as a float ("90501.0") - digits only, first five
+    df["zip"] = (df["szip5"].fillna(df["h_zip"]).fillna("").astype(str)
+                 .str.replace(r"[^0-9]", "", regex=True).str[:5])
     df["yr"] = df["sd"].str[:4].astype(int)
 
     # derived metrics, rails applied at computation - a wild number is shown as
@@ -325,6 +327,18 @@ def main():
                        "types": {t: int(n) for t, n in g["type"].value_counts().items()}})
 
     cities.sort(key=lambda c: -c["n"])
+
+    # ZIP -> the city files holding its comps, so the UI can search either way.
+    # A ZIP occasionally straddles assessor city names; the list keeps them all.
+    zips = {}
+    slug_of = {c["name"]: c["slug"] for c in cities}
+    zdf = df[df["zip"].astype(str).str.match(r"^\d{5}$", na=False)]
+    for (z, city), n in zdf.groupby(["zip", "city"]).size().items():
+        if city in slug_of:
+            zips.setdefault(str(z), []).append({"slug": slug_of[city], "n": int(n)})
+    for z in zips:
+        zips[z].sort(key=lambda e: -e["n"])
+
     INDEX.write_text(json.dumps({
         "built": date.today().isoformat(),
         "coverage": {"from": earliest, "to": latest},
@@ -332,6 +346,7 @@ def main():
         "types": TYPES,
         "countyStats": stats_for(df),
         "cities": cities,
+        "zips": zips,
     }, separators=(",", ":")), encoding="utf-8")
 
     total_kb = sum(f.stat().st_size for f in OUT_DIR.glob("*.json")) // 1024
