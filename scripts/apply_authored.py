@@ -38,6 +38,18 @@ def js_str(s):
     return json.dumps(s, ensure_ascii=False)
 
 
+def js_body(s):
+    """The library stores bodies as BACKTICK template literals, and every Python
+    tool in scripts/ (preflight, build_spanish, reground, clean_voice_libraries)
+    parses them with a regex that requires backticks. A JSON double-quoted body
+    is valid JavaScript and loads fine in the browser - but it is invisible to
+    all of them, so the scripts would never be validated or translated."""
+    if "`" in s or "${" in s:
+        raise SystemExit("body contains a backtick or ${ - cannot store as a "
+                         "template literal: " + s[:60])
+    return "`" + s + "`"
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dry", action="store_true")
@@ -58,7 +70,7 @@ def main():
         body = house_style(v["body"], v["ch"])
         rows.append(' {t:%s,ch:%s,adv:%s,title:%s,body:%s},' % (
             js_str(v["t"]), js_str(v["ch"]), js_str(v["adv"]),
-            js_str(v["title"]), js_str(body)))
+            js_str(v["title"]), js_body(body)))
 
     print("appending %d scripts (%d already present)" % (len(rows), skipped))
     if args.dry:

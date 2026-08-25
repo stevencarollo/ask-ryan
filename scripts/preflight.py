@@ -51,7 +51,10 @@ def main():
     keys = {s["key"] for s in S}
 
     print("\n=== BASE LIBRARY ===")
-    check(len(S) == 274, "274 scripts", str(len(S)))
+    # Counts grow as advisors author new material - assert the roster and the
+    # library agree with each other rather than against a number frozen in 2026.
+    EXPECT_SCRIPTS, EXPECT_VOICES = 314, 38
+    check(len(S) == EXPECT_SCRIPTS, "%d scripts" % EXPECT_SCRIPTS, str(len(S)))
     check(len(keys) == len(S), "no duplicate keys")
     chk = subprocess.run(["node", "--check", str(ROOT / "scripts_data.js")],
                          capture_output=True, text=True)
@@ -67,6 +70,19 @@ def main():
     check(not weird, "no malformed placeholders or markdown", str(len(weird)))
     echo = [s for s in S if ECHO_RE.search(s["body"])]
     check(not echo, "no generator prompt-echo", ", ".join(x["title"][:20] for x in echo[:3]))
+
+    # The member reads these aloud. An advisor naming themselves - or their real
+    # company - makes an agent introduce themselves as somebody else. Found live
+    # in 5 scripts (Espinosa, Figueroa "The Fig Team", Cauble "Cauble Group",
+    # plus two newly authored), so this is a standing check, not a one-off.
+    aspec = importlib.util.spec_from_file_location(
+        "au", str(ROOT / "scripts" / "author_scripts.py"))
+    au = importlib.util.module_from_spec(aspec)
+    aspec.loader.exec_module(au)
+    selfnamed = [(s, au.names_self(s["body"], s["adv"])) for s in S]
+    selfnamed = [(s, n) for s, n in selfnamed if n]
+    check(not selfnamed, "no script names its own advisor as the speaker",
+          ", ".join("%s in %s" % (n, s["title"][:24]) for s, n in selfnamed[:3]))
 
     # spoken-format discipline
     longvm = [s for s in S if s["ch"] == "vm" and len(s["body"].split()) > 95]
@@ -92,9 +108,9 @@ def main():
         check(any("FROM you" in s["body"] for s in S if s["adv"] == "Chris Voss"),
               "Voss 'wants something FROM you' intact")
 
-    print("\n=== VOICE LIBRARIES (34) ===")
+    print("\n=== VOICE LIBRARIES ===")
     vfiles = sorted(p for p in (ROOT / "voices").glob("*.json") if not p.name.startswith("_"))
-    check(len(vfiles) == 34, "34 advisor libraries", str(len(vfiles)))
+    check(len(vfiles) == EXPECT_VOICES, "%d advisor libraries" % EXPECT_VOICES, str(len(vfiles)))
     bad_v = miss_v = orphan_v = 0
     for f in vfiles:
         d = json.loads(f.read_text(encoding="utf-8"))
@@ -107,7 +123,7 @@ def main():
         d = json.loads(f.read_text(encoding="utf-8"))
         echo_v += sum(1 for v in d.values() if ECHO_RE.search(v.get("script", "")))
     check(echo_v == 0, "no prompt-echo in voice variants", str(echo_v))
-    check(miss_v == 0, "every library covers all 274 scripts", f"{miss_v} missing")
+    check(miss_v == 0, "every library covers all %d scripts" % EXPECT_SCRIPTS, f"{miss_v} missing")
     check(orphan_v == 0, "no orphaned keys in voice libraries", f"{orphan_v} orphans")
 
     print("\n=== SPANISH LIBRARY ===")

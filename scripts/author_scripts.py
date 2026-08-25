@@ -230,6 +230,9 @@ HARD RULES
   Use {{{{Owner}}}} for the person being spoken to. Use {{{{Address}}}} or
   {{{{City}}}} only if the script genuinely needs them. Placeholders exactly as
   written, double braces.
+- NEVER put your own name in the script. The agent using it introduces THEMSELVES:
+  always "this is {{{{Agent}}}} with {{{{Brokerage}}}}", never your name and never
+  your real company. You are supplying the method, not the identity.
 - Write only the script. No preamble, no notes about what you did, no markdown headers.
 
 Respond with ONLY JSON: {{"script": "the script text"}}"""
@@ -318,7 +321,7 @@ def main():
                                   ch_rule=CH_RULE[ch]),
                     max_tokens=1400, temperature=0.7)
                 cand = normalize(( r or {}).get("script", ""))
-                errs = validate(cand, ch)
+                errs = validate(cand, ch, adv)
                 if not errs:
                     body = cand
                     break
@@ -356,7 +359,46 @@ def normalize(s):
     return s.strip()
 
 
-def validate(out, ch):
+# Only an INTRODUCTION is a bug. "Brand It Like Serhant" is a book title and a
+# legitimate reference; "Veronica Figueroa here" makes the member introduce
+# themselves as somebody else, and "At Studio McGee, we..." hands them a company
+# they do not work for.
+_INTRO = (r"(?:this is|it'?s|here'?s|i'?m|name is|habla|soy|le habla|"
+          r"calling from|from|with|at|de|con)")
+
+
+def names_self(body, adv):
+    """Flag the advisor's name only where it reads as the speaker or the
+    speaker's firm. Placeholder interiors are stripped first so "Tim" cannot
+    match inside {{Timeframe}}."""
+    outside = re.sub(r"\{\{[^}]*\}\}", " ", body)
+    cands = []
+    for p in [adv] + [x.strip() for x in re.split(r"&|\band\b", adv)]:
+        p = p.strip()
+        if len(p) >= 4:
+            cands.append(p)
+            last = p.split()[-1]
+            if len(last) >= 5:
+                cands.append(last)
+    for n in dict.fromkeys(cands):
+        e = re.escape(n)
+        # "<intro> Name"  e.g. this is Bruce Nemovitz / le habla Veronica Figueroa
+        if re.search(_INTRO + r"[\s,]+" + e + r"\b", outside, re.I):
+            return n
+        # "Name here" / "Name speaking"  e.g. Byron Lazine here
+        if re.search(r"\b" + e + r"[\s,]+(?:here|speaking)\b", outside, re.I):
+            return n
+        # the advisor's real firm offered as the member's  e.g. At Studio McGee, we
+        if re.search(r"\b(?:at|from|with|de|con)\s+\w*\s?" + e +
+                     r"\s*(?:Group|Team|Studio|Realty|Real Estate|Company|Co\.)?\s*,?\s+we\b",
+                     outside, re.I):
+            return n
+        if re.search(r"\b(?:Studio|Group|Team)\s+" + e + r"\b", outside, re.I):
+            return n
+    return None
+
+
+def validate(out, ch, adv=None):
     """Same bar the rest of the library is held to, plus the age-respect rule."""
     errs = []
     if not out or len(out.strip()) < 40:
@@ -403,6 +445,10 @@ def validate(out, ch):
         errs.append("text-too-long")
     if ch == "email" and not out.lstrip().startswith("Subject:"):
         errs.append("no-subject")
+    if adv:
+        n = names_self(out, adv)
+        if n:
+            errs.append("names-self:" + n)
     return errs
 
 

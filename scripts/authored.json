@@ -90,13 +90,6 @@
   "title": "Sell It As-Is",
   "body": "YOU: Hi {{Owner}}, this is {{Agent}} with {{Brokerage}}. I understand you're thinking about selling {{Address}} and that the big question is the condition of the home. (Pause) If the house is lived in for 30‑plus years, the memories are the biggest part, not the paint or the carpet. We can list it as‑is, price it right, and let the market do the work that a renovation would normally try to do. (Pause) I'll start by looking at the move‑in date for the community you're considering - that date anchors everything else. (Pause) Then we'll do a quick walk‑through, note the strengths - a good roof, updated furnace - and put together a \"strengths inventory\" for buyers. (Pause) From there we set a price that reflects those facts, and buyers who need a home ready to move in will come forward. (Pause) How does that sound to you?"
  },
- "nemovitz|Four Kids, Four Opinions": {
-  "adv": "Bruce Nemovitz",
-  "t": "senior",
-  "ch": "call",
-  "title": "Four Kids, Four Opinions",
-  "body": "YOU: Hello {{Owner}}, this is Bruce Nemovitz with {{Brokerage}}. Thanks for calling. I understand you're facing some different opinions among your family about the home. That's very common; it's a big decision for everyone involved. (pause) What often helps in situations like this is to establish a clear, objective baseline for the home's current market value, exactly as it stands today. This isn't about mediating feelings; it's about giving everyone a shared, factual number to stand on. My team and I can come out, walk through the house, and then prepare a detailed market analysis. We'd look at the home's condition, compare it to similar sales in the area, and give you a realistic picture of what buyers are paying right now. We can also discuss what selling 'as-is' looks like versus any potential updates. There's no pressure or obligation; it just gives everyone the facts to move forward, whatever direction you decide."
- },
  "nemovitz|The Eyes-Closed Text": {
   "adv": "Bruce Nemovitz",
   "t": "senior",
@@ -145,13 +138,6 @@
   "ch": "call",
   "title": "Dad Won't Discuss It",
   "body": "YOU: Hi {{Owner}}, this is {{Agent}} with {{Brokerage}}. You mentioned your dad isn't keen on discussing future plans. Look, this is common. My job is often to be the neutral third party, so you don't have to be the one pushing. (pause for acknowledgment) YOU: When you talk to him, you can simply say, \"Dad, I spoke with a real estate specialist, {{Agent}}. They actually have a really practical 30-day checklist for what it takes to get a house ready, and I thought it might be useful for us to just look at it together. Not to make any decisions, just to see what's involved.\" (pause) YOU: It gives you a reason to bring it up without it feeling like a threat. We can just review what options might look like, long before any crisis forces a decision. You're not being morbid, you're being useful."
- },
- "spade|Sell Now or Wait for the Step-Up": {
-  "adv": "Chris Spade",
-  "t": "adultchild",
-  "ch": "call",
-  "title": "Sell Now or Wait for the Step-Up",
-  "body": "YOU: Hey {{Owner}}, Chris Spade here from {{Brokerage}}. I know you've got a lot on your plate and only a few minutes. (pause) First, let's talk money - the step‑up in basis can save you a big chunk of tax, but it only applies if the home stays in the estate until a death. If you sell now, we lock in today's market and you can use the proceeds to cover care, pay off a reverse mortgage, or give siblings a clean split. (pause) Does that line up with what you're hoping for? (listen) YOU: Got it. Next, the listing side - I'll give you a 30‑day market‑ready checklist that turns the house into a buyer‑magnet in a week. (pause) Once you've seen the numbers and the checklist, we can decide the timing that works for you and your family. (pause) Let's get you off the phone with a plan."
  },
  "spade|Gen X Voicemail": {
   "adv": "Chris Spade",
@@ -230,13 +216,6 @@
   "title": "The 38-Year Home Voicemail",
   "body": "Hi {{Owner}}, this is {{Agent}} with {{Brokerage}}. I noticed your home at {{Address}} has been in your family for 38 years, and I'm calling to see if you'd like a quick, no‑pressure look at the market and a simple checklist to help you decide what's next. There's no perfect time, but if you're asking the question, the time is near. Give me a call back at your convenience at {{Phone}}."
  },
- "nemovitz|As-Is Voicemail": {
-  "adv": "Bruce Nemovitz",
-  "t": "senior",
-  "ch": "vm",
-  "title": "As-Is Voicemail",
-  "body": "Hello {{Owner}}, this is Bruce Nemovitz with {{Agent}} at {{Brokerage}}. I'm calling because many homeowners wonder if they need to update their house before selling. The truth is, that's often not necessary. Selling a home \"as-is\" is a completely legitimate strategy, and it continues to attract buyers when priced correctly. If you'd like to discuss how selling as-is could work for you, please call me back. My number is..."
- },
  "buckelew|For the Son or Daughter Voicemail": {
   "adv": "Nikki Buckelew",
   "t": "adultchild",
@@ -278,5 +257,26 @@
   "ch": "email",
   "title": "Is Someone Pressuring Your Parent",
   "body": "Subject: Is Someone Pressuring Your Parent?\n\nHi {{Owner}},\n\nI understand you've been hearing suggestions from a buyer, a contractor, or even family about what your parent should do with the house. First, let's pause and make sure you both feel clear on the options—staying, modifying, or moving—without any pressure. Ask your parent what feels right for them right now, and note any concerns they voice. If someone is pushing a particular path, gently point out that you're looking out for what truly serves your parent's comfort and independence, not just a quick sale. I can help you explore all alternatives, including simple home upgrades that let them stay safely. Let's set a time to talk through this calmly.\n\n{{Agent}} - {{Brokerage}}"
+ },
+ "nemovitz|Four Kids, Four Opinions": {
+  "adv": "Bruce Nemovitz",
+  "t": "senior",
+  "ch": "call",
+  "title": "Four Kids, Four Opinions",
+  "body": "YOU: Hello {{Owner}}, this is {{Agent}} with {{Brokerage}}. I understand you have four kids each with their own view on the family home. That's a lot to sort through.\nYOU: First, let's anchor the timeline around any move‑in date you already have for a new place. Listing about 2-3 months before that gives us a comfortable window for everyone.\nYOU: I'll pull a recent market report for {{Address}} - it shows what similar homes in {{City}} are selling for as‑is. That number lets the family see a neutral, fact‑based picture.\nYOU: From there we can decide if the as‑is price meets your goals, or if a few small fixes might raise the value enough to make a difference.\nYOU: Whatever you choose, we'll handle the paperwork, the clean‑out, and coordinate any specialists so the process stays low‑stress.\nYOU: There is no perfect time, but if you're asking the question, the time is near."
+ },
+ "nemovitz|As-Is Voicemail": {
+  "adv": "Bruce Nemovitz",
+  "t": "senior",
+  "ch": "vm",
+  "title": "As-Is Voicemail",
+  "body": "Hi {{Owner}}, this is {{Agent}} with {{Brokerage}}. I'm calling about your home at {{Address}}. You can list it as‑is—no repairs, no cleaning, no rush. I'll handle the paperwork, coordinate movers, and match the timing to any senior community move‑in you have. There's no pressure; if you're curious, give me a call back. There is no perfect time, but if you're asking the question, the time is near."
+ },
+ "spade|Sell Now or Wait for the Step-Up": {
+  "adv": "Chris Spade",
+  "t": "adultchild",
+  "ch": "call",
+  "title": "Sell Now or Wait for the Step-Up",
+  "body": "YOU: Hi, this is {{Agent}} with {{Brokerage}}. I understand you've got a call about whether to sell now or wait for the step‑up. Do you have a few minutes to walk through the numbers first? (pause) \nYOU: Great. The step‑up can wipe out capital gains for your sibling's share, but it only kicks in at the date of death. If you sell now, we can lock in today's market price and use the proceeds to cover any care costs, reverse‑mortgage payoff, or a new place for Mom. \nYOU: On the other hand, waiting could mean a higher basis and less tax, but it also means the house stays on the market longer and you keep managing upkeep. \nYOU: Let me send you a quick 30‑day market‑ready checklist - it turns the house into a list of concrete tasks, so you can see exactly what's involved either way. \nYOU: After you've reviewed that, we can talk about timing, listing strategy, and how the money flows. How does that sound?"
  }
 }

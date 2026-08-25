@@ -73,6 +73,7 @@ def build_prompt(script, voice):
     if e:
         ground = f"\nTheir voice: {e.get('style','')}\nTheir frameworks and vocabulary: {e.get('deep','')}"
     chan_rule = CHAN_RULE.get(script["ch"], "Keep the same format and length.")
+    banned = ", ".join(_banned_words()[:20])
     return f"""You are The Roundtable's script coach. Rewrite this {script['ch']} script.
 
 THE VOICE: rewrite it entirely in the voice of {voice['n']}.{ground}
@@ -81,7 +82,14 @@ Speak the way they speak - their pacing, their signature phrases, their philosop
 Rules:
 - Keep the original structure and intent, but the VOICE becomes {voice['n']}'s. Topic: {script['topic']}.
 - Keep every {{{{placeholder}}}} exactly as written.
+- CRITICAL: the member reads this aloud as THEMSELVES. {voice['n']} is lending
+  their METHOD, not their identity. Never write "{voice['n']} here", "this is
+  {voice['n']}", "I'm {voice['n']}", and never put their real company, team or
+  brokerage in the member's mouth. The speaker is always {{{{Agent}}}} with
+  {{{{Brokerage}}}}. Referring to their published book or framework by name is
+  fine; introducing yourself as them is not.
 - {chan_rule}
+- BANNED - generic filler no working agent says: {banned}
 
 ORIGINAL SCRIPT:
 {script['body']}
@@ -109,6 +117,52 @@ def flatten_script(val):
     return str(val)
 
 
+
+# Shared with author_scripts.py so both generators hold the same line: an advisor
+# lends their METHOD, never their identity. Loaded lazily to avoid a circular
+# import at module load.
+def _names_self(body, adv):
+    import importlib.util
+    global _AU
+    try:
+        _AU
+    except NameError:
+        spec = importlib.util.spec_from_file_location(
+            "au", os.path.join(HERE, "author_scripts.py"))
+        _AU = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(_AU)
+    return _AU.names_self(body, adv)
+
+
+
+def _banned_words():
+    import importlib.util
+    global _RG
+    try:
+        _RG
+    except NameError:
+        spec = importlib.util.spec_from_file_location(
+            "rg", os.path.join(HERE, "reground_library.py"))
+        _RG = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(_RG)
+    return _RG.BANNED
+
+
+def _banned():
+    """The same banned-filler list reground_library.py enforces on the base
+    library, so a voice variant is held to the bar its source was."""
+    import importlib.util
+    global _RG
+    try:
+        _RG
+    except NameError:
+        spec = importlib.util.spec_from_file_location(
+            "rg", os.path.join(HERE, "reground_library.py"))
+        _RG = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(_RG)
+    return _RG.BANNED_RE
+
+
 def rewrite(script, voice, attempt=0):
     body = json.dumps({
         "contents": [{"parts": [{"text": build_prompt(script, voice)}]}],
@@ -124,6 +178,19 @@ def rewrite(script, voice, attempt=0):
         flat = flatten_script(out.get("script"))
         if not flat or len(flat) < 10:
             raise RuntimeError("empty script field")
+        # The member reads this aloud as themselves. A variant that introduces
+        # them as the advisor - or as the advisor's firm - is worse than no
+        # variant, so reject it and let the retry produce a clean one.
+        who = _names_self(flat, voice["n"])
+        if who:
+            raise RuntimeError("impersonates the advisor (%s)" % who)
+        # Filler was previously scrubbed by a SEPARATE pass after the fact, so a
+        # rebuild reintroduced 300 hits ("seamless", "unlock", "blueprint",
+        # "doctrine"). Reject it here instead - the clean-up pass should be a
+        # safety net, not the only thing standing between slop and the vault.
+        hit = _banned().search(flat)
+        if hit:
+            raise RuntimeError("filler: %s" % hit.group(0)[:20])
         return {"script": flat, "why": reword(out.get("why", ""))}
     except urllib.error.HTTPError as e:
         body_err = e.read().decode(errors="replace")[:200]
