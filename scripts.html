@@ -163,6 +163,10 @@ body.hasmkt .abtn.gold{display:inline-block}
 .profbar b{color:var(--gold-bright)}
 .profbar .pedit{background:none;border:1px solid var(--line);color:var(--gold);font-size:.92em;padding:3px 10px;border-radius:6px;min-height:28px;cursor:pointer}
 .profbar .pedit:hover{background:var(--gold);color:var(--ink)}
+.mailerpick{display:inline-flex;align-items:center;gap:6px;font-size:.95em;color:var(--muted);white-space:nowrap}
+.mailerpick select{padding:4px 24px 4px 8px;background:var(--ink);border:1px solid var(--line);border-radius:6px;color:var(--ivory);font-family:'Inter',sans-serif;font-size:1em;min-height:30px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23C9A85C' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+.mailerpick select:hover{border-color:var(--gold)}
+@media(max-width:720px){.mailerpick{flex:1 1 100%}.mailerpick select{flex:1;min-height:40px;font-size:16px}}
 .pfields{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .pfields input{background:var(--charcoal);border:1px solid var(--line);border-radius:6px;color:var(--ivory);font-family:'Inter',sans-serif;font-size:.92em;padding:7px 11px;min-width:170px}
 .pfields input:focus{border-color:var(--gold);outline:none}
@@ -398,6 +402,13 @@ body.hasmkt .abtn.gold{display:inline-block}
   <div class="profbar" id="profbar">
     <span id="profTxt"></span>
     <button class="pedit" id="profEdit">Edit</button>
+    <label class="mailerpick" for="mailerSel">✉ Email opens in
+      <select id="mailerSel" onchange="setMailer(this.value)">
+        <option value="default">my computer's mail app</option>
+        <option value="gmail">Gmail</option>
+        <option value="outlookweb">Outlook on the web</option>
+      </select>
+    </label>
     <span class="pfields" id="profFields" style="display:none">
       <input id="pfName" placeholder="Your name" autocomplete="name">
       <input id="pfPhone" type="tel" placeholder="Your phone (fills 'call me at…')" autocomplete="tel">
@@ -669,7 +680,7 @@ function emailSignature(){
   return '\n\n' + lines.join('\n');
 }
 
-function mailtoURL(i){
+function mailParts(i){
   const s = SCRIPTS[i];
   let txt = fillPlain(s.local || s.body), subject = '', body = txt;
   const m = txt.match(/^Subject:\s*(.+)\r?\n+([\s\S]*)$/);
@@ -682,8 +693,40 @@ function mailtoURL(i){
     body = lines.join('\n').replace(/\s+$/, '');
   }
   body += emailSignature();
-  const to = (ACTIVE_LEAD && ACTIVE_LEAD.email) ? encodeURIComponent(ACTIVE_LEAD.email) : '';
-  return 'mailto:' + to + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+  const to = (ACTIVE_LEAD && ACTIVE_LEAD.email) ? ACTIVE_LEAD.email : '';
+  return {to: to, subject: subject, body: body};
+}
+
+/* mailto: hands the message to whatever the OS registered - which is Outlook on
+   most Windows machines whether or not that is the mail the member actually
+   uses, and a browser Gmail never registers for it. Gmail and Outlook-web have
+   their own compose URLs that skip the OS entirely, so let the member say once
+   which they want. Same rt_mailer key the owner dashboard uses, so it is one
+   setting across the whole product. */
+const MAILER_NAME = {gmail: 'Gmail', outlookweb: 'Outlook web', default: 'my mail app'};
+function mailer(){
+  const m = localStorage.getItem('rt_mailer');
+  return MAILER_NAME[m] ? m : 'default';   // default respects whatever they already use
+}
+function setMailer(m){
+  localStorage.setItem('rt_mailer', MAILER_NAME[m] ? m : 'default');
+  syncMailer();
+}
+function syncMailer(){
+  const sel = document.getElementById('mailerSel');
+  if (sel) sel.value = mailer();
+}
+function mailtoURL(i){
+  const p = mailParts(i), q = (k, v) => k + '=' + encodeURIComponent(v);
+  const m = mailer();
+  if (m === 'gmail')
+    return 'https://mail.google.com/mail/?view=cm&fs=1&' +
+           q('to', p.to) + '&' + q('su', p.subject) + '&' + q('body', p.body);
+  if (m === 'outlookweb')
+    return 'https://outlook.office.com/mail/deeplink/compose?' +
+           q('to', p.to) + '&' + q('subject', p.subject) + '&' + q('body', p.body);
+  return 'mailto:' + encodeURIComponent(p.to) + '?' +
+         q('subject', p.subject) + '&' + q('body', p.body);
 }
 function smsURL(i){
   const s = SCRIPTS[i];
@@ -691,10 +734,21 @@ function smsURL(i){
   const to = (ACTIVE_LEAD && ACTIVE_LEAD.phone) ? encodeURIComponent(String(ACTIVE_LEAD.phone).replace(/[^+\d]/g, '')) : '';
   return 'sms:' + to + '?&body=' + encodeURIComponent(body);
 }
-function openInEmail(i){ location.href = mailtoURL(i); }
+function openInEmail(i){
+  const url = mailtoURL(i), m = mailer();
+  if (m === 'default'){
+    // desktop clients truncate long mailto links; browsers do not
+    if (url.length > 1900) return toast('Too long for your mail app — use Copy, or switch to Gmail above');
+    location.href = url;
+    return;
+  }
+  if (!window.open(url, '_blank', 'noopener'))
+    toast('Popup blocked — allow popups for this site, or use Copy');
+}
 function openInText(i){ location.href = smsURL(i); }
 
 function syncProf(){
+  syncMailer();
   const t = document.getElementById('profTxt');
   if (PROFILE.name){
     t.innerHTML = '✒ Scripts signed as <b>' + esc(PROFILE.name) + '</b>' +
