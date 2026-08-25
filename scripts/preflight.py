@@ -141,6 +141,22 @@ def main():
                     tone_eg.append("%s:%s" % (f.stem, e[0]))
     check(tone_v == 0, "no coach-talk, segment labels or condescension in variants",
           ", ".join(tone_eg) if tone_eg else str(tone_v))
+    # The re-voicer silently flipped 185 Spanish-topic variants into ENGLISH
+    # (35 advisors; found 2026-08-25 via the native-speaker review). A member
+    # picking those voices got English where the script promises Spanish. Gate:
+    # every espanol-topic variant must stay Spanish-dominant by stopword count.
+    es_topic = {s["key"] for s in S if s["t"] == "espanol"}
+    EN_W = re.compile(r"\b(the|your|and|with|this|that|what|when|we're|you're|is|are|it's)\b", re.I)
+    ES_W = re.compile(r"\b(de|la|el|que|su|para|con|una|los|las|es|en|por|usted)\b", re.I)
+    wrong_lang = []
+    for f in vfiles:
+        d = json.loads(f.read_text(encoding="utf-8"))
+        for k in es_topic:
+            s = d.get(k, {}).get("script", "")
+            if s and len(EN_W.findall(s)) > len(ES_W.findall(s)):
+                wrong_lang.append(f"{f.stem}:{k}")
+    check(not wrong_lang, "espanol-topic variants stay Spanish-dominant",
+          ", ".join(wrong_lang[:4]))
     selfn_v = 0
     for f in vfiles:
         adv = next((a["n"] for a in json.loads(
