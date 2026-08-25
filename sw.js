@@ -7,7 +7,7 @@
    stripped dossier scaffolding ("Our doctrine: ...") out of 33 voice libraries
    shipped while this string stood still, and every installed app kept serving
    the broken scripts. */
-const CACHE_V = 'rt-v6-seniors-2026-08-25';
+const CACHE_V = 'rt-v7-es-review-2026-08-25';
 const STATIC_FIRST = [/\/xlsx\.full\.min\.js$/, /\/voices\/.+\.json$/, /\/icons\/.+\.png$/, /fonts\.(googleapis|gstatic)\.com/];
 
 self.addEventListener('install', (e) => self.skipWaiting());
