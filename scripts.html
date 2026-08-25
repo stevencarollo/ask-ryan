@@ -15,7 +15,7 @@
 <script>RTAuth.guard();</script>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--gold:#C9A85C;--gold-bright:#E5C87E;--ink:#0B0B0D;--charcoal:#131316;--line:rgba(201,168,92,.25);--ivory:#F5F1E8;--muted:#8E887B;--teal:#7BC4A8;}
+:root{--gold:#C9A85C;--gold-bright:#E5C87E;--ink:#0B0B0D;--charcoal:#131316;--line:rgba(201,168,92,.25);--ivory:#F5F1E8;--muted:#8E887B;--teal:#7BC4A8;--red:#D97A7A;}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Inter',sans-serif;background:radial-gradient(ellipse 70% 50% at 50% -10%,rgba(201,168,92,.14),transparent 60%),var(--ink);color:var(--ivory);min-height:100vh}
 button{cursor:pointer;font-family:'Inter',sans-serif}
@@ -282,6 +282,12 @@ body.hasmkt .abtn.gold{display:inline-block}
 .ttile.on .tn{color:var(--gold-bright)}
 .ttile.on .tc{color:var(--gold)}
 .ttile:focus-visible{outline:2px solid var(--gold-bright);outline-offset:2px}
+/* a topic the member made themselves - marked, and the only one with a delete */
+.ttile.mine{position:relative;border-color:rgba(201,168,92,.5);border-style:dashed}
+.ttile .mystar{color:var(--gold);margin-right:4px}
+.tdel{position:absolute;top:3px;right:4px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:5px;color:var(--muted);font-size:.78em;line-height:1;cursor:pointer}
+.ttile.mine:hover .tdel,.tdel:focus-visible{color:var(--red);background:rgba(217,122,122,.14)}
+@media(max-width:720px){.tdel{width:28px;height:28px;font-size:.9em;color:var(--muted)}}
 @media(prefers-reduced-motion:reduce){.ttile{transition:none}}
 .tgrid-more{display:none;width:100%;margin-top:7px;background:transparent;border:1px dashed var(--line);border-radius:8px;color:var(--gold);font-family:'Inter',sans-serif;font-size:.82em;font-weight:600;padding:9px;min-height:42px;cursor:pointer}
 .tgrid-more:hover{border-color:var(--gold);background:rgba(201,168,92,.08)}
@@ -1634,18 +1640,32 @@ function buildTopicGrid(){
   for (const [tid, tname] of TOPICS){
     const n = per[tid] || 0;
     if (!n) continue;
+    const mine = tid.startsWith('custom');
     const b = document.createElement('button');
     b.type = 'button';
-    b.className = 'ttile' + (tSel.has(tid) ? ' on' : '');
+    b.className = 'ttile' + (tSel.has(tid) ? ' on' : '') + (mine ? ' mine' : '');
     b.setAttribute('aria-pressed', tSel.has(tid) ? 'true' : 'false');
     b.title = tname;
-    b.innerHTML = '<span class="tn">' + esc(TOPIC_SHORT[tid] || tname) + '</span>' +
-                  '<span class="tc">' + n + ' script' + (n === 1 ? '' : 's') + '</span>';
+    b.innerHTML = '<span class="tn">' + (mine ? '<span class="mystar">✦</span>' : '') +
+                    esc(mine ? tname.replace(/^Your Topic:\s*/, '') : (TOPIC_SHORT[tid] || tname)) + '</span>' +
+                  '<span class="tc">' + n + ' script' + (n === 1 ? '' : 's') +
+                    (mine ? ' · yours' : '') + '</span>';
     b.onclick = () => {
       tSel.has(tid) ? tSel.delete(tid) : tSel.add(tid);
       if (tSel.size === TOPICS.length) tSel.clear();
       buildTopicChips(); render();
     };
+    if (mine){
+      // a topic they made is the only one they can delete
+      const x = document.createElement('span');
+      x.className = 'tdel';
+      x.textContent = '✕';
+      x.title = 'Delete this topic';
+      x.setAttribute('role', 'button');
+      x.setAttribute('aria-label', 'Delete ' + tname);
+      x.onclick = ev => { ev.stopPropagation(); removeCustomTopic(tid, tname); };
+      b.appendChild(x);
+    }
     g.appendChild(b);
   }
   // Only exists when it has a job. It used to sit there permanently AND light up
@@ -1685,6 +1705,8 @@ function buildTopicChips(){   // name kept — every call site rebuilds the topi
   }
   syncFilterBtns();
 }
+let ctCounter = 0;       // MUST precede loadCustomTopics() - `let` has no hoisting
+loadCustomTopics();      // restore anything the member generated last session
 buildFormatMenu();
 buildTopicChips();
 document.getElementById('q').addEventListener('input', render);
@@ -1914,7 +1936,45 @@ async function rewriteOne(i, epoch){
     groups[a.g].appendChild(o);
   }
 })();
-let ctCounter = 0;
+/* ===== Custom topics: keep them, and let them go =====
+   These cost the member a live generation and then vanished on refresh, because
+   they only ever lived in the in-memory TOPICS/SCRIPTS arrays - market,
+   favourites and the lead list all persisted, these did not. And once created
+   there was no way to remove one. Both fixed here. */
+function saveCustomTopics(){
+  try{
+    const out = TOPICS.filter(t => t[0].startsWith('custom')).map(t => ({
+      tid: t[0], name: t[1], desc: t[2],
+      scripts: SCRIPTS.filter(s => s.t === t[0])
+                      .map(s => ({ch: s.ch, adv: s.adv, title: s.title, body: s.body}))
+    }));
+    if (out.length) localStorage.setItem('rt_custom', JSON.stringify(out));
+    else localStorage.removeItem('rt_custom');
+  }catch(e){}   // quota: the vault still works, they just do not survive a refresh
+}
+
+function loadCustomTopics(){
+  let saved = [];
+  try{ saved = JSON.parse(localStorage.getItem('rt_custom')) || []; }catch(e){ return; }
+  for (const c of saved){
+    if (TOPICS.some(t => t[0] === c.tid)) continue;
+    TOPICS.unshift([c.tid, c.name, c.desc]);
+    for (const s of (c.scripts || [])) SCRIPTS.push(Object.assign({t: c.tid}, s));
+    const n = parseInt(String(c.tid).replace('custom', ''), 10);
+    if (n > ctCounter) ctCounter = n;      // never reuse an id after a reload
+  }
+}
+
+function removeCustomTopic(tid, name){
+  if (!confirm('Delete "' + name + '" and its scripts?\n\nThis cannot be undone.')) return;
+  const idx = TOPICS.findIndex(t => t[0] === tid);
+  if (idx > -1) TOPICS.splice(idx, 1);
+  for (let i = SCRIPTS.length - 1; i >= 0; i--) if (SCRIPTS[i].t === tid) SCRIPTS.splice(i, 1);
+  tSel.delete(tid);
+  saveCustomTopics();
+  buildFormatMenu(); buildTopicChips(); render();
+  toast('Deleted — your own topic is gone');
+}
 function syncCtLocal(){
   const lab = document.getElementById('ctLocLabel');
   const box = document.getElementById('ctLocal');
@@ -1960,6 +2020,7 @@ document.getElementById('ctGo').onclick = async () => {
         adv: d.advisor || 'The Roundtable Panel', title: s.title || 'Custom Script', body: s.body});
     }
     tSel = new Set([tid]); chSel.clear();
+    saveCustomTopics();               // survives a refresh now
     buildFormatMenu(); buildTopicChips();
     render();
     const first = document.querySelector('.topic');
