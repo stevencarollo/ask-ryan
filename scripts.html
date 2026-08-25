@@ -258,6 +258,7 @@ body.hasmkt .abtn.gold{display:inline-block}
 .lead-row.on{background:rgba(201,168,92,.14)}
 .lead-row .ln{font-weight:600;min-width:150px}
 .lead-row .la{color:var(--muted);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lead-row .ldnc{font-size:.7em;font-weight:800;color:var(--red,#D97A7A);border:1px solid rgba(217,122,122,.5);border-radius:4px;padding:1px 6px;letter-spacing:.06em}
 .lead-row .lt{font-size:.82em;color:var(--gold);border:1px solid var(--line);border-radius:999px;padding:1px 9px;white-space:nowrap}
 /* ===== commercial comps (Market panel, Commercial mode) ===== */
 .mmode{display:flex;gap:8px;margin-bottom:12px}
@@ -694,6 +695,13 @@ const RX_ADDR  = rxTok(['Address']);
 const RX_STREET= rxTok(['Street']);
 const RX_CITY  = rxTok(['City']);
 const RX_HOOD  = rxTok(['Neighborhood']);
+// per-lead numbers, filled from the uploaded file when it carries them -
+// otherwise tidyMerge() still turns them into readable [fill-in] blanks
+const RX_VALUE = rxTok(['Value']);
+const RX_EQTY  = rxTok(['Equity']);
+const RX_DEBT  = rxTok(['Debt']);
+const RX_PRICE = rxTok(['Price']);
+const fmtMoney = n => '$' + Math.round(n).toLocaleString();
 
 /* Nobody says "your W Cassidy St home" out loud - they say "your Cassidy St
    home". Title data carries the directional; spoken scripts should not.
@@ -727,6 +735,10 @@ function mergePairs(L = ACTIVE_LEAD){
       p.push([RX_ADDR, dropDirectional(L.address)]);
       p.push([RX_STREET, dropDirectional(L.address.replace(/^[\d\-]+\s+/, '').replace(/,.*$/, ''))]);
     }
+    if (L.val) p.push([RX_VALUE, fmtMoney(L.val)]);
+    if (L.eq) p.push([RX_EQTY, fmtMoney(L.eq)]);
+    if (L.debt) p.push([RX_DEBT, fmtMoney(L.debt)]);
+    if (L.pr) p.push([RX_PRICE, fmtMoney(L.pr)]);
   }
   const city = (L && L.city) || mktCity;
   if (city){ p.push([RX_CITY, city]); p.push([RX_HOOD, city]); }
@@ -843,7 +855,13 @@ function openInEmail(i){
   if (!window.open(url, '_blank', 'noopener'))
     toast('Popup blocked — allow popups for this site, or use Copy');
 }
-function openInText(i){ location.href = smsURL(i); }
+function openInText(i){
+  // the number on file is DNC-registered: open anyway (texting a lead who
+  // opted in is legitimate) but never let it happen unknowingly
+  if (ACTIVE_LEAD && ACTIVE_LEAD.dnc)
+    toast('Heads up: this number is on the Do-Not-Call registry');
+  location.href = smsURL(i);
+}
 
 function syncProf(){
   syncMailer();
@@ -1244,8 +1262,26 @@ function leadsFromRows(rows){
   // not a probate or tax lead, and a wrong topic is worse than no topic.
   const proseCols = ['signals plain', 'signals'].map(n => hs.indexOf(n)).filter(i => i > -1);
   const PROSE_RE = /lives elsewhere|out.of.state|absentee|non.?owner/;
-  const cPhone = pickCol(hs, ['cell 1', 'cell', 'mobile', 'phone 1', 'phone', 'cell phone']);
+  // "Best DNC-Free Cell" is the house call-sheet standard (it appears in a
+  // dozen of the exports this parser meets) - when present it is by definition
+  // the number that is safe to text, so it outranks Cell 1.
+  const cPhone = pickCol(hs, ['best dnc free cell', 'cell 1', 'cell', 'mobile', 'phone 1', 'phone', 'cell phone']);
+  const cDnc   = pickCol(hs, ['cell 1 dnc']);        // flag for the fallback number
+  const usedBest = cPhone > -1 && hs[cPhone].includes('best dnc free cell');
   const cMail  = pickCol(hs, ['email 1', 'email', 'email address']);
+  // Per-lead numbers the script placeholders can quote: {{Value}}, {{Equity}},
+  // {{Debt}}, {{Price}} stop being [fill-in] blanks when the file carries them.
+  const cVal   = pickCol(hs, ['est value', 'avm value', 'estimated value', 'assessed value', 'market value', 'avm']);
+  const cEq    = pickCol(hs, ['equity $', 'equity value', 'equity']);
+  const cDebt  = pickCol(hs, ['loan balance', 'total loans', '1st balance', 'mortgage balance']);
+  const cPr    = pickCol(hs, ['last sale price', 'sale price', 'list price']);
+  // mailing != situs is the classic absentee tell - used only when nothing
+  // else identified the lead
+  const cMAddr = pickCol(hs, ['mailing address', 'mail address', 'standardized mailing']);
+  const money = v => {
+    const n = parseFloat(String(v == null ? '' : v).replace(/[$,%\s]/g, ''));
+    return isFinite(n) && n > 1000 ? n : null;
+  };
   const out = [];
   let srcIdx = -1;
   for (const r of rows.slice(1)){
@@ -1277,6 +1313,12 @@ function leadsFromRows(rows){
         if (PROSE_RE.test(v)) { topic = 'absentee'; if (!type) type = 'Absentee owner'; break; }
       }
     }
+    // last fallback: the owner's mail goes somewhere other than the property
+    if (!topic && cMAddr > -1 && cAddr > -1) {
+      const norm = a => String(a || '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 14);
+      const ma = norm(r[cMAddr]), sa = norm(r[cAddr]);
+      if (ma && sa && ma !== sa) { topic = 'absentee'; if (!type) type = 'Absentee owner'; }
+    }
     out.push({
       name: name || '(no name)',
       first: (name.split(/\s+/)[0] || '').replace(/[^A-Za-z'\-].*$/, ''),
@@ -1286,7 +1328,13 @@ function leadsFromRows(rows){
       topic: topic,                        // null = row didn't say; picker fills it
       rowSure: topic !== null,
       phone: cPhone > -1 ? String(r[cPhone] || '').trim() : '',
+      // fell back to Cell 1 and its DNC column says the number is registered
+      dnc: !usedBest && cDnc > -1 && /^(y|yes|true|dnc|1)$/i.test(String(r[cDnc] || '').trim()),
       email: cMail > -1 ? String(r[cMail] || '').trim() : '',
+      val: cVal > -1 ? money(r[cVal]) : null,
+      eq: cEq > -1 ? money(r[cEq]) : null,
+      debt: cDebt > -1 ? money(r[cDebt]) : null,
+      pr: cPr > -1 ? money(r[cPr]) : null,
       srcIdx: srcIdx
     });
     if (out.length >= 2000) break;       // keep localStorage happy
@@ -1469,6 +1517,7 @@ function renderLeads(){
     const b = document.createElement('button');
     b.className = 'lead-row' + (ACTIVE_LEAD === l ? ' on' : '');
     b.innerHTML = '<span class="ln">' + esc(l.name) + '</span><span class="la">' + esc(l.address) + '</span>' +
+      (l.dnc ? '<span class="ldnc" title="This number is on the Do-Not-Call registry">DNC</span>' : '') +
       '<span class="lt">' + esc(l.type || topicName(l.topic)) + '</span>';
     b.onclick = () => activateLead(idx);
     box.appendChild(b);
