@@ -266,6 +266,9 @@ body.hasmkt .abtn.gold{display:inline-block}
 .mmode{display:flex;gap:8px;margin-bottom:12px}
 .mm{padding:9px 16px;background:transparent;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-family:'Inter',sans-serif;font-size:.84em;font-weight:600;min-height:40px;cursor:pointer}
 .mm.on{background:rgba(201,168,92,.15);border-color:var(--gold);color:var(--gold-bright)}
+.cc-how{margin-top:7px;font-size:.74em;color:var(--muted);line-height:1.55}
+.cc-how b{color:var(--gold)}
+.cc-pick .ac-wrap{max-width:420px}
 .cc-pick input{width:100%;max-width:420px;padding:12px 14px;background:var(--ink);border:1px solid var(--line);border-radius:6px;color:var(--ivory);font-size:16px !important}
 .cc-types{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
 .cc-type{display:inline-flex;align-items:stretch;background:var(--ink);border:1px solid var(--line);border-radius:999px;overflow:hidden;min-height:36px}
@@ -514,8 +517,11 @@ body.hasmkt .abtn.gold{display:inline-block}
       </div>
       <div id="comMarket" style="display:none">
         <div class="cc-pick">
-          <input id="ccCity" list="ccCityList" placeholder="City or ZIP — Torrance, 90501, El Segundo…" autocomplete="off" enterkeyhint="go">
-          <datalist id="ccCityList"></datalist>
+          <div class="ac-wrap">
+            <input id="ccCity" placeholder="City, ZIP, or property address…" autocomplete="off" autocapitalize="words" enterkeyhint="go">
+            <div class="ac-list" id="ccAcList"></div>
+          </div>
+          <div class="cc-how">Search by <b>city</b> (Torrance) · <b>ZIP</b> (90501) · or a <b>property address</b> (3010 Pacific Coast Hwy, Torrance) — an address pins that property and ranks comps by distance</div>
         </div>
         <div class="cc-types" id="ccTypes"></div>
         <details class="cc-adv" id="ccAdv">
@@ -2558,12 +2564,7 @@ async function ccLoadIndex(){
     document.getElementById('ccFresh').textContent = 'Comps data could not load — refresh and try again.';
     return;
   }
-  const dl = document.getElementById('ccCityList');
-  dl.innerHTML = CC_INDEX.cities.map(c =>
-    '<option value="' + esc(c.name) + '">' + c.n + ' sales</option>').join('') +
-    Object.entries(CC_INDEX.zips || {}).sort().map(([z, entries]) =>
-      '<option value="' + z + '">' + entries.reduce((a,e)=>a+e.n,0) + ' sales · ' +
-      esc(entries[0].slug.replace(/-/g,' ')) + '</option>').join('');
+
   document.getElementById('ccFresh').textContent =
     'Recorded ' + CC_INDEX.county + ' County sales ' + CC_INDEX.coverage.from + ' → ' +
     CC_INDEX.coverage.to + ' · county recorder + assessor roll · ' +
@@ -2980,8 +2981,74 @@ function ccCopyComps(){
   copyText(tsv, rows.length + ' comps copied — paste into a sheet or email');
 }
 
-document.getElementById('ccCity').addEventListener('change', e => ccPickCity(e.target.value));
-document.getElementById('ccCity').addEventListener('keydown', e => { if (e.key === 'Enter') ccPickCity(e.target.value); });
+const ccAc = document.getElementById('ccAcList');
+const ccCityEl = document.getElementById('ccCity');
+let ccAcSel = -1;
+
+function ccAcHide(){ ccAc.classList.remove('on'); ccAcSel = -1; }
+
+function ccAcRows(q){
+  if (!CC_INDEX) return [];
+  const t = q.trim().toLowerCase();
+  if (!t) // empty box: the biggest markets, so the member sees what is here
+    return CC_INDEX.cities.slice(0, 8).map(c => ({q: c.name, main: c.name, tag: c.n + ' sales'}));
+  // an address in progress: complete it with a city so the pick just works
+  if (/^\d+[a-z]?\s+[a-z]/i.test(t) && !/\b\d{5}\b/.test(t)){
+    const parts = t.split(',');
+    const frag = parts.length > 1 ? parts[parts.length-1].trim() : '';
+    const base = (parts.length > 1 ? parts.slice(0,-1).join(',') : t).trim();
+    const cities = CC_INDEX.cities
+      .filter(c => !frag || c.name.toLowerCase().startsWith(frag))
+      .slice(0, 6);
+    return cities.map(c => ({q: base.replace(/,$/, '') + ', ' + c.name,
+                             main: base + ', ' + c.name, tag: 'search near this address'}));
+  }
+  const rows = [];
+  for (const c of CC_INDEX.cities){
+    if (c.name.toLowerCase().includes(t)) rows.push({q: c.name, main: c.name, tag: c.n + ' sales'});
+    if (rows.length >= 6) break;
+  }
+  if (/^\d{1,5}$/.test(t)){
+    for (const [z, entries] of Object.entries(CC_INDEX.zips || {}).sort()){
+      if (z.startsWith(t)) rows.push({q: z, zip: z,
+        main: entries[0].slug.replace(/-/g, ' ').replace(/\b[a-z]/g, m => m.toUpperCase()),
+        tag: entries.reduce((a,e)=>a+e.n,0) + ' sales'});
+      if (rows.length >= 8) break;
+    }
+  }
+  return rows.slice(0, 8);
+}
+
+function ccAcRender(){
+  const rows = ccAcRows(ccCityEl.value);
+  if (!rows.length){ ccAcHide(); return; }
+  ccAc.innerHTML = rows.map((r, i) =>
+    '<button type="button" class="ac-row' + (i === ccAcSel ? ' sel' : '') + '" data-q="' + esc(r.q) + '">' +
+    (r.zip ? '<span class="ac-zip">' + r.zip + '</span>' : '') +
+    '<span class="ac-city">' + esc(r.main) + '</span>' +
+    '<span class="ac-tag">' + esc(r.tag) + '</span></button>').join('');
+  ccAc.classList.add('on');
+  ccAc.querySelectorAll('.ac-row').forEach(b =>
+    b.addEventListener('mousedown', ev => { ev.preventDefault();
+      ccCityEl.value = b.dataset.q; ccAcHide(); ccPickCity(b.dataset.q); }));
+}
+
+ccCityEl.addEventListener('input', () => { ccAcSel = -1; ccAcRender(); });
+ccCityEl.addEventListener('focus', ccAcRender);
+ccCityEl.addEventListener('blur', () => setTimeout(ccAcHide, 150));
+ccCityEl.addEventListener('keydown', e => {
+  const rows = ccAc.querySelectorAll('.ac-row');
+  if (e.key === 'ArrowDown' && rows.length){ e.preventDefault(); ccAcSel = Math.min(ccAcSel+1, rows.length-1); ccAcRender(); }
+  else if (e.key === 'ArrowUp' && rows.length){ e.preventDefault(); ccAcSel = Math.max(ccAcSel-1, 0); ccAcRender(); }
+  else if (e.key === 'Escape') ccAcHide();
+  else if (e.key === 'Enter'){
+    e.preventDefault();
+    const sel = ccAc.querySelector('.ac-row.sel');
+    const q = sel ? sel.dataset.q : ccCityEl.value;
+    if (sel) ccCityEl.value = q;
+    ccAcHide(); ccPickCity(q);
+  }
+});
 
 // a commercial market set last visit comes back, same as the residential one
 try{
