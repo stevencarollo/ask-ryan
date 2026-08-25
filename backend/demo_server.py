@@ -1096,6 +1096,59 @@ Respond with ONLY a JSON object (no markdown, no commentary) with exactly these 
         }}
 
 
+def _market_prose(m: dict):
+    """Turn a market payload into (temperature line, stat fragments) for the
+    rewrite prompt. Two shapes: the Altos residential snapshot, and the
+    commercial-comps summary ({commercial:true, city, types, n, medPsf,
+    medPpu, trendPct, latest, recent:[...]}) built client-side from the
+    recorded-sales dataset."""
+    if m.get("commercial"):
+        pct = m.get("trendPct")
+        temp = ("a commercial market with values rising - owners are sitting on gains" if isinstance(pct, (int, float)) and pct >= 3 else
+                "a commercial market with values softening - the right buyer matters more than ever" if isinstance(pct, (int, float)) and pct <= -3 else
+                "a steady commercial market - recorded sales are the leverage")
+        stats = []
+        if m.get("types"):
+            stats.append("property types: " + ", ".join(m["types"][:4]))
+        if m.get("n"):
+            stats.append(f"{int(m['n'])} recorded sales in the dataset")
+        if m.get("medPsf"):
+            stats.append(f"median ${int(m['medPsf']):,}/SF on building area")
+        if m.get("medPpu"):
+            stats.append(f"multifamily median ${int(m['medPpu']):,} per unit")
+        if isinstance(pct, (int, float)):
+            stats.append(f"median $/SF {'up' if pct >= 0 else 'down'} {abs(int(pct))}% year over year")
+        for r in (m.get("recent") or [])[:2]:
+            try:
+                stats.append(f"recent closed sale: {r['addr']} ({r['type']}) at ${int(r['price']):,} on {r['date']}")
+            except Exception:
+                pass
+        if m.get("latest"):
+            stats.append(f"recorded sales current through {m['latest']}")
+        return temp, stats
+
+    mai = m.get("mai")
+    if isinstance(mai, (int, float)):
+        temp = ("a strong seller's market - buyers are competing" if mai >= 40 else
+                "a seller's market - well-priced homes move" if mai >= 30 else
+                "a balanced market - pricing and presentation decide" if mai >= 20 else
+                "a buyer's market - sellers need an edge to stand out")
+    else:
+        temp = "a shifting market"
+    stats = []
+    if m.get("p"):
+        stats.append(f"median list price ${int(m['p']):,}")
+    if m.get("dom"):
+        stats.append(f"median {int(m['dom'])} days on market")
+    if m.get("cut") is not None:
+        stats.append(f"{m['cut']}% of active listings have cut their price")
+    if m.get("inv") is not None:
+        stats.append(f"{m['inv']} active listings")
+    if m.get("rent"):
+        stats.append(f"median rent ${int(m['rent']):,}/mo")
+    return temp, stats
+
+
 @app.post("/api/localize-script")
 async def localize_script(data: dict):
     """Scripts Studio tailor engine: rewrite a script for a local market, a chosen
@@ -1114,26 +1167,7 @@ async def localize_script(data: dict):
     if not script or not (m.get("name") or voice.get("name")):
         return {"status": "error", "error": "script plus a market or a voice required"}
 
-    mai = m.get("mai")
-    if isinstance(mai, (int, float)):
-        temp = ("a strong seller's market - buyers are competing" if mai >= 40 else
-                "a seller's market - well-priced homes move" if mai >= 30 else
-                "a balanced market - pricing and presentation decide" if mai >= 20 else
-                "a buyer's market - sellers need an edge to stand out")
-    else:
-        temp = "a shifting market"
-
-    stats = []
-    if m.get("p"):
-        stats.append(f"median list price ${int(m['p']):,}")
-    if m.get("dom"):
-        stats.append(f"median {int(m['dom'])} days on market")
-    if m.get("cut") is not None:
-        stats.append(f"{m['cut']}% of active listings have cut their price")
-    if m.get("inv") is not None:
-        stats.append(f"{m['inv']} active listings")
-    if m.get("rent"):
-        stats.append(f"median rent ${int(m['rent']):,}/mo")
+    temp, stats = _market_prose(m)
 
     chan_rule = {
         "call": "Keep it a natural spoken phone script with the same beats and any agent/owner placeholders intact.",
@@ -1256,21 +1290,9 @@ async def generate_scripts(data: dict):
 
     mkt = ""
     if m.get("name"):
-        stats = []
-        if m.get("p"):
-            stats.append(f"median list price ${int(m['p']):,}")
-        if m.get("dom"):
-            stats.append(f"median {int(m['dom'])} days on market")
-        if m.get("cut") is not None:
-            stats.append(f"{m['cut']}% of listings have cut price")
-        if m.get("inv") is not None:
-            stats.append(f"{m['inv']} active listings")
-        mai = m.get("mai")
-        temp = ("a strong seller's market" if isinstance(mai, (int, float)) and mai >= 40 else
-                "a seller's market" if isinstance(mai, (int, float)) and mai >= 30 else
-                "a balanced market" if isinstance(mai, (int, float)) and mai >= 20 else
-                "a buyer's market" if isinstance(mai, (int, float)) else "")
-        mkt = (f"\nLOCAL MARKET: write for {m['name']} specifically - Altos data: {'; '.join(stats)}"
+        temp, stats = _market_prose(m)
+        src = "recorded county sales" if m.get("commercial") else "Altos data"
+        mkt = (f"\nLOCAL MARKET: write for {m['name']} specifically - {src}: {'; '.join(stats)}"
                + (f" ({temp})" if temp else "")
                + ". Weave at most two of these numbers into each script, naturally.")
 

@@ -259,6 +259,35 @@ body.hasmkt .abtn.gold{display:inline-block}
 .lead-row .ln{font-weight:600;min-width:150px}
 .lead-row .la{color:var(--muted);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lead-row .lt{font-size:.82em;color:var(--gold);border:1px solid var(--line);border-radius:999px;padding:1px 9px;white-space:nowrap}
+/* ===== commercial comps (Market panel, Commercial mode) ===== */
+.mmode{display:flex;gap:8px;margin-bottom:12px}
+.mm{padding:9px 16px;background:transparent;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-family:'Inter',sans-serif;font-size:.84em;font-weight:600;min-height:40px;cursor:pointer}
+.mm.on{background:rgba(201,168,92,.15);border-color:var(--gold);color:var(--gold-bright)}
+.cc-pick input{width:100%;max-width:420px;padding:12px 14px;background:var(--ink);border:1px solid var(--line);border-radius:6px;color:var(--ivory);font-size:16px !important}
+.cc-types{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.cc-type{padding:7px 13px;background:var(--ink);border:1px solid var(--line);border-radius:999px;color:var(--muted);font-family:'Inter',sans-serif;font-size:.8em;font-weight:600;min-height:36px;cursor:pointer}
+.cc-type.on{background:rgba(201,168,92,.15);border-color:var(--gold);color:var(--gold-bright)}
+.cc-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;margin-top:12px}
+.cc-card{background:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.cc-card .t{font-size:.72em;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
+.cc-card .big{font-family:'Cinzel',serif;font-size:1.25em;color:var(--gold-bright)}
+.cc-card .sub{font-size:.74em;color:var(--muted);line-height:1.5;margin-top:2px}
+.cc-card .up{color:var(--teal)} .cc-card .dn{color:var(--red,#D97A7A)}
+.cc-tblwrap{margin-top:12px;overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+.cc-tbl{width:100%;border-collapse:collapse;font-size:.8em;min-width:640px}
+.cc-tbl th{background:rgba(201,168,92,.08);color:var(--gold);text-align:left;padding:8px 10px;font-size:.86em;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+.cc-tbl td{padding:7px 10px;border-top:1px solid rgba(201,168,92,.1);white-space:nowrap;color:var(--ivory)}
+.cc-tbl td.mut{color:var(--muted)}
+.cc-more{display:block;width:100%;background:transparent;border:none;border-top:1px solid var(--line);color:var(--gold);font-family:'Inter',sans-serif;font-size:.8em;font-weight:600;padding:10px;min-height:42px;cursor:pointer}
+.cc-more:hover{background:rgba(201,168,92,.07)}
+.cc-acts{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+.cc-acts .go{padding:12px 20px;background:linear-gradient(135deg,var(--gold) 0%,#B8964A 100%);color:var(--ink);border:none;border-radius:6px;font-weight:700;font-size:.82em;letter-spacing:.08em;text-transform:uppercase;min-height:46px;cursor:pointer}
+.cc-acts .go:hover{background:var(--gold-bright)}
+.cc-acts .clr{display:inline-flex;align-items:center;padding:11px 16px;background:transparent;color:var(--gold);border:1px solid var(--line);border-radius:6px;font-size:.8em;font-weight:600;min-height:46px;cursor:pointer}
+.cc-acts .clr:hover{border-color:var(--gold);color:var(--gold-bright)}
+.cc-fresh{margin-top:10px;font-size:.72em;color:var(--muted);line-height:1.5}
+@media(max-width:720px){.cc-stats{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}.cc-type{min-height:44px;padding:9px 14px}.mm{min-height:44px}}
+
 /* ===== landing layout: get the product in front of the eye ===== */
 .vaulthead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:10px}
 .vaulthead h1{margin-bottom:0}
@@ -437,16 +466,39 @@ body.hasmkt .abtn.gold{display:inline-block}
   <details class="custom-topic" id="marketPanel">
     <summary id="marketSum">📍 Market — not set · tap to localize your scripts</summary>
     <div class="ct-body">
-      <div class="locbar" id="locbar">
-        <div class="ac-wrap">
-          <input id="locq" placeholder="City or ZIP — Torrance or 90277" autocomplete="off" autocapitalize="words" enterkeyhint="go">
-          <div class="ac-list" id="acList"></div>
-        </div>
-        <button class="go" id="locgo">Set My Market</button>
-        <button class="clr" id="locclr">✕ Clear</button>
+      <div class="mmode" role="tablist" aria-label="Market type">
+        <button type="button" id="mmRes" class="mm on" role="tab" aria-selected="true" onclick="setMktMode('res')">🏠 Residential</button>
+        <button type="button" id="mmCom" class="mm" role="tab" aria-selected="false" onclick="setMktMode('com')">🏢 Commercial comps</button>
       </div>
-      <div class="locerr" id="locerr"></div>
-      <div class="mkt" id="mkt"></div>
+      <div id="resMarket">
+        <div class="locbar" id="locbar">
+          <div class="ac-wrap">
+            <input id="locq" placeholder="City or ZIP — Torrance or 90277" autocomplete="off" autocapitalize="words" enterkeyhint="go">
+            <div class="ac-list" id="acList"></div>
+          </div>
+          <button class="go" id="locgo">Set My Market</button>
+          <button class="clr" id="locclr">✕ Clear</button>
+        </div>
+        <div class="locerr" id="locerr"></div>
+        <div class="mkt" id="mkt"></div>
+      </div>
+      <div id="comMarket" style="display:none">
+        <div class="cc-pick">
+          <input id="ccCity" list="ccCityList" placeholder="City — Torrance, El Segundo, Long Beach…" autocomplete="off" enterkeyhint="go">
+          <datalist id="ccCityList"></datalist>
+        </div>
+        <div class="cc-types" id="ccTypes"></div>
+        <div class="cc-stats" id="ccStats"></div>
+        <div class="cc-tblwrap" id="ccTblWrap" style="display:none">
+          <table class="cc-tbl" id="ccTbl"></table>
+          <button type="button" class="cc-more" id="ccMore" onclick="ccShowMore()">Show more sales</button>
+        </div>
+        <div class="cc-acts" id="ccActs" style="display:none">
+          <button type="button" class="go" id="ccUse" onclick="ccUseMarket()">Use in my scripts</button>
+          <button type="button" class="clr" id="ccCopy" onclick="ccCopyComps()">📋 Copy comps</button>
+        </div>
+        <div class="cc-fresh" id="ccFresh"></div>
+      </div>
     </div>
   </details>
 
@@ -1917,7 +1969,9 @@ async function tailorPicks(){
 function syncSetupSum(){
   const mEl = document.getElementById('marketSum');
   if (MARKET){
-    mEl.innerHTML = '📍 Market — <b>' + esc(MARKET.name) + '</b> · scripts quote this week\'s numbers when tailored';
+    mEl.innerHTML = '📍 Market — <b>' + esc(MARKET.name) + '</b> · ' +
+      (MARKET.commercial ? 'scripts quote recorded comps when tailored'
+                         : 'scripts quote this week\'s numbers when tailored');
   } else {
     mEl.textContent = '📍 Market — not set · tap to localize your scripts';
   }
@@ -1955,7 +2009,8 @@ async function rewriteOne(i, epoch){
   try{
     const topic = (TOPICS.find(t=>t[0]===s.t)||[,''])[1];
     const payload = {script:s.body, channel:s.ch==='vm'?'voicemail':s.ch, advisor:s.adv, topic};
-    if (MARKET) payload.market = {name:MARKET.name, zip:MARKET.zip||null, p:MARKET.p, sf:MARKET.sf,
+    if (MARKET && MARKET.commercial) payload.market = MARKET;
+    else if (MARKET) payload.market = {name:MARKET.name, zip:MARKET.zip||null, p:MARKET.p, sf:MARKET.sf,
       dom:MARKET.dom, cut:MARKET.cut, inv:MARKET.inv, mai:MARKET.mai, rent:MARKET.rent};
     if (VOICE) payload.voice = {id:VOICE.id, name:VOICE.n};
     if (SPANISH) payload.lang = 'es';
@@ -2059,7 +2114,8 @@ document.getElementById('ctGo').onclick = async () => {
     if (SPANISH) payload.lang = 'es';       // Spanish no longer requires a bilingual advisor
     if (PROFILE.email) payload.member = {email: PROFILE.email};
     if (document.getElementById('ctLocal').checked && MARKET)
-      payload.market = {name:MARKET.name, p:MARKET.p, dom:MARKET.dom, cut:MARKET.cut, inv:MARKET.inv, mai:MARKET.mai, rent:MARKET.rent};
+      payload.market = MARKET.commercial ? MARKET
+        : {name:MARKET.name, p:MARKET.p, dom:MARKET.dom, cut:MARKET.cut, inv:MARKET.inv, mai:MARKET.mai, rent:MARKET.rent};
     const r = await fetch(API_URL + '/api/generate-scripts', {
       method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
     const d = await r.json();
@@ -2232,6 +2288,7 @@ document.getElementById('locq').addEventListener('keydown', e=>{
 document.getElementById('locclr').onclick = ()=>{
   MARKET = null; voiceEpoch++; AUTOQ.length = 0;
   localStorage.removeItem('rt_market');
+  localStorage.removeItem('rt_market_cc');
   syncGold(); syncCtLocal();
   document.getElementById('mkt').classList.remove('on');
   document.getElementById('locbar').classList.remove('set');
@@ -2271,12 +2328,176 @@ function setMarket(restoring){
     <span class="upd">Altos Research weekly data · updated ${MD.updated}</span>`;
   mk.classList.add('on');
   localStorage.setItem('rt_market', q.trim());
+  localStorage.removeItem('rt_market_cc');     // the two modes share one MARKET slot
   rememberMarket(q.trim());
   SCRIPTS.forEach(s=>{delete s.local; delete s.why; delete s.voicedBy; delete s.preOnly;});
   render();
   syncSetupSum();
   toast(restoring ? `Welcome back — market set to ${m.name}` : `${m.name} set — star your picks or tailor any card`);
 }
+
+/* ===== Commercial comps (LA County) =====
+   Recorded sales 2021 -> present, precomputed offline by
+   scripts/build_commercial_comps.py from the county recorder history + the
+   assessor parcel roll, served as static JSON per city. Residential stays the
+   default; this mode is for the commercial brokers. */
+let CC_INDEX = null, CC_CITY = null, CC_SEL = new Set(), CC_SHOWN = 30;
+const CC_MONEY = v => '$' + Math.round(v).toLocaleString();
+
+function setMktMode(mode){
+  const com = mode === 'com';
+  document.getElementById('mmRes').classList.toggle('on', !com);
+  document.getElementById('mmCom').classList.toggle('on', com);
+  document.getElementById('mmRes').setAttribute('aria-selected', String(!com));
+  document.getElementById('mmCom').setAttribute('aria-selected', String(com));
+  document.getElementById('resMarket').style.display = com ? 'none' : '';
+  document.getElementById('comMarket').style.display = com ? '' : 'none';
+  if (com && !CC_INDEX) ccLoadIndex();
+}
+
+async function ccLoadIndex(){
+  try{
+    CC_INDEX = await (await fetch('/comps/cc_index.json')).json();
+  }catch(e){
+    document.getElementById('ccFresh').textContent = 'Comps data could not load — refresh and try again.';
+    return;
+  }
+  const dl = document.getElementById('ccCityList');
+  dl.innerHTML = CC_INDEX.cities.map(c =>
+    '<option value="' + esc(c.name) + '">' + c.n + ' sales</option>').join('');
+  document.getElementById('ccFresh').textContent =
+    'Recorded ' + CC_INDEX.county + ' County sales ' + CC_INDEX.coverage.from + ' → ' +
+    CC_INDEX.coverage.to + ' · county recorder + assessor roll · ' +
+    CC_INDEX.cities.reduce((a,c)=>a+c.n,0).toLocaleString() + ' commercial sales across ' +
+    CC_INDEX.cities.length + ' cities';
+}
+
+async function ccPickCity(name){
+  const c = CC_INDEX && CC_INDEX.cities.find(x => x.name.toLowerCase() === String(name||'').trim().toLowerCase());
+  if (!c) return;
+  try{
+    CC_CITY = await (await fetch('/comps/cc/' + c.slug + '.json')).json();
+  }catch(e){ toast('Could not load ' + c.name + ' — try again'); return; }
+  CC_SEL = new Set(Object.keys(CC_CITY.stats));   // every type present, on by default
+  CC_SHOWN = 30;
+  ccRender();
+}
+
+function ccTrend(st){
+  // latest complete year vs the one before it; the current year is partial
+  const y = st.byYear || {};
+  const now = new Date().getFullYear();
+  for (let a = now - 1; a > now - 4; a--){
+    const cur = y[String(a)], prev = y[String(a-1)];
+    if (cur && prev && cur.medPsf && prev.medPsf)
+      return {pct: Math.round(100*(cur.medPsf - prev.medPsf)/prev.medPsf), yr: a};
+  }
+  return null;
+}
+
+function ccRender(){
+  if (!CC_CITY) return;
+  const d = CC_CITY;
+  // type chips with counts
+  document.getElementById('ccTypes').innerHTML = Object.entries(d.stats)
+    .sort((a,b)=>b[1].n-a[1].n)
+    .map(([t,s]) => '<button type="button" class="cc-type' + (CC_SEL.has(t)?' on':'') +
+      '" onclick="ccToggleType(\'' + esc(t).replace(/'/g,"\\'") + '\')">' +
+      esc(t) + ' · ' + s.n + '</button>').join('');
+  // stat cards for the selected types
+  document.getElementById('ccStats').innerHTML = Object.entries(d.stats)
+    .filter(([t])=>CC_SEL.has(t)).sort((a,b)=>b[1].n-a[1].n)
+    .map(([t,s])=>{
+      const tr = ccTrend(s);
+      return '<div class="cc-card"><div class="t">' + esc(t) + '</div>' +
+        '<div class="big">' + (s.medPsf ? CC_MONEY(s.medPsf) + '/SF' : CC_MONEY(s.medPrice)) + '</div>' +
+        '<div class="sub">' + s.n + ' sales · median ' + CC_MONEY(s.medPrice) +
+        (s.medPpu ? ' · ' + CC_MONEY(s.medPpu) + '/unit' : '') +
+        (s.medPlsf ? ' · ' + CC_MONEY(s.medPlsf) + '/lot SF' : '') +
+        (tr ? ' · <span class="' + (tr.pct >= 0 ? 'up' : 'dn') + '">' +
+              (tr.pct >= 0 ? '▲' : '▼') + Math.abs(tr.pct) + '% ' + tr.yr + '</span>' : '') +
+        '</div></div>';
+    }).join('');
+  // comps table
+  const rows = d.comps.filter(c => CC_SEL.has(d.types[c[6]]));
+  const body = rows.slice(0, CC_SHOWN).map(c => {
+    const psf = c[2] >= 300 ? Math.round(c[1]/c[2]) : null;
+    return '<tr><td class="mut">' + c[0] + '</td><td>' + esc(c[7] || '(no address)') +
+      '</td><td class="mut">' + esc(d.types[c[6]]) + '</td><td>' + CC_MONEY(c[1]) +
+      '</td><td class="mut">' + (c[2] ? c[2].toLocaleString() : '—') +
+      '</td><td>' + (psf ? '$' + psf.toLocaleString() : '—') +
+      '</td><td class="mut">' + (c[4] || '—') + '</td><td class="mut">' + (c[5] || '—') + '</td></tr>';
+  }).join('');
+  document.getElementById('ccTbl').innerHTML =
+    '<tr><th>Date</th><th>Address</th><th>Type</th><th>Price</th><th>Bldg SF</th><th>$/SF</th><th>Units</th><th>Built</th></tr>' + body;
+  document.getElementById('ccTblWrap').style.display = rows.length ? '' : 'none';
+  document.getElementById('ccMore').style.display = rows.length > CC_SHOWN ? '' : 'none';
+  document.getElementById('ccMore').textContent = 'Show more (' + Math.min(50, rows.length - CC_SHOWN) + ' of ' + (rows.length - CC_SHOWN) + ' left)';
+  document.getElementById('ccActs').style.display = rows.length ? 'flex' : 'none';
+}
+
+function ccToggleType(t){
+  CC_SEL.has(t) ? CC_SEL.delete(t) : CC_SEL.add(t);
+  if (!CC_SEL.size) CC_SEL = new Set(Object.keys(CC_CITY.stats));  // never a dead-empty view
+  CC_SHOWN = 30; ccRender();
+}
+function ccShowMore(){ CC_SHOWN += 50; ccRender(); }
+
+function ccUseMarket(){
+  if (!CC_CITY) return;
+  const sel = [...CC_SEL];
+  // one blended summary across the chosen types, medians weighted by count
+  const st = Object.entries(CC_CITY.stats).filter(([t])=>CC_SEL.has(t));
+  const n = st.reduce((a,[,s])=>a+s.n,0);
+  const wPsf = st.filter(([,s])=>s.medPsf);
+  const medPsf = wPsf.length ? Math.round(wPsf.reduce((a,[,s])=>a+s.medPsf*s.n,0) / wPsf.reduce((a,[,s])=>a+s.n,0)) : null;
+  const mf = CC_CITY.stats['Multifamily 5+'];
+  const trends = st.map(([,s])=>ccTrend(s)).filter(Boolean);
+  const trendPct = trends.length ? Math.round(trends.reduce((a,t)=>a+t.pct,0)/trends.length) : null;
+  MARKET = {
+    name: CC_CITY.city + ' commercial', commercial: true, city: CC_CITY.city,
+    types: sel, n: n, medPsf: medPsf,
+    medPpu: (mf && CC_SEL.has('Multifamily 5+')) ? mf.medPpu : null,
+    trendPct: trendPct,
+    latest: CC_INDEX ? CC_INDEX.coverage.to : null,
+    recent: CC_CITY.comps.filter(c=>CC_SEL.has(CC_CITY.types[c[6]])).slice(0,3)
+              .map(c=>({date:c[0], price:c[1], sf:c[2], type:CC_CITY.types[c[6]], addr:c[7]})),
+  };
+  voiceEpoch++; AUTOQ.length = 0;      // market changed: cache keys shift
+  localStorage.setItem('rt_market_cc', JSON.stringify({city: CC_CITY.city, types: sel}));
+  localStorage.removeItem('rt_market');
+  syncGold(); syncCtLocal();
+  SCRIPTS.forEach(s=>{delete s.local; delete s.why; delete s.voicedBy; delete s.preOnly;});
+  render(); syncSetupSum();
+  toast(CC_CITY.city + ' commercial set — tailor any script to quote these comps');
+}
+
+function ccCopyComps(){
+  if (!CC_CITY) return;
+  const d = CC_CITY;
+  const rows = d.comps.filter(c => CC_SEL.has(d.types[c[6]])).slice(0, CC_SHOWN);
+  const tsv = ['Date\tAddress\tType\tPrice\tBldg SF\t$/SF\tUnits\tBuilt'].concat(rows.map(c => {
+    const psf = c[2] >= 300 ? Math.round(c[1]/c[2]) : '';
+    return [c[0], c[7], d.types[c[6]], c[1], c[2]||'', psf, c[4]||'', c[5]||''].join('\t');
+  })).join('\n');
+  copyText(tsv, rows.length + ' comps copied — paste into a sheet or email');
+}
+
+document.getElementById('ccCity').addEventListener('change', e => ccPickCity(e.target.value));
+document.getElementById('ccCity').addEventListener('keydown', e => { if (e.key === 'Enter') ccPickCity(e.target.value); });
+
+// a commercial market set last visit comes back, same as the residential one
+try{
+  const cc = JSON.parse(localStorage.getItem('rt_market_cc'));
+  if (cc && cc.city){
+    setMktMode('com');
+    ccLoadIndex().then(async () => {
+      document.getElementById('ccCity').value = cc.city;
+      await ccPickCity(cc.city);
+      if (CC_CITY){ CC_SEL = new Set(cc.types || Object.keys(CC_CITY.stats)); ccRender(); ccUseMarket(); }
+    });
+  }
+}catch(e){}
 
 async function tailor(i, manual){
   if (!MARKET && !VOICE) return;
