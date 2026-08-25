@@ -29,6 +29,11 @@ from datetime import date
 from pathlib import Path
 
 import duckdb
+import pandas as _pd
+
+
+def pd_to_dt(x):
+    return _pd.to_datetime(x, errors="coerce")
 
 REPO = Path(__file__).resolve().parent.parent
 OUT_DIR = REPO / "comps" / "cc"
@@ -169,6 +174,7 @@ def load_gap(con, path):
     c_st = pick("street", "address", "situs")
     c_ct = pick("city")
     c_zp = pick("zip")
+    c_ty = pick("sale type")
     if not (c_apn and c_dt and c_pr):
         raise SystemExit(f"gap file must carry APN, date and price - found: {list(raw.columns)}")
     out = pd.DataFrame({
@@ -181,6 +187,7 @@ def load_gap(con, path):
         "h_addr": raw[c_st].where(raw[c_st].notna(), None).astype(object) if c_st else None,
         "h_city": raw[c_ct].where(raw[c_ct].notna(), None).astype(object) if c_ct else None,
         "h_zip": raw[c_zp].where(raw[c_zp].notna(), None).astype(object) if c_zp else None,
+        "sale_type": raw[c_ty].where(raw[c_ty].notna(), None).astype(object) if c_ty else None,
     })
     out = out[(out["price"] >= MIN_PRICE) & out["sd"].notna() & (out["ap"].str.len() == 10)]
     print(f"gap file: {len(out):,} usable sales, "
@@ -199,7 +206,7 @@ def load_gap(con, path):
                TRY_CAST(lat AS DOUBLE)            plat,
                TRY_CAST(lon AS DOUBLE)            plon
         FROM read_parquet('{REGRID}') WHERE parcelnumb_no_formatting IS NOT NULL)
-      SELECT g.ap, CAST(g.sd AS VARCHAR) sd, g.price, g.land_use, g.h_addr, g.h_city, g.h_zip,
+      SELECT g.ap, CAST(g.sd AS VARCHAR) sd, g.price, g.land_use, g.sale_type, g.h_addr, g.h_city, g.h_zip,
              r.parcelnumb, r.usedesc, r.scity, r.szip5, r.address,
              r.bldg_sf, r.rec_sf, r.lot_sf, r.units, r.yb, r.plat, r.plon
       FROM gap g LEFT JOIN r USING (ap)
@@ -260,6 +267,37 @@ def main():
     with np.errstate(divide="ignore", invalid="ignore"):
         plsf = np.where(lot >= 1000, price / lot, np.nan)
     df["plsf"] = np.where((plsf >= 5) & (plsf <= 2000), plsf, np.nan)
+
+    # Sort FIRST, then compute every flag on the same frame: an earlier
+    # version computed the portfolio flag, sorted for flip detection, and
+    # zipped the two by POSITION - scrambling flags onto random rows.
+    df = df.sort_values(["ap", "sd"]).reset_index(drop=True)
+    # P = portfolio/allocated: one deal recorded across several parcels shows
+    #     as identical (date, price, city) deeds - each "price" is an
+    #     allocation, not a market clearing price for that parcel
+    dup = df.groupby(["sd", "price", "city"])["ap"].transform("count")
+    flag_p = ((dup >= 2) & (df["price"] > 0)).to_numpy()
+    # D = distressed: the recorder's own Sale Type says REO / distressed
+    if "sale_type" in df.columns:
+        st = df["sale_type"].fillna("").astype(str).str.lower()
+        flag_d = st.str.contains("reo|distress|foreclos").to_numpy()
+    else:
+        import numpy as _np
+        flag_d = _np.zeros(len(df), dtype=bool)
+    # F = flip: the same parcel trading twice inside 18 months - both legs
+    #     badged, neither excluded (the second leg is often a true sale)
+    prev_ap = df["ap"].shift(); prev_sd = pd_to_dt(df["sd"]).shift()
+    gap_days = (pd_to_dt(df["sd"]) - prev_sd).dt.days
+    same = df["ap"] == prev_ap
+    flip_leg2 = same & (gap_days <= 548)
+    flip_leg1 = flip_leg2.shift(-1).fillna(False) & (df["ap"] == df["ap"].shift(-1))
+    flag_f = (flip_leg2 | flip_leg1).to_numpy()
+    df["flags"] = [("P" if p_ else "") + ("D" if d_ else "") + ("F" if f_ else "")
+                   for p_, d_, f_ in zip(flag_p, flag_d, flag_f)]
+    print(f"condition flags: {int(flag_p.sum()):,} portfolio-allocated, "
+          f"{int(flag_d.sum()):,} distressed, {int(flag_f.sum()):,} flip legs")
+    bad = df["flags"].str.contains("P|D", regex=True)
+    df.loc[bad, ["psf", "ppu", "plsf"]] = float("nan")
 
     latest = df["sd"].max()
     earliest = df["sd"].min()
@@ -322,12 +360,12 @@ def main():
                   int(r.units_) if r.units_ > 0 else 0,
                   int(r.yb_) if r.yb_ > 1800 else 0,
                   tidx[r.type], r.addr, str(r.zip), str(r.pn_),
-                  r.lat_, r.lon_]
+                  r.lat_, r.lon_, r.flags]
                  for r in gv.itertuples()]
         (OUT_DIR / f"{slug}.json").write_text(json.dumps({
             "city": city, "types": TYPES,
             "cols": ["date", "price", "bldgSF", "lotSF", "units", "yearBuilt",
-                     "typeIdx", "address", "zip", "apn", "lat", "lon"],
+                     "typeIdx", "address", "zip", "apn", "lat", "lon", "flags"],
             "stats": stats_for(g), "comps": comps,
         }, separators=(",", ":")), encoding="utf-8")
         cities.append({"name": city, "slug": slug, "n": int(len(g)),

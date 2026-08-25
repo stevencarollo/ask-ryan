@@ -291,6 +291,12 @@ body.hasmkt .abtn.gold{display:inline-block}
 .cc-adv-clr:hover{border-color:var(--gold);color:var(--gold-bright)}
 .cc-subj{margin-top:12px;padding:10px 13px;background:rgba(201,168,92,.08);border:1px solid var(--gold);border-radius:8px;font-size:.82em;color:var(--ivory);line-height:1.55}
 .cc-subj b{color:var(--gold-bright)}
+.cc-radius{margin-left:8px;display:inline-flex;gap:4px;align-items:center;flex-wrap:wrap}
+.ccr{padding:4px 10px;background:transparent;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-family:'Inter',sans-serif;font-size:.86em;font-weight:600;min-height:30px;cursor:pointer}
+.ccr.on{background:rgba(201,168,92,.16);border-color:var(--gold);color:var(--gold-bright)}
+.ccflag{font-size:.68em;font-weight:800;letter-spacing:.05em;color:var(--red,#D97A7A);border:1px solid rgba(217,122,122,.45);border-radius:4px;padding:1px 5px;margin-left:5px;vertical-align:1px}
+.ccflag.fl{color:var(--gold);border-color:rgba(201,168,92,.45)}
+@media(max-width:720px){.ccr{min-height:40px;padding:7px 12px}}
 .cc-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;margin-top:12px}
 .cc-card{background:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
 .cc-card .t{font-size:.72em;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
@@ -2584,6 +2590,23 @@ function ccDistMi(lat1, lon1, lat2, lon2){
             Math.cos(lat1*d)*Math.cos(lat2*d)*Math.sin((lon2-lon1)*d/2)**2;
   return 2*R*Math.asin(Math.sqrt(a));
 }
+function ccSetRadius(r){
+  if (!CC_SUBJ) return;
+  CC_SUBJ.radius = r || 0;
+  CC_SHOWN = 30; ccRender();
+}
+function ccSimilarSize(){
+  // half-to-double the subject SF, via the same custom inputs the member sees
+  if (!CC_SUBJ || !CC_SUBJ.exact || !CC_SUBJ.exact[2]) return;
+  const sf = CC_SUBJ.exact[2];
+  const on = !CC_SUBJ.sized;
+  CC_SUBJ.sized = on;
+  document.getElementById('advSf').value = on ? 'custom' : '';
+  document.getElementById('advSfC').classList.toggle('on', on);
+  document.getElementById('advSfMin').value = on ? Math.round(sf * 0.5) : '';
+  document.getElementById('advSfMax').value = on ? Math.round(sf * 2) : '';
+  CC_SHOWN = 30; ccRender();
+}
 function ccParseAddress(q){
   // "3010 Pacific Coast Hwy, Torrance" / "1322 W 227th St 90501"
   const m = q.match(/^(\d+[a-z]?)\s+(.+)$/i);
@@ -2698,8 +2721,11 @@ function ccMedian(a){
   const s = [...a].sort((x,y)=>x-y), m = s.length >> 1;
   return s.length % 2 ? s[m] : (s[m-1]+s[m])/2;
 }
-function ccPsf(c){ const v = c[2] >= 300 ? c[1]/c[2] : null; return v && v >= 30 && v <= 3000 ? v : null; }
-function ccPpu(c){ const v = c[4] >= 5 ? c[1]/c[4] : null; return v && v >= 25000 && v <= 2000000 ? v : null; }
+function ccClean(c){ return !/[PD]/.test(c[12] || ''); }   // P=allocated, D=distressed
+function ccPsf(c){ if (!ccClean(c)) return null;
+  const v = c[2] >= 300 ? c[1]/c[2] : null; return v && v >= 30 && v <= 3000 ? v : null; }
+function ccPpu(c){ if (!ccClean(c)) return null;
+  const v = c[4] >= 5 ? c[1]/c[4] : null; return v && v >= 25000 && v <= 2000000 ? v : null; }
 
 /* a preset picks a canned range; "Custom…" reads the min/max pair, clamped to
    sane rails so a stray keystroke cannot ask for 90,000 units. Blank min or
@@ -2736,9 +2762,11 @@ function ccAdvFilter(rows){
   if (months){ const dte = new Date(); dte.setMonth(dte.getMonth() - months);
                since = dte.toISOString().slice(0, 10); }
   const inb = (b, val) => !b || (val >= b[0] && val <= b[1]);
+  const rad = (CC_SUBJ && CC_SUBJ.lat && CC_SUBJ.radius) ? CC_SUBJ.radius : 0;
   return rows.filter(c =>
     inb(u, c[4]) && inb(f, c[2]) && inb(y, c[5]) && inb(pr, c[1]) &&
-    (!since || c[0] >= since));
+    (!since || c[0] >= since) &&
+    (!rad || (c[10] && c[11] && ccDistMi(CC_SUBJ.lat, CC_SUBJ.lon, c[10], c[11]) <= rad)));
 }
 function ccAdvClear(){
   ['advUnits','advSf','advYb','advPrice','advWhen'].forEach(id => document.getElementById(id).value = '');
@@ -2761,9 +2789,11 @@ function ccStatsFromRows(rows, types){
   for (const [t, g] of Object.entries(byType)){
     const byYear = {};
     g.forEach(c => (byYear[c[0].slice(0,4)] = byYear[c[0].slice(0,4)] || []).push(c));
+    const clean = g.filter(ccClean);
     out[t] = {
       n: g.length,
-      medPrice: ccMedian(g.map(c=>c[1])),
+      screened: g.length - clean.length,
+      medPrice: ccMedian(clean.map(c=>c[1])),
       medPsf: ccMedian(g.map(ccPsf).filter(Boolean)),
       medPpu: t === 'Multifamily 5+' ? ccMedian(g.map(ccPpu).filter(Boolean)) : null,
       byYear: Object.fromEntries(Object.entries(byYear).map(([y, gy]) =>
@@ -2825,6 +2855,7 @@ function ccRender(){
         (s.medPpu ? ' · ' + CC_MONEY(s.medPpu) + '/unit' : '') +
         (tr ? ' · <span class="' + (tr.pct >= 0 ? 'up' : 'dn') + '">' +
               (tr.pct >= 0 ? '▲' : '▼') + Math.abs(tr.pct) + '% ' + tr.yr + '</span>' : '') +
+        (s.screened ? ' · ' + s.screened + ' allocated/distressed shown but not averaged' : '') +
         '</div></div>';
     }).join('');
   // subject banner: the address the broker typed anchors the whole view
@@ -2834,9 +2865,18 @@ function ccRender(){
       sb.style.display = '';
       if (CC_SUBJ.exact){
         const e = CC_SUBJ.exact;
+        const radios = CC_SUBJ.lat
+          ? ' <span class="cc-radius">Within ' + [0.5, 1, 2, 5, 0].map(r =>
+              '<button type="button" class="ccr' + ((CC_SUBJ.radius||0)===r ? ' on' : '') +
+              '" onclick="ccSetRadius(' + r + ')">' + (r ? r + ' mi' : 'any') + '</button>').join('') + '</span>'
+          : '';
+        const size = e[2] >= 500
+          ? ' <button type="button" class="ccr' + (CC_SUBJ.sized ? ' on' : '') +
+            '" onclick="ccSimilarSize()" title="Appraiser convention: comps sized like the subject (half to double its SF)">≈ similar size</button>'
+          : '';
         sb.innerHTML = '📍 <b>' + esc(e[7]) + '</b> — sold <b>' + e[0] + '</b> for <b>' +
           CC_MONEY(e[1]) + '</b> (' + esc(d.types[e[6]]) + (e[2] ? ', ' + e[2].toLocaleString() + ' SF' : '') +
-          ')' + (CC_SUBJ.lat ? ' · comps below sorted nearest-first' : '');
+          ')' + (CC_SUBJ.lat ? ' · nearest-first' : '') + radios + size;
       } else {
         sb.innerHTML = '📍 <b>' + esc(CC_SUBJ.raw) + '</b> — no recorded sale in the window · showing ' +
           (CC_SUBJ.streetHits ? CC_SUBJ.streetHits + ' sale' + (CC_SUBJ.streetHits===1?'':'s') + ' on the same street, then ' : '') +
@@ -2869,9 +2909,13 @@ function ccRender(){
   CC_ROWS = rows;                     // the slice Copy and Use-in-scripts see
   const body = rows.slice(0, CC_SHOWN).map(c => {
     const psf = c[2] >= 300 ? Math.round(c[1]/c[2]) : null;
+    const fl = c[12] || '';
+    const badge = (fl.includes('P') ? ' <span class="ccflag" title="One deal recorded across several parcels - the price is an allocation, not a market price for this parcel alone">PORTFOLIO</span>' : '') +
+                  (fl.includes('D') ? ' <span class="ccflag" title="Recorded as REO / distressed - not an arms-length market price">DISTRESSED</span>' : '') +
+                  (fl.includes('F') ? ' <span class="ccflag fl" title="This parcel traded twice within 18 months">FLIP</span>' : '');
     const dist = (CC_SUBJ && CC_SUBJ.lat && c[10] && c[11])
       ? ' <span class="mut">· ' + ccDistMi(CC_SUBJ.lat, CC_SUBJ.lon, c[10], c[11]).toFixed(1) + ' mi</span>' : '';
-    return '<tr><td class="mut">' + c[0] + '</td><td>' + esc(c[7] || '(no address)') + dist +
+    return '<tr><td class="mut">' + c[0] + '</td><td>' + esc(c[7] || '(no address)') + dist + badge +
       '</td><td class="mut">' + esc(d.types[c[6]]) + '</td><td>' + CC_MONEY(c[1]) +
       '</td><td class="mut">' + (c[2] ? c[2].toLocaleString() : '—') +
       '</td><td>' + (psf ? '$' + psf.toLocaleString() : '—') +
