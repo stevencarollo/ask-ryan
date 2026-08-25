@@ -289,6 +289,8 @@ body.hasmkt .abtn.gold{display:inline-block}
 .adv-pair input::placeholder{color:var(--muted)}
 .cc-adv-clr{margin:8px 13px 12px;background:transparent;border:1px solid var(--line);border-radius:6px;color:var(--muted);font-family:'Inter',sans-serif;font-size:.76em;font-weight:600;padding:7px 12px;min-height:34px;cursor:pointer}
 .cc-adv-clr:hover{border-color:var(--gold);color:var(--gold-bright)}
+.cc-subj{margin-top:12px;padding:10px 13px;background:rgba(201,168,92,.08);border:1px solid var(--gold);border-radius:8px;font-size:.82em;color:var(--ivory);line-height:1.55}
+.cc-subj b{color:var(--gold-bright)}
 .cc-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;margin-top:12px}
 .cc-card{background:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
 .cc-card .t{font-size:.72em;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
@@ -547,6 +549,7 @@ body.hasmkt .abtn.gold{display:inline-block}
           </div>
           <button type="button" class="cc-adv-clr" id="advClr" onclick="ccAdvClear()">Reset filters</button>
         </details>
+        <div class="cc-subj" id="ccSubj" style="display:none"></div>
         <div class="cc-stats" id="ccStats"></div>
         <div class="cc-tblwrap" id="ccTblWrap" style="display:none">
           <table class="cc-tbl" id="ccTbl"></table>
@@ -2544,7 +2547,7 @@ function setMktMode(mode){
 
 async function ccLoadIndex(){
   try{
-    CC_INDEX = await (await fetch('/comps/cc_index.json')).json();
+    CC_INDEX = await (await fetch('/comps/cc_index.json', {cache:'no-store'})).json();
   }catch(e){
     document.getElementById('ccFresh').textContent = 'Comps data could not load — refresh and try again.';
     return;
@@ -2562,8 +2565,93 @@ async function ccLoadIndex(){
     CC_INDEX.cities.length + ' cities';
 }
 
+/* ---- address anchoring: type a property address and the view organises
+   itself around it - nearest recorded sales first, the subject's own sale
+   pinned if it traded in the window. Needs a city or ZIP alongside the street
+   so we know which file to open (no geocoder in a static site - the comps'
+   own parcel centroids are the map). ---- */
+let CC_SUBJ = null;
+const CC_SUFFIX = /\b(st|street|ave|avenue|blvd|boulevard|dr|drive|rd|road|pl|place|ln|lane|way|ct|court|hwy|highway|cir|circle|ter|terrace)\.?$/i;
+function ccNormStreet(a){
+  let s = String(a || '').toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+  s = s.replace(/^(n|s|e|w|ne|nw|se|sw|north|south|east|west)\s+/, '');
+  s = s.replace(CC_SUFFIX, '').trim();
+  return s;
+}
+function ccDistMi(lat1, lon1, lat2, lon2){
+  const R = 3958.8, d = Math.PI / 180;
+  const a = Math.sin((lat2-lat1)*d/2)**2 +
+            Math.cos(lat1*d)*Math.cos(lat2*d)*Math.sin((lon2-lon1)*d/2)**2;
+  return 2*R*Math.asin(Math.sqrt(a));
+}
+function ccParseAddress(q){
+  // "3010 Pacific Coast Hwy, Torrance" / "1322 W 227th St 90501"
+  const m = q.match(/^(\d+[a-z]?)\s+(.+)$/i);
+  if (!m) return null;
+  let rest = m[2].replace(/,/g, ' ').replace(/\s+/g, ' ').trim();
+  let zip = null, city = null;
+  const zm = rest.match(/\b(\d{5})\b\s*$/);
+  if (zm){ zip = zm[1]; rest = rest.slice(0, zm.index).trim(); }
+  if (!zip && CC_INDEX){
+    for (const c of CC_INDEX.cities){
+      if (rest.toLowerCase().endsWith(' ' + c.name.toLowerCase())){
+        city = c; rest = rest.slice(0, rest.length - c.name.length).trim();
+        break;
+      }
+    }
+  }
+  return {num: m[1].toLowerCase(), street: ccNormStreet(rest), zip, city, raw: q};
+}
+
 async function ccPickCity(name){
   const q = String(name || '').trim();
+  CC_SUBJ = null;
+  // an address = house number + words; a bare ZIP is not
+  if (/^\d+[a-z]?\s+[a-z]/i.test(q) && !/^\d{5}$/.test(q)){
+    const ad = ccParseAddress(q);
+    if (ad && !ad.zip && !ad.city){
+      toast('Add the city or ZIP after the address — "3010 Pacific Coast Hwy, Torrance"');
+      return;
+    }
+    if (ad){
+      // load the scope the address names
+      let comps = null, scopeLabel = '';
+      try{
+        if (ad.zip){
+          const entries = (CC_INDEX.zips && CC_INDEX.zips[ad.zip]) || [];
+          if (!entries.length){ toast('No commercial sales on record for ' + ad.zip); return; }
+          const files = await Promise.all(entries.map(e => fetch('/comps/cc/' + e.slug + '.json', {cache:'no-store'}).then(r=>r.json())));
+          comps = files.flatMap(f => f.comps.filter(c => String(c[8]) === ad.zip));
+          CC_CITY = {city: 'ZIP ' + ad.zip, q: q, types: files[0].types, stats: {}, comps: comps};
+          scopeLabel = 'ZIP ' + ad.zip;
+        } else {
+          const f = await (await fetch('/comps/cc/' + ad.city.slug + '.json', {cache:'no-store'})).json();
+          CC_CITY = {city: ad.city.name, q: q, types: f.types, stats: {}, comps: f.comps};
+          scopeLabel = ad.city.name;
+        }
+      }catch(e){ toast('Could not load comps — try again'); return; }
+      // anchor: exact parcel first, then same-street
+      const exact = CC_CITY.comps.find(c =>
+        ccNormStreet(String(c[7]).replace(/^\d+[a-z]?\s+/i,'')) === ad.street &&
+        String(c[7]).toLowerCase().startsWith(ad.num + ' '));
+      const onStreet = CC_CITY.comps.filter(c =>
+        ccNormStreet(String(c[7]).replace(/^\d+[a-z]?\s+/i,'')) === ad.street);
+      CC_SUBJ = {raw: ad.raw, street: ad.street, scope: scopeLabel,
+                 exact: exact || null, streetHits: onStreet.length,
+                 lat: exact && exact[10] ? exact[10] : null,
+                 lon: exact && exact[11] ? exact[11] : null};
+      // the subject's own type is the natural default view
+      const first = exact ? CC_CITY.types[exact[6]]
+        : (onStreet.length ? CC_CITY.types[onStreet[0][6]] : null);
+      const present = {};
+      CC_CITY.comps.forEach(c => present[CC_CITY.types[c[6]]] = 1);
+      CC_SEL = new Set([first && present[first] ? first
+        : (present['Multifamily 5+'] ? 'Multifamily 5+' : Object.keys(present)[0])]);
+      CC_SHOWN = 30;
+      ccRender();
+      return;
+    }
+  }
   // a five-digit query is a ZIP: pull the city file(s) that hold it and keep
   // only that ZIP's deeds - stats recompute client-side like everything else
   if (/^\d{5}$/.test(q)){
@@ -2571,7 +2659,7 @@ async function ccPickCity(name){
     if (!entries.length){ toast('No commercial sales on record for ' + q); return; }
     try{
       const files = await Promise.all(entries.map(e =>
-        fetch('/comps/cc/' + e.slug + '.json').then(r => r.json())));
+        fetch('/comps/cc/' + e.slug + '.json', {cache:'no-store'}).then(r => r.json())));
       const comps = files.flatMap(f => f.comps.filter(c => String(c[8]) === q))
                          .sort((a,b) => a[0] < b[0] ? 1 : -1);
       CC_CITY = {city: 'ZIP ' + q, q: q, types: files[0].types, stats: {}, comps: comps};
@@ -2587,7 +2675,7 @@ async function ccPickCity(name){
   const c = CC_INDEX && CC_INDEX.cities.find(x => x.name.toLowerCase() === q.toLowerCase());
   if (!c) return;
   try{
-    CC_CITY = await (await fetch('/comps/cc/' + c.slug + '.json')).json();
+    CC_CITY = await (await fetch('/comps/cc/' + c.slug + '.json', {cache:'no-store'})).json();
   }catch(e){ toast('Could not load ' + c.name + ' — try again'); return; }
   CC_CITY.q = c.name;                 // what a reload feeds back into this picker
   // Multifamily 5+ opens the view (the bread-and-butter product type); if the
@@ -2739,6 +2827,23 @@ function ccRender(){
               (tr.pct >= 0 ? '▲' : '▼') + Math.abs(tr.pct) + '% ' + tr.yr + '</span>' : '') +
         '</div></div>';
     }).join('');
+  // subject banner: the address the broker typed anchors the whole view
+  const sb = document.getElementById('ccSubj');
+  if (sb){
+    if (CC_SUBJ){
+      sb.style.display = '';
+      if (CC_SUBJ.exact){
+        const e = CC_SUBJ.exact;
+        sb.innerHTML = '📍 <b>' + esc(e[7]) + '</b> — sold <b>' + e[0] + '</b> for <b>' +
+          CC_MONEY(e[1]) + '</b> (' + esc(d.types[e[6]]) + (e[2] ? ', ' + e[2].toLocaleString() + ' SF' : '') +
+          ')' + (CC_SUBJ.lat ? ' · comps below sorted nearest-first' : '');
+      } else {
+        sb.innerHTML = '📍 <b>' + esc(CC_SUBJ.raw) + '</b> — no recorded sale in the window · showing ' +
+          (CC_SUBJ.streetHits ? CC_SUBJ.streetHits + ' sale' + (CC_SUBJ.streetHits===1?'':'s') + ' on the same street, then ' : '') +
+          esc(CC_SUBJ.scope) + ' comps';
+      }
+    } else sb.style.display = 'none';
+  }
   // comps table: filters, then type selection, then the chosen ordering
   let rows = pool.filter(c => CC_SEL.has(d.types[c[6]]));
   const sort = document.getElementById('advSort').value;
@@ -2748,10 +2853,25 @@ function ccRender(){
   else if (sort === 'psfHi') rows = [...rows].sort((a,b)=>psfOf(b)-psfOf(a));
   else if (sort === 'psfLo') rows = [...rows].filter(psfOf).sort((a,b)=>psfOf(a)-psfOf(b));
   else if (sort === 'sfHi') rows = [...rows].sort((a,b)=>b[2]-a[2]);
+  else if (CC_SUBJ && CC_SUBJ.lat){
+    // untouched default with an anchored subject = nearest recorded sale first
+    rows = [...rows].sort((a,b) =>
+      ((a[10]&&a[11]) ? ccDistMi(CC_SUBJ.lat, CC_SUBJ.lon, a[10], a[11]) : 999) -
+      ((b[10]&&b[11]) ? ccDistMi(CC_SUBJ.lat, CC_SUBJ.lon, b[10], b[11]) : 999));
+  } else if (CC_SUBJ && CC_SUBJ.streetHits){
+    // no coords for the subject: its street floats to the top, newest first
+    rows = [...rows].sort((a,b) => {
+      const as = ccNormStreet(String(a[7]).replace(/^\d+[a-z]?\s+/i,'')) === CC_SUBJ.street ? 0 : 1;
+      const bs = ccNormStreet(String(b[7]).replace(/^\d+[a-z]?\s+/i,'')) === CC_SUBJ.street ? 0 : 1;
+      return as - bs || (a[0] < b[0] ? 1 : -1);
+    });
+  }
   CC_ROWS = rows;                     // the slice Copy and Use-in-scripts see
   const body = rows.slice(0, CC_SHOWN).map(c => {
     const psf = c[2] >= 300 ? Math.round(c[1]/c[2]) : null;
-    return '<tr><td class="mut">' + c[0] + '</td><td>' + esc(c[7] || '(no address)') +
+    const dist = (CC_SUBJ && CC_SUBJ.lat && c[10] && c[11])
+      ? ' <span class="mut">· ' + ccDistMi(CC_SUBJ.lat, CC_SUBJ.lon, c[10], c[11]).toFixed(1) + ' mi</span>' : '';
+    return '<tr><td class="mut">' + c[0] + '</td><td>' + esc(c[7] || '(no address)') + dist +
       '</td><td class="mut">' + esc(d.types[c[6]]) + '</td><td>' + CC_MONEY(c[1]) +
       '</td><td class="mut">' + (c[2] ? c[2].toLocaleString() : '—') +
       '</td><td>' + (psf ? '$' + psf.toLocaleString() : '—') +

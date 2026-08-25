@@ -113,6 +113,8 @@ def load(con):
                TRY_CAST(ll_gissqft AS DOUBLE)     lot_sf,
                TRY_CAST(numunits AS DOUBLE)       units,
                TRY_CAST(yearbuilt AS INTEGER)     yb,
+               TRY_CAST(lat AS DOUBLE)            plat,
+               TRY_CAST(lon AS DOUBLE)            plon,
                TRY_CAST(saledate AS DATE)         r_sd,
                TRY_CAST(saleprice AS DOUBLE)      r_price
         FROM read_parquet('{REGRID}')
@@ -128,7 +130,7 @@ def load(con):
       hist AS (        -- the 5-year record, with parcel attributes attached
         SELECT h.ap, h.sd, h.price, h.land_use, h.h_addr, h.h_city, h.h_zip,
                r.parcelnumb, r.usedesc, r.scity, r.szip5, r.address,
-               r.bldg_sf, r.rec_sf, r.lot_sf, r.units, r.yb
+               r.bldg_sf, r.rec_sf, r.lot_sf, r.units, r.yb, r.plat, r.plon
         FROM h LEFT JOIN r USING (ap)
       ),
       tail AS (        -- Regrid last-sales AFTER the history window: fresher
@@ -136,7 +138,7 @@ def load(con):
                CAST(NULL AS VARCHAR) h_addr, CAST(NULL AS VARCHAR) h_city,
                CAST(NULL AS VARCHAR) h_zip,
                parcelnumb, usedesc, scity, szip5, address,
-               bldg_sf, rec_sf, lot_sf, units, yb
+               bldg_sf, rec_sf, lot_sf, units, yb, plat, plon
         FROM r
         WHERE r_sd > (SELECT max(sd) FROM h) AND r_price >= {MIN_PRICE}
       )
@@ -193,11 +195,13 @@ def load_gap(con, path):
                TRY_CAST(recrdareano AS DOUBLE)    rec_sf,
                TRY_CAST(ll_gissqft AS DOUBLE)     lot_sf,
                TRY_CAST(numunits AS DOUBLE)       units,
-               TRY_CAST(yearbuilt AS INTEGER)     yb
+               TRY_CAST(yearbuilt AS INTEGER)     yb,
+               TRY_CAST(lat AS DOUBLE)            plat,
+               TRY_CAST(lon AS DOUBLE)            plon
         FROM read_parquet('{REGRID}') WHERE parcelnumb_no_formatting IS NOT NULL)
       SELECT g.ap, CAST(g.sd AS VARCHAR) sd, g.price, g.land_use, g.h_addr, g.h_city, g.h_zip,
              r.parcelnumb, r.usedesc, r.scity, r.szip5, r.address,
-             r.bldg_sf, r.rec_sf, r.lot_sf, r.units, r.yb
+             r.bldg_sf, r.rec_sf, r.lot_sf, r.units, r.yb, r.plat, r.plon
       FROM gap g LEFT JOIN r USING (ap)
     """).fetchdf()
 
@@ -310,17 +314,20 @@ def main():
                           g["ap"].str.replace(r"^(\d{4})(\d{3})(\d{3})$",
                                               lambda m: m.group(1)+"-"+m.group(2)+"-"+m.group(3),
                                               regex=True)))
+        gv = gv.assign(lat_=gv["plat"].astype(float).fillna(0).round(5),
+                       lon_=gv["plon"].astype(float).fillna(0).round(5))
         comps = [[r.sd, int(r.price),
                   int(r.sf_) if r.sf_ > 0 else 0,
                   int(r.lot_) if r.lot_ > 0 else 0,
                   int(r.units_) if r.units_ > 0 else 0,
                   int(r.yb_) if r.yb_ > 1800 else 0,
-                  tidx[r.type], r.addr, str(r.zip), str(r.pn_)]
+                  tidx[r.type], r.addr, str(r.zip), str(r.pn_),
+                  r.lat_, r.lon_]
                  for r in gv.itertuples()]
         (OUT_DIR / f"{slug}.json").write_text(json.dumps({
             "city": city, "types": TYPES,
             "cols": ["date", "price", "bldgSF", "lotSF", "units", "yearBuilt",
-                     "typeIdx", "address", "zip", "apn"],
+                     "typeIdx", "address", "zip", "apn", "lat", "lon"],
             "stats": stats_for(g), "comps": comps,
         }, separators=(",", ":")), encoding="utf-8")
         cities.append({"name": city, "slug": slug, "n": int(len(g)),
