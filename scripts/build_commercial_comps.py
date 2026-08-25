@@ -241,7 +241,7 @@ def main():
     # building SF: assessor area first, recorded-area fallback
     df["sf"] = df["bldg_sf"].where(df["bldg_sf"] > 0, df["rec_sf"])
     df["city"] = df["scity"].fillna(df["h_city"]).fillna("").str.strip().str.title()
-    df["city"] = df["city"].str.replace(r"La County", "LA County", regex=True)
+    df["city"] = df["city"].str.replace(r"\bLa County\b", "LA County", regex=True)
     df.loc[df["city"] == "", "city"] = "Unincorporated LA County"
     df["addr"] = (df["address"].fillna(df["h_addr"]).fillna("").str.strip().str.title()
                   # .title() capitalises street ordinals ("227Th St") - undo it
@@ -396,6 +396,65 @@ def main():
 
     total_kb = sum(f.stat().st_size for f in OUT_DIR.glob("*.json")) // 1024
     print(f"wrote {len(cities)} city files ({total_kb:,} KB) + cc_index.json")
+    build_parcel_roll()
+
+
+def build_parcel_roll():
+    """The full commercial parcel roll, per city: so an ADDRESS lookup can
+    resolve any commercial parcel - type, size, units, year, coordinates -
+    whether or not it traded in the window. The UI fetches a city's roll only
+    when a typed address is not already a sold comp."""
+    roll_dir = REPO / "comps" / "ccp"
+    roll_dir.mkdir(parents=True, exist_ok=True)
+    con = duckdb.connect()
+    roll = con.execute(f"""
+      SELECT address, usedesc, scity,
+             TRY_CAST(area_building AS DOUBLE) sf1, TRY_CAST(recrdareano AS DOUBLE) sf2,
+             TRY_CAST(numunits AS DOUBLE) units, TRY_CAST(yearbuilt AS INTEGER) yb,
+             TRY_CAST(lat AS DOUBLE) plat, TRY_CAST(lon AS DOUBLE) plon,
+             szip5, parcelnumb
+      FROM read_parquet('{REGRID}')
+      WHERE (usedesc LIKE 'Commercial%' OR usedesc LIKE 'Industrial%'
+         OR usedesc = 'Residential - Five or more apartments')
+        AND address IS NOT NULL AND length(address) > 5
+    """).fetchdf()
+    roll["type"] = [classify(u, None) for u in roll["usedesc"]]
+    roll = roll[roll["type"].notna()].copy()
+    la_fix = re.compile(r"\bLa County\b")
+    roll["city"] = (roll["scity"].fillna("").str.strip().str.title()
+                    .map(lambda c: la_fix.sub("LA County", c)))
+    roll.loc[roll["city"] == "", "city"] = "Unincorporated LA County"
+    roll["sf"] = roll["sf1"].where(roll["sf1"] > 0, roll["sf2"]).fillna(0)
+    ord_fix = re.compile(r"(\d)(St|Nd|Rd|Th)\b")
+    roll["addr"] = (roll["address"].astype(str).str.strip().str.title()
+                    .map(lambda a: ord_fix.sub(lambda m: m.group(1) + m.group(2).lower(), a)))
+    roll["zip"] = (roll["szip5"].fillna("").astype(str)
+                   .str.replace(r"[^0-9]", "", regex=True).str[:5])
+    tidx = {t: i for i, t in enumerate(TYPES)}
+    n_files = 0
+    # pandas NA is not truthy - flatten to plain floats before serialising
+    roll["units_"] = roll["units"].astype(float).fillna(0)
+    roll["yb_"] = roll["yb"].astype(float).fillna(0)
+    roll["plat_"] = roll["plat"].astype(float).fillna(0).round(5)
+    roll["plon_"] = roll["plon"].astype(float).fillna(0).round(5)
+    roll["pn_"] = roll["parcelnumb"].fillna("")
+    for city, g in roll.groupby("city"):
+        slug = slugify(city)
+        if not slug:
+            continue
+        rows = [[r.addr, tidx[r.type],
+                 int(r.sf) if r.sf > 0 else 0,
+                 int(r.units_) if r.units_ > 0 else 0,
+                 int(r.yb_) if r.yb_ > 1800 else 0,
+                 r.plat_, r.plon_,
+                 str(r.zip), str(r.pn_)]
+                for r in g.itertuples()]
+        (roll_dir / f"{slug}.json").write_text(json.dumps(
+            {"city": city, "types": TYPES, "parcels": rows},
+            separators=(",", ":")), encoding="utf-8")
+        n_files += 1
+    roll_kb = sum(f.stat().st_size for f in roll_dir.glob("*.json")) // 1024
+    print(f"parcel roll: {len(roll):,} parcels in {n_files} files ({roll_kb:,} KB)")
 
 
 if __name__ == "__main__":

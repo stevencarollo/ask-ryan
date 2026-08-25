@@ -2598,8 +2598,8 @@ function ccSetRadius(r){
 }
 function ccSimilarSize(){
   // half-to-double the subject SF, via the same custom inputs the member sees
-  if (!CC_SUBJ || !CC_SUBJ.exact || !CC_SUBJ.exact[2]) return;
-  const sf = CC_SUBJ.exact[2];
+  if (!CC_SUBJ || !CC_SUBJ.sf) return;
+  const sf = CC_SUBJ.sf;
   const on = !CC_SUBJ.sized;
   CC_SUBJ.sized = on;
   document.getElementById('advSf').value = on ? 'custom' : '';
@@ -2607,6 +2607,31 @@ function ccSimilarSize(){
   document.getElementById('advSfMin').value = on ? Math.round(sf * 0.5) : '';
   document.getElementById('advSfMax').value = on ? Math.round(sf * 2) : '';
   CC_SHOWN = 30; ccRender();
+}
+const CC_ROLLS = {};   // fetched assessor-roll files, kept for the session
+async function ccRollFetch(slug){
+  if (CC_ROLLS[slug] !== undefined) return CC_ROLLS[slug];
+  try{
+    const f = await (await fetch('/comps/ccp/' + slug + '.json', {cache:'no-store'})).json();
+    CC_ROLLS[slug] = f.parcels || [];
+  }catch(e){ CC_ROLLS[slug] = []; }
+  return CC_ROLLS[slug];
+}
+async function ccRollLookup(ad){
+  // the full assessor roll (203k commercial parcels): resolves an address
+  // that never traded in the window - type, SF, units, year, coordinates
+  let slugs = [];
+  if (ad.city) slugs = [ad.city.slug];
+  else if (ad.zip) slugs = ((CC_INDEX && CC_INDEX.zips && CC_INDEX.zips[ad.zip]) || []).map(e => e.slug);
+  for (const slug of slugs){
+    const rows = await ccRollFetch(slug);
+    const hit = rows.find(pr =>
+      String(pr[0]).toLowerCase().startsWith(ad.num + ' ') &&
+      ccNormStreet(String(pr[0]).replace(/^\d+[a-z]?\s+/i,'')) === ad.street &&
+      (!ad.zip || String(pr[7]) === ad.zip));
+    if (hit) return hit;
+  }
+  return null;
 }
 function ccParseAddress(q){
   // "3010 Pacific Coast Hwy, Torrance" / "1322 W 227th St 90501"
@@ -2654,18 +2679,24 @@ async function ccPickCity(name){
           scopeLabel = ad.city.name;
         }
       }catch(e){ toast('Could not load comps — try again'); return; }
-      // anchor: exact parcel first, then same-street
+      // anchor: exact sold comp first, then the full assessor roll (so ANY
+      // commercial address resolves - type, size, coordinates - whether or
+      // not it traded), then same-street sales as the last resort
       const exact = CC_CITY.comps.find(c =>
         ccNormStreet(String(c[7]).replace(/^\d+[a-z]?\s+/i,'')) === ad.street &&
         String(c[7]).toLowerCase().startsWith(ad.num + ' '));
       const onStreet = CC_CITY.comps.filter(c =>
         ccNormStreet(String(c[7]).replace(/^\d+[a-z]?\s+/i,'')) === ad.street);
+      let roll = null;
+      if (!exact) roll = await ccRollLookup(ad);
       CC_SUBJ = {raw: ad.raw, street: ad.street, scope: scopeLabel,
-                 exact: exact || null, streetHits: onStreet.length,
-                 lat: exact && exact[10] ? exact[10] : null,
-                 lon: exact && exact[11] ? exact[11] : null};
+                 exact: exact || null, roll: roll, streetHits: onStreet.length,
+                 sf: exact ? exact[2] : (roll ? roll[2] : 0),
+                 lat: exact && exact[10] ? exact[10] : (roll && roll[5] ? roll[5] : null),
+                 lon: exact && exact[11] ? exact[11] : (roll && roll[6] ? roll[6] : null)};
       // the subject's own type is the natural default view
       const first = exact ? CC_CITY.types[exact[6]]
+        : roll ? CC_CITY.types[roll[1]]
         : (onStreet.length ? CC_CITY.types[onStreet[0][6]] : null);
       const present = {};
       CC_CITY.comps.forEach(c => present[CC_CITY.types[c[6]]] = 1);
@@ -2864,20 +2895,28 @@ function ccRender(){
   if (sb){
     if (CC_SUBJ){
       sb.style.display = '';
+      const radios = CC_SUBJ.lat
+        ? ' <span class="cc-radius">Within ' + [0.5, 1, 2, 5, 0].map(r =>
+            '<button type="button" class="ccr' + ((CC_SUBJ.radius||0)===r ? ' on' : '') +
+            '" onclick="ccSetRadius(' + r + ')">' + (r ? r + ' mi' : 'any') + '</button>').join('') + '</span>'
+        : '';
+      const size = CC_SUBJ.sf >= 500
+        ? ' <button type="button" class="ccr' + (CC_SUBJ.sized ? ' on' : '') +
+          '" onclick="ccSimilarSize()" title="Appraiser convention: comps sized like the subject (half to double its SF)">≈ similar size</button>'
+        : '';
       if (CC_SUBJ.exact){
         const e = CC_SUBJ.exact;
-        const radios = CC_SUBJ.lat
-          ? ' <span class="cc-radius">Within ' + [0.5, 1, 2, 5, 0].map(r =>
-              '<button type="button" class="ccr' + ((CC_SUBJ.radius||0)===r ? ' on' : '') +
-              '" onclick="ccSetRadius(' + r + ')">' + (r ? r + ' mi' : 'any') + '</button>').join('') + '</span>'
-          : '';
-        const size = e[2] >= 500
-          ? ' <button type="button" class="ccr' + (CC_SUBJ.sized ? ' on' : '') +
-            '" onclick="ccSimilarSize()" title="Appraiser convention: comps sized like the subject (half to double its SF)">≈ similar size</button>'
-          : '';
         sb.innerHTML = '📍 <b>' + esc(e[7]) + '</b> — sold <b>' + e[0] + '</b> for <b>' +
           CC_MONEY(e[1]) + '</b> (' + esc(d.types[e[6]]) + (e[2] ? ', ' + e[2].toLocaleString() + ' SF' : '') +
           ')' + (CC_SUBJ.lat ? ' · nearest-first' : '') + radios + size;
+      } else if (CC_SUBJ.roll){
+        const p = CC_SUBJ.roll;
+        sb.innerHTML = '📍 <b>' + esc(p[0]) + '</b> — ' + esc(d.types[p[1]]) +
+          (p[2] ? ', ' + p[2].toLocaleString() + ' SF' : '') +
+          (p[3] > 1 ? ', ' + p[3] + ' units' : '') +
+          (p[4] ? ', built ' + p[4] : '') +
+          ' <span class="mut">(assessor roll · no recorded sale in the window)</span>' +
+          (CC_SUBJ.lat ? ' · nearest-first' : '') + radios + size;
       } else {
         sb.innerHTML = '📍 <b>' + esc(CC_SUBJ.raw) + '</b> — no recorded sale in the window · showing ' +
           (CC_SUBJ.streetHits ? CC_SUBJ.streetHits + ' sale' + (CC_SUBJ.streetHits===1?'':'s') + ' on the same street, then ' : '') +
