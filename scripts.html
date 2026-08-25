@@ -268,6 +268,10 @@ body.hasmkt .abtn.gold{display:inline-block}
 .mm.on{background:rgba(201,168,92,.15);border-color:var(--gold);color:var(--gold-bright)}
 .cc-how{margin-top:7px;font-size:.74em;color:var(--muted);line-height:1.55}
 .cc-how b{color:var(--gold)}
+.cap-bench{margin:8px 0 4px;font-size:.78em;color:var(--muted);line-height:1.6}
+.cap-bench b{color:var(--gold)}
+.cap-out{margin-top:8px;font-size:.82em;color:var(--ivory);line-height:1.6;background:rgba(201,168,92,.06);border:1px solid rgba(201,168,92,.18);border-radius:8px;padding:8px 10px}
+.cap-out b{color:var(--gold)}
 .cc-pick .ac-wrap{max-width:420px}
 .cc-pick input{width:100%;max-width:420px;padding:12px 14px;background:var(--ink);border:1px solid var(--line);border-radius:6px;color:var(--ivory);font-size:16px !important}
 .cc-types{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
@@ -560,6 +564,16 @@ body.hasmkt .abtn.gold{display:inline-block}
               <option value="psfLo">$/SF · low to high</option><option value="sfHi">Largest building</option></select></label>
           </div>
           <button type="button" class="cc-adv-clr" id="advClr" onclick="ccAdvClear()">Reset filters</button>
+        </details>
+        <details class="cc-adv" id="ccCap">
+          <summary>📐 Cap rate &amp; value — LA benchmarks</summary>
+          <div class="cap-bench" id="capBench"></div>
+          <div class="cc-adv-grid cap-grid">
+            <label>Annual NOI ($/yr)<input type="number" id="capNoi" placeholder="e.g. 180000" min="0" step="1000" oninput="ccCapCalc()"></label>
+            <label>Price ($)<input type="number" id="capPrice" placeholder="e.g. 3000000" min="0" step="10000" oninput="ccCapCalc()"></label>
+            <label>Cap rate (%)<input type="number" id="capRate" placeholder="5.8" min="0.5" max="20" step="0.05" oninput="ccCapCalc()"></label>
+          </div>
+          <div class="cap-out" id="capOut">Enter any two — the third computes. NOI = rent and other income minus operating expenses, before the mortgage.</div>
         </details>
         <div class="cc-subj" id="ccSubj" style="display:none"></div>
         <div class="cc-stats" id="ccStats"></div>
@@ -2578,6 +2592,44 @@ async function ccLoadIndex(){
    so we know which file to open (no geocoder in a static site - the comps'
    own parcel centroids are the map). ---- */
 let CC_SUBJ = null;
+// LA County cap-rate benchmarks, all classes combined, refreshed quarterly
+// from published institutional broker research (Q2 2026: Kidder Mathews,
+// CoStar/Matthews aggregates; CBRE's own survey is semiannual and gated).
+// Office is deliberately null - LA office volume is too thin for an honest
+// number, and shipping a guess would be worse than saying so.
+const CC_BENCH = {
+  asof: 'Q2 2026',
+  types: {
+    'Multifamily 5+': {avg: 5.8, note: 'up 30 bps year-over-year'},
+    'Industrial':     {avg: 5.8, lo: 5.5, hi: 6.0},
+    'Retail':         {avg: 5.96, lo: 5.6, hi: 6.1},
+    'Office':         null
+  }
+};
+function ccCapCalc(){
+  const noi = parseFloat(document.getElementById('capNoi').value) || 0;
+  const price = parseFloat(document.getElementById('capPrice').value) || 0;
+  const cr = document.getElementById('capRate');
+  // an empty cap field falls back to the benchmark in its placeholder, so
+  // "NOI in, value out" works in one keystroke at the market rate
+  const cap = parseFloat(cr.value) || parseFloat(cr.placeholder) || 0;
+  const capLbl = cr.value ? cap + '%' : 'the ' + CC_BENCH.asof + ' benchmark ' + cap + '%';
+  const out = document.getElementById('capOut');
+  const M = v => CC_MONEY(Math.round(v));
+  if (noi > 0 && cap > 0 && !price){
+    out.innerHTML = 'At ' + capLbl + ', ' + M(noi) + '/yr of NOI supports a value of <b>' +
+      M(noi / (cap/100)) + '</b>.';
+  } else if (price > 0 && cap > 0 && !noi){
+    out.innerHTML = 'A ' + M(price) + ' price at ' + capLbl + ' implies <b>' +
+      M(price * cap/100) + '/yr</b> of NOI — a quick gut-check against the actual rent roll.';
+  } else if (noi > 0 && price > 0){
+    const r = noi / price * 100;
+    out.innerHTML = M(noi) + '/yr on ' + M(price) + ' is a <b>' + r.toFixed(2) + '% cap rate</b>' +
+      (cap ? ' — ' + (r >= cap ? 'above' : 'below') + ' ' + capLbl : '') + '.';
+  } else {
+    out.textContent = 'Enter any two — the third computes. NOI = rent and other income minus operating expenses, before the mortgage.';
+  }
+}
 const CC_SUFFIX = /\b(st|street|ave|avenue|blvd|boulevard|dr|drive|rd|road|pl|place|ln|lane|way|ct|court|hwy|highway|cir|circle|ter|terrace)\.?$/i;
 function ccNormStreet(a){
   let s = String(a || '').toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
@@ -2890,6 +2942,28 @@ function ccRender(){
         (s.screened ? ' · ' + s.screened + ' allocated/distressed shown but not averaged' : '') +
         '</div></div>';
     }).join('');
+  // benchmark cap rates for the selected types (quarterly survey layer)
+  const cb = document.getElementById('capBench');
+  if (cb){
+    const parts = [];
+    let firstAvg = null;
+    for (const t of CC_SEL){
+      const b = CC_BENCH.types[t];
+      if (b === null) parts.push(esc(t) + ': sales volume too thin for a reliable benchmark');
+      else if (b){
+        parts.push(esc(t) + ' <b>~' + b.avg + '%</b>' +
+          (b.lo ? ' (' + b.lo + '–' + b.hi + '%)' : '') + (b.note ? ' · ' + b.note : ''));
+        if (firstAvg === null) firstAvg = b.avg;
+      }
+    }
+    cb.innerHTML = parts.length
+      ? 'LA County benchmark cap rates, all classes — ' + CC_BENCH.asof +
+        ' institutional surveys:<br>' + parts.join(' · ')
+      : 'No published cap-rate benchmark for the selected type' + (CC_SEL.size===1?'':'s') +
+        ' — enter your own rate below.';
+    const cr = document.getElementById('capRate');
+    if (cr) cr.placeholder = firstAvg !== null ? String(firstAvg) : '5.8';
+  }
   // subject banner: the address the broker typed anchors the whole view
   const sb = document.getElementById('ccSubj');
   if (sb){
