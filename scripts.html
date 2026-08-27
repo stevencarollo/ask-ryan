@@ -103,6 +103,17 @@ nav.topbar{display:flex;justify-content:space-between;align-items:center;gap:10p
 /* filter menus: tap to open, checkboxes to pick — no sideways swiping */
 .fmenus{display:flex;gap:9px;flex-wrap:wrap;flex:1 1 auto}
 .fmenu-wrap{position:relative;flex:0 1 auto;min-width:178px}
+/* Formats live in the open as toggle chips: every format is ON by default and
+   a tap unchecks it. A dropdown hid which formats were showing. */
+.fmt-chips{display:flex;flex-wrap:wrap;gap:8px;flex:1 1 auto;align-items:center}
+.fmt-chip{display:inline-flex;align-items:center;gap:7px;padding:10px 14px;min-height:48px;
+  background:var(--charcoal);border:1px solid var(--line);border-radius:8px;color:var(--muted);
+  font-size:.88em;font-weight:600;cursor:pointer;transition:border-color .15s,color .15s,background .15s}
+.fmt-chip:hover{border-color:var(--gold)}
+.fmt-chip .bx{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;
+  border:1.5px solid var(--muted);border-radius:4px;font-size:.72em;line-height:1;color:transparent}
+.fmt-chip.on{color:var(--ivory);border-color:var(--gold);background:rgba(201,168,92,.09)}
+.fmt-chip.on .bx{background:var(--gold);border-color:var(--gold);color:var(--ink)}
 .fmenu-btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;background:var(--charcoal);border:1px solid var(--line);border-radius:8px;color:var(--ivory);font-size:.88em;font-weight:600;min-height:48px;text-align:left}
 .fmenu-btn:hover{border-color:var(--gold)}
 .fmenu-btn.filtered{border-color:var(--gold);color:var(--gold-bright)}
@@ -687,10 +698,7 @@ body.hasmkt .abtn.gold{display:inline-block}
 <section class="filters">
   <input class="search" id="q" placeholder="Search scripts, advisors, situations…">
   <div class="fmenus">
-    <div class="fmenu-wrap">
-      <button class="fmenu-btn" id="chBtn" onclick="toggleMenu('ch')">📞 Formats: All <span class="car">▾</span></button>
-      <div class="fmenu" id="chMenu"></div>
-    </div>
+    <div class="fmt-chips" id="fmtChips"></div>
     <div class="fmenu-wrap">
       <button class="fmenu-btn" id="tBtn" onclick="toggleMenu('t')">🗂 Topics: All <span class="car">▾</span></button>
       <div class="fmenu" id="tMenu"></div>
@@ -1797,9 +1805,9 @@ const CH_OPTS = [["call","📞 Call Scripts"],["vm","🎙 Voicemails"],["text","
 function toggleMenu(which){
   const menu = document.getElementById(which + 'Menu');
   const btn = document.getElementById(which + 'Btn');
-  const other = which === 'ch' ? 't' : 'ch';
-  document.getElementById(other + 'Menu').classList.remove('on');
-  document.getElementById(other + 'Btn').classList.remove('open');
+  if (!menu || !btn) return;
+  document.querySelectorAll('.fmenu').forEach(m => { if (m !== menu) m.classList.remove('on'); });
+  document.querySelectorAll('.fmenu-btn').forEach(b => { if (b !== btn) b.classList.remove('open'); });
   menu.classList.toggle('on');
   btn.classList.toggle('open', menu.classList.contains('on'));
 }
@@ -1811,11 +1819,8 @@ document.addEventListener('click', (e) => {
 });
 
 function syncFilterBtns(){
-  const chBtn = document.getElementById('chBtn');
   const tBtn = document.getElementById('tBtn');
-  const chNames = CH_OPTS.filter(([v]) => chSel.has(v)).map(([,l]) => l.replace(/^\S+\s/, ''));
-  chBtn.innerHTML = '📞 Formats: ' + (chSel.size ? (chNames.length <= 2 ? chNames.join(' + ') : chSel.size + ' selected') : 'All') + ' <span class="car">▾</span>';
-  chBtn.classList.toggle('filtered', !!chSel.size);
+  buildFormatChips();
   const tNames = TOPICS.filter(t => tSel.has(t[0])).map(t => t[1]);
   tBtn.innerHTML = '🗂 Topics: ' + (tSel.size ? (tNames.length === 1 ? tNames[0] : tSel.size + ' selected') : 'All') + ' <span class="car">▾</span>';
   tBtn.classList.toggle('filtered', !!tSel.size);
@@ -1833,17 +1838,37 @@ function menuRow(label, checked, isAll, onchange){
   return row;
 }
 
-function buildFormatMenu(){
-  const m = document.getElementById('chMenu');
-  m.innerHTML = '';
-  m.appendChild(menuRow('All formats', chSel.size === 0, true, () => { chSel.clear(); buildFormatMenu(); syncFilterBtns(); render(); }));
+/* Formats as always-visible toggle chips. chSel empty means "All", so an
+   empty set paints every chip ON - that is the default the member lands on
+   and each tap unchecks one format. */
+const fmtOn = v => chSel.size === 0 || chSel.has(v);
+function buildFormatChips(){
+  const box = document.getElementById('fmtChips');
+  if (!box) return;
+  box.innerHTML = '';
   for (const [v, l] of CH_OPTS){
-    m.appendChild(menuRow(l, chSel.has(v), false, () => {
-      chSel.has(v) ? chSel.delete(v) : chSel.add(v);
-      if (chSel.size === CH_OPTS.length) chSel.clear();   // everything picked = All
-      buildFormatMenu(); syncFilterBtns(); render();
-    }));
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'fmt-chip' + (fmtOn(v) ? ' on' : '');
+    b.setAttribute('aria-pressed', fmtOn(v) ? 'true' : 'false');
+    b.innerHTML = '<span class="bx">✓</span>' + esc(l);
+    b.addEventListener('click', () => toggleFmt(v));
+    box.appendChild(b);
   }
+}
+function toggleFmt(v){
+  if (chSel.size === 0){
+    // everything was on - unchecking one keeps the other three
+    CH_OPTS.forEach(([x]) => { if (x !== v) chSel.add(x); });
+  } else if (chSel.has(v)){
+    chSel.delete(v);
+    // never leave the vault empty: unchecking the last one resets to All
+    if (chSel.size === 0) toast('At least one format stays on - showing all four again');
+  } else {
+    chSel.add(v);
+    if (chSel.size === CH_OPTS.length) chSel.clear();   // everything picked = All
+  }
+  syncFilterBtns(); render();   // syncFilterBtns repaints the chips
 }
 
 /* Short labels for the tiles. The full names run to 44 characters ("Circle
@@ -1951,7 +1976,7 @@ function buildTopicChips(){   // name kept — every call site rebuilds the topi
 }
 let ctCounter = 0;       // MUST precede loadCustomTopics() - `let` has no hoisting
 loadCustomTopics();      // restore anything the member generated last session
-buildFormatMenu();
+buildFormatChips();
 buildTopicChips();
 document.getElementById('q').addEventListener('input', render);
 
@@ -2219,7 +2244,7 @@ function removeCustomTopic(tid, name){
   for (let i = SCRIPTS.length - 1; i >= 0; i--) if (SCRIPTS[i].t === tid) SCRIPTS.splice(i, 1);
   tSel.delete(tid);
   saveCustomTopics();
-  buildFormatMenu(); buildTopicChips(); render();
+  buildFormatChips(); buildTopicChips(); render();
   toast('Deleted — your own topic is gone');
 }
 function syncCtLocal(){
@@ -2269,7 +2294,7 @@ document.getElementById('ctGo').onclick = async () => {
     }
     tSel = new Set([tid]); chSel.clear();
     saveCustomTopics();               // survives a refresh now
-    buildFormatMenu(); buildTopicChips();
+    buildFormatChips(); buildTopicChips();
     render();
     const first = document.querySelector('.topic');
     if (first) first.scrollIntoView({behavior:'smooth'});
