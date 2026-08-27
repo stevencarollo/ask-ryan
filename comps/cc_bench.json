@@ -1,0 +1,17 @@
+{
+  "asof": "Q2 2026",
+  "updated": "2026-08-27",
+  "notes": "LA cap-rate benchmarks, refreshed quarterly from published institutional broker research. Metro averages are all-classes; cls = class deltas in percentage points shaped from the national class curve. mfCities = published Q1 2026 multifamily submarket ranges, named cities only. Office quotes per-class ranges only (LA office is bifurcated 300-500 bps on leasing health). Estimates derived from these are a guide, not an appraisal. To refresh: edit this file, redeploy.",
+  "types": {
+    "Multifamily 5+": {"avg": 5.8, "note": "up 30 bps year-over-year", "cls": {"A": -0.30, "B": 0, "C": 0.45}},
+    "Industrial": {"avg": 5.8, "lo": 5.5, "hi": 6.0, "cls": {"A": -0.25, "B": 0, "C": 0.40}},
+    "Retail": {"avg": 5.96, "lo": 5.6, "hi": 6.1, "cls": {"A": -0.30, "B": 0, "C": 0.50}},
+    "Office": {"classOnly": {"A": [6.5, 8.0], "B": [8.5, 11.0], "C": [9.5, 12.0]}}
+  },
+  "mfCities": {
+    "Beverly Hills": [4.7, 5.5], "Santa Monica": [4.7, 5.5],
+    "West Hollywood": [4.75, 5.75], "Pasadena": [4.75, 5.75], "Glendale": [4.75, 5.75],
+    "Torrance": [4.75, 5.75], "Redondo Beach": [4.75, 5.75], "Hermosa Beach": [4.75, 5.75],
+    "Manhattan Beach": [4.75, 5.75], "El Segundo": [4.75, 5.75]
+  }
+}

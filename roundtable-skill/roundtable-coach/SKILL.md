@@ -90,7 +90,18 @@ The user's team runs a members-only site at **https://roundtablehq.vercel.app**.
 
 **Not yet open** (shown as "coming soon" to members): Coaching Chat, Flyer Studio, Podcast Studio. Do not send anyone to those pages - do that work here in conversation instead.
 
-Everything the site does, this skill already does conversationally; the site adds live market data, instant voice and language switching, and the spreadsheet workflow.
+Everything the site does, this skill already does conversationally; the site adds instant voice and language switching and the spreadsheet workflow.
+
+## Live commercial data — you can fetch it
+
+The commercial dataset behind the site is public JSON: 27,000+ recorded LA County
+sales by city, the full 203k-parcel assessor roll, county medians, and the quarterly
+cap-rate benchmarks — plus the weekly Altos residential stats for 426 ZIPs. When the user asks for actual comps, a property profile, residential market talk, or a
+cap-rate-based value for an LA County commercial property — and you have web access —
+**read references/live_data.md and fetch the real numbers** instead of estimating.
+It has the endpoints, the row schemas, the screening rules (portfolio/distressed
+sales never enter a median), and the city+class cap-rate method. No web access →
+coach the method and point them at the site's Market panel.
 
 ## Rules
 

@@ -2578,6 +2578,9 @@ async function ccLoadIndex(){
     document.getElementById('ccFresh').textContent = 'Comps data could not load — refresh and try again.';
     return;
   }
+  try{
+    CC_BENCH = await (await fetch('/comps/cc_bench.json', {cache:'no-store'})).json();
+  }catch(e){ /* benchmarks are optional - the panel says so if absent */ }
 
   document.getElementById('ccFresh').textContent =
     'Recorded ' + CC_INDEX.county + ' County sales ' + CC_INDEX.coverage.from + ' → ' +
@@ -2592,29 +2595,11 @@ async function ccLoadIndex(){
    so we know which file to open (no geocoder in a static site - the comps'
    own parcel centroids are the map). ---- */
 let CC_SUBJ = null;
-// LA cap-rate benchmarks, refreshed quarterly from published institutional
-// broker research (Q2 2026 metro averages; Q1 2026 multifamily submarket
-// survey rows; class deltas shaped from the national class curve). CBRE and
-// peers publish METRO x type x class only - nothing free exists per city -
-// so unnamed cities get an ESTIMATE: metro base adjusted by how the city's
-// own recorded-sale pricing compares to the county (clamped, labeled).
-const CC_BENCH = {
-  asof: 'Q2 2026',
-  types: {
-    'Multifamily 5+': {avg: 5.8, note: 'up 30 bps year-over-year', cls: {A: -0.30, B: 0, C: 0.45}},
-    'Industrial':     {avg: 5.8,  lo: 5.5, hi: 6.0, cls: {A: -0.25, B: 0, C: 0.40}},
-    'Retail':         {avg: 5.96, lo: 5.6, hi: 6.1, cls: {A: -0.30, B: 0, C: 0.50}},
-    // LA office is bifurcated by 300-500 bps on leasing health - one blended
-    // number would mislead, so office quotes per-class ranges only
-    'Office':         {classOnly: {A: [6.5, 8.0], B: [8.5, 11.0], C: [9.5, 12.0]}}
-  },
-  mfCities: {   // Q1 2026 published multifamily submarket ranges, named cities only
-    'Beverly Hills': [4.7, 5.5], 'Santa Monica': [4.7, 5.5],
-    'West Hollywood': [4.75, 5.75], 'Pasadena': [4.75, 5.75], 'Glendale': [4.75, 5.75],
-    'Torrance': [4.75, 5.75], 'Redondo Beach': [4.75, 5.75], 'Hermosa Beach': [4.75, 5.75],
-    'Manhattan Beach': [4.75, 5.75], 'El Segundo': [4.75, 5.75]
-  }
-};
+// LA cap-rate benchmarks live in /comps/cc_bench.json - ONE source shared by
+// this page and the roundtable-coach Claude skill, refreshed quarterly by
+// editing that file. Loaded alongside the index; empty until then (ccCapFor
+// degrades to "no published benchmark").
+let CC_BENCH = {asof: '', types: {}, mfCities: {}};
 let CC_CLS = 'All';        // property class filter for the cap benchmark
 let CC_CLS_AUTO = false;   // true when the class was inferred from the subject
 function ccClsFromYb(yb){
