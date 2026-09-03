@@ -808,6 +808,11 @@ function tidyMerge(s){
   // there is nothing to confirm, so drop the question rather than ask "there?"
   s = s.replace(new RegExp('(^|\\n)([ \\t]*(?:YOU:|ME:|AGENT:)?[ \\t]*)' + OWNER + '\\?[ ]*', 'g'),
                 (m, nl, pre) => nl + pre);
+  // A name CONFIRMATION mid-sentence - "Hi, is this {{Owner}}?", "¿es
+  // {{Owner}}?", "¿hablo con {{Owner}}?". "there" turns these into nonsense
+  // ("is this there?"), so leave the visible blank the agent fills instead.
+  s = s.replace(new RegExp('\\b(is this|is that|es|hablo con|habla con)\\s+' + OWNER + '\\?', 'gi'),
+                '$1 [owner name]?');
   s = s.replace(new RegExp(OWNER, 'g'), 'there');
   // every other unfilled token becomes a visible fill-in blank
   return s.replace(/\{\{([^{}\n]+)\}\}/g, (m, w) =>
