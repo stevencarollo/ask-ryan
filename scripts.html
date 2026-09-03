@@ -808,6 +808,14 @@ function tidyMerge(s){
   // there is nothing to confirm, so drop the question rather than ask "there?"
   s = s.replace(new RegExp('(^|\\n)([ \\t]*(?:YOU:|ME:|AGENT:)?[ \\t]*)' + OWNER + '\\?[ ]*', 'g'),
                 (m, nl, pre) => nl + pre);
+  // "{{Owner}}, Jane Agent here" - the token opens the line ahead of a NAME,
+  // which the lowercase rule above does not catch. Drop the token.
+  s = s.replace(new RegExp('(^|\\n)([ \\t]*(?:YOU:|ME:|AGENT:)?[ \\t]*)' + OWNER + '[ ,]+([A-Z])', 'g'),
+                (m, nl, pre, c) => nl + pre + c);
+  // A salutation line that is ONLY the token - an email opening "{{Owner}},"
+  // must not collapse to a bare "there,".
+  s = s.replace(new RegExp('(^|\\n)([ \\t]*)' + OWNER + '(,?)[ \\t]*(?=\\n|$)', 'g'),
+                (m, nl, pre, comma) => nl + pre + 'Hi there' + (comma || ','));
   // A name CONFIRMATION mid-sentence - "Hi, is this {{Owner}}?", "¿es
   // {{Owner}}?", "¿hablo con {{Owner}}?". "there" turns these into nonsense
   // ("is this there?"), so leave the visible blank the agent fills instead.
