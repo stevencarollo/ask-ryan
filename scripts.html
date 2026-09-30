@@ -634,6 +634,7 @@ body.hasmkt .abtn.gold{display:inline-block}
       <div class="lead-controls">
         <input type="file" id="leadFile" accept=".csv,.xlsx,.xls">
         <label><input type="checkbox" id="leadUseName" checked> Address each script to the lead by name</label>
+        <label id="leadPinRow" style="display:none"><input type="checkbox" id="leadPinOn" checked> <span id="leadPinLabel"></span></label>
         <button class="clr" id="leadClear" style="display:none">✕ Clear list</button>
       </div>
       <div class="lead-sum" id="leadSum">Upload an Excel or CSV of your leads (name, address, lead type — plus phone/email if you have them). Each lead's type picks the right scripts automatically: NOD leads get the Pre-Foreclosure library, probate leads get Probate, expireds get Expired. Your file never leaves this browser.</div>
@@ -1024,9 +1025,14 @@ async function exportLeadScripts(){
       return m ? {subject: m[1].trim(), body: m[2].trim()} : {subject: '', body: txt};
     };
     const cellFor = (lead, col) => {
-      if (!lead || !lead.topic) return '';
-      const pool = xPool(lead.topic, col.ch);
-      const s = pool[col.idx || 0];
+      if (!lead) return '';
+      // a script the member asked for BY NAME wins over the diagnosis, and
+      // reaches every lead whatever their type
+      let s = xPinFor(col.ch, col.idx || 0);
+      if (!s){
+        if (!lead.topic) return '';
+        s = xPool(lead.topic, col.ch)[col.idx || 0];
+      }
       if (!s) return '';
       const filled = fillPlain(s.local || s.body, lead);
       return col.ch === 'email' ? emailParts(filled)[col.part] : filled;
@@ -1628,6 +1634,12 @@ document.getElementById('leadClear').onclick = () => {
   document.getElementById('leadSum').textContent = 'Lead list cleared.';
 };
 document.getElementById('leadUseName').addEventListener('change', render);
+document.getElementById('leadPinOn').addEventListener('change', () => {
+  syncXSettings(); syncFileBtns();
+  toast(document.getElementById('leadPinOn').checked
+    ? 'Your chosen script goes to every lead'
+    : 'Back to the best match for each lead');
+});
 try{
   const saved = JSON.parse(localStorage.getItem('rt_leads'));
   if (Array.isArray(saved) && saved.length){
@@ -2521,6 +2533,22 @@ function setMarket(restoring){
    become a column most leads never use. */
 const FILE_CAP = 3;
 
+/* Asking for a script BY NAME is a different instruction from "fill my file".
+   When the member taps this on a card they have already decided - so that
+   script is written to every lead as requested, instead of the per-lead
+   diagnosis choosing something else for them. Everything they did NOT pin
+   keeps being diagnosed lead by lead, exactly as before. */
+let XPIN = [];                 // skeys, in the order they were requested
+const xPinScripts = () => XPIN.map(k => SCRIPTS.find(s => skey(s) === k)).filter(Boolean);
+function xPinOn(){
+  const cb = document.getElementById('leadPinOn');
+  return XPIN.length > 0 && (!cb || cb.checked);
+}
+function xPinFor(ch, idx){     // the requested script for this format+column
+  if (!xPinOn()) return null;
+  return xPinScripts().filter(s => s.ch === ch)[idx] || null;
+}
+
 function fileBtn(s){
   // everything here is guarded because render() can theoretically run before
   // the export-settings block declares its state (the ctCounter lesson)
@@ -2528,11 +2556,13 @@ function fileBtn(s){
     if (!LEADS.length)
       return {label: '📥 Use with my leads', on: false,
               tip: 'Upload your lead list and this script can be written into it'};
-    const on = XMODE === 'fav' && xChosenKeys().has(skey(s));
+    const on = XPIN.includes(skey(s));
     return on
-      ? {label: '✓ In your file', on: true, tip: 'This script will be written into your export — tap to remove'}
-      : {label: '📥 Add to my file', on: false, tip: 'Write this script into your lead-list export'};
-  }catch(e){ return {label: '📥 Add to my file', on: false, tip: ''}; }
+      ? {label: '✓ Using this script', on: true,
+         tip: 'This exact script is written to every lead in your file — tap to stop using it'}
+      : {label: '📥 Use with my leads', on: false,
+         tip: 'Write THIS script into your export for every lead, instead of the automatic pick'};
+  }catch(e){ return {label: '📥 Use with my leads', on: false, tip: ''}; }
 }
 
 function toggleFileScript(i){
@@ -2543,34 +2573,43 @@ function toggleFileScript(i){
     toast('Upload your lead list first — then this script is one tap from your file');
     return;
   }
-  const chosen = xChosenKeys();
-  if (XMODE === 'fav' && chosen.has(k)){          // remove
-    XADD.delete(k); if (PICKS.has(k)) XOFF.add(k);
-    xSaveState(); syncXSettings(); syncFileBtn(i);
-    toast('Removed from your file');
+  if (XPIN.includes(k)){                            // tap again = stop using it
+    XPIN = XPIN.filter(x => x !== k);
+    syncPinRow(); syncXSettings(); syncFileBtn(i);
+    toast(XPIN.length ? 'Removed — your file keeps the other scripts you chose'
+                      : 'Removed — your file goes back to the best match for each lead');
     return;
   }
-  // the script must actually reach somebody's row
-  if (!LEADS.some(l => l.topic === s.t)){
-    toast('Your list has no ' + topicName(s.t) + ' leads — this script would reach nobody');
-    return;
-  }
-  // cap: three per format per topic, counted against what is already chosen
-  const same = SCRIPTS.filter(x => x.t === s.t && x.ch === s.ch && chosen.has(skey(x))).length;
-  if (XMODE === 'fav' && same >= FILE_CAP){
+  // cap: three per format, so a file gets Call 1-3 rather than a column
+  // nobody reads. No lead-type check here on purpose - a script asked for
+  // BY NAME goes to every lead, which is the whole point of this button.
+  const same = xPinScripts().filter(x => x.ch === s.ch).length;
+  if (same >= FILE_CAP){
     toast('You already have ' + FILE_CAP + ' ' + CH_LABEL[s.ch].toLowerCase() +
-          's for ' + topicName(s.t) + ' — remove one first (tap its ✓)');
+          's chosen — remove one first (tap its ✓)');
     return;
   }
-  const wasAuto = XMODE !== 'fav';
-  XMODE = 'fav';
-  const w = document.getElementById('xWhich');
-  if (w){ w.value = 'fav'; w.classList.add('custom'); }
-  XOFF.delete(k); if (!PICKS.has(k)) XADD.add(k);
-  xSaveState(); syncXSettings(); syncFileBtn(i);
-  const now = SCRIPTS.filter(x => x.t === s.t && x.ch === s.ch && xChosenKeys().has(skey(x))).length;
-  toast('Added — ' + now + ' of ' + FILE_CAP + ' ' + CH_LABEL[s.ch].toLowerCase() + 's for ' + topicName(s.t) +
-        (wasAuto ? ' · your export now uses your hand-picked scripts' : ''));
+  XPIN.push(k);
+  const cb = document.getElementById('leadPinOn');
+  if (cb) cb.checked = true;
+  syncPinRow(); syncXSettings(); syncFileBtn(i);
+  const n = xPinScripts().filter(x => x.ch === s.ch).length;
+  toast('Using "' + s.title + '" for every lead — ' + n + ' of ' + FILE_CAP + ' ' +
+        CH_LABEL[s.ch].toLowerCase() + 's');
+}
+
+/* the checkbox that sits beside "Address each script to the lead by name" */
+function syncPinRow(){
+  const row = document.getElementById('leadPinRow');
+  const lab = document.getElementById('leadPinLabel');
+  if (!row || !lab) return;
+  const picked = xPinScripts();
+  if (!picked.length){ row.style.display = 'none'; return; }
+  row.style.display = '';
+  lab.textContent = picked.length === 1
+    ? 'Using "' + picked[0].title + '" to add to this file'
+    : 'Using your ' + picked.length + ' chosen scripts to add to this file';
+  lab.title = picked.map(s => s.title).join(' · ');
 }
 
 function syncFileBtns(){
@@ -3346,16 +3385,23 @@ function xTopicsInPlay(){
 /* how many columns a format earns: in favorites mode the picks decide, so a
    format nobody starred simply does not appear in the file */
 function xDepth(ch){
+  // a script asked for by name always earns its column, whatever the
+  // diagnosis or the favourites would have produced on their own
+  const pinned = xPinOn() ? xPinScripts().filter(s => s.ch === ch).length : 0;
   const topics = xTopicsInPlay();
-  if (XMODE !== 'fav')
-    return topics.reduce((n, t) => Math.max(n, SCRIPTS.filter(s => s.t === t && s.ch === ch).length), 0);
-  const keys = xChosenKeys();
-  return topics.reduce((n, t) =>
-    Math.max(n, SCRIPTS.filter(s => s.t === t && s.ch === ch && keys.has(skey(s))).length), 0);
+  const base = XMODE !== 'fav'
+    ? topics.reduce((n, t) => Math.max(n, SCRIPTS.filter(s => s.t === t && s.ch === ch).length), 0)
+    : (() => { const keys = xChosenKeys();
+        return topics.reduce((n, t) =>
+          Math.max(n, SCRIPTS.filter(s => s.t === t && s.ch === ch && keys.has(skey(s))).length), 0); })();
+  return Math.max(base, pinned);
 }
 function xChans(){
+  const pinnedCh = xPinOn() ? [...new Set(xPinScripts().map(s => s.ch))] : [];
   if (XMODE === 'fav') return ['call','vm','text','email'].filter(ch => xDepth(ch) > 0);
-  return [...document.querySelectorAll('.xp-ch:checked')].map(c => c.value);
+  const checked = [...document.querySelectorAll('.xp-ch:checked')].map(c => c.value);
+  // never silently drop a format the member explicitly asked for
+  return ['call','vm','text','email'].filter(ch => checked.includes(ch) || pinnedCh.includes(ch));
 }
 
 function xSaveState(){
@@ -3497,7 +3543,15 @@ function xSummary(){
             ' · <b>' + cols + '</b> script column' + (cols === 1 ? '' : 's') +
             (per.length ? ' <span class="per">(' + per.join(' · ') + ')</span>' : ''));
   const how = [];
-  if (XMODE === 'fav' && PICKS.size){
+  const pins = xPinOn() ? xPinScripts() : [];
+  if (pins.length){
+    how.push(pins.length === 1
+      ? '<b>"' + esc(pins[0].title) + '"</b> for every lead'
+      : '<b>your ' + pins.length + ' chosen scripts</b> for every lead');
+    const rest = chans.filter(c => !pins.some(p => p.ch === c));
+    if (rest.length || pins.some(p => xDepth(p.ch) > pins.filter(x => x.ch === p.ch).length))
+      how.push('the best match per lead for the rest');
+  } else if (XMODE === 'fav' && PICKS.size){
     const keys = xChosenKeys();
     const stars = [...keys].filter(k => PICKS.has(k)).length;
     how.push('your ' + keys.size + ' chosen script' + (keys.size === 1 ? '' : 's') +
@@ -3543,6 +3597,7 @@ function syncXSettings(){
   }
   const chans = document.getElementById('xpChans');
   if (chans) chans.style.display = XMODE === 'fav' ? 'none' : '';   // picks already carry their format
+  syncPinRow();
   renderXFav();
   xSummary();
   syncFileBtns();
