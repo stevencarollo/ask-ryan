@@ -634,6 +634,7 @@ body.hasmkt .abtn.gold{display:inline-block}
       <div class="lead-controls">
         <input type="file" id="leadFile" accept=".csv,.xlsx,.xls">
         <label><input type="checkbox" id="leadUseName" checked> Address each script to the lead by name</label>
+        <label title="Each lead gets the weekly market numbers for its OWN ZIP or city - a list spanning three cities gets three sets of numbers"><input type="checkbox" id="leadMkt" autocomplete="off"> Add local market data to each lead (matched by ZIP or city)</label>
         <label id="leadPinRow" style="display:none"><input type="checkbox" id="leadPinOn" checked> <span id="leadPinLabel"></span></label>
         <button class="clr" id="leadClear" style="display:none">✕ Clear list</button>
       </div>
@@ -769,6 +770,77 @@ function dropDirectional(addr){
   return parts.join(' ');
 }
 
+/* ===== Per-lead market data =====
+   One list often spans several cities. With "Add local market data" on, every
+   lead is matched to ITS OWN area in the weekly market file - ZIP first (the
+   most precise), then city - and its scripts and its row carry that area's
+   numbers. Deterministic: no AI call per lead, so a 2,000-row list costs the
+   system nothing extra. Off by default. */
+function mktOn(){
+  const cb = document.getElementById('leadMkt');
+  return !!(cb && cb.checked);
+}
+let MD_CITY_KEY = null;               // lowercase city -> the file's own key
+function leadMarket(L){
+  // MD is declared further down the page: a browser that restores this
+  // checkbox on reload can reach here before it exists (the ctCounter lesson)
+  let md = null;
+  try { md = MD; } catch (e) { return null; }
+  if (!md || !L) return null;
+  const z = L.zip && MD.zips[L.zip];
+  if (z) return Object.assign({}, z, {city: title(z.c || ''), zip: L.zip,
+                                     area: title(z.c || '') + ' ' + L.zip, by: 'zip'});
+  const ck = String(L.city || '').trim().toLowerCase();
+  if (!ck) return null;
+  if (!MD_CITY_KEY){
+    MD_CITY_KEY = {};
+    for (const k of Object.keys(MD.cities)) MD_CITY_KEY[k.toLowerCase()] = k;
+  }
+  const key = MD_CITY_KEY[ck];
+  return key ? Object.assign({}, MD.cities[key], {city: title(key), zip: null,
+                                                  area: title(key), by: 'city'}) : null;
+}
+const fmtPct = v => (Math.round(v * 10) / 10) + '%';
+function mktCoverage(){
+  const areas = {}; let hit = 0;
+  (typeof LEADS !== 'undefined' ? LEADS : []).forEach(l => {
+    const m = leadMarket(l);
+    if (m){ hit++; areas[m.area] = (areas[m.area] || 0) + 1; }
+  });
+  return {hit: hit, names: Object.entries(areas).sort((a, b) => b[1] - a[1]).map(x => x[0])};
+}
+/* one sentence an agent can actually say, built only from numbers we have */
+function marketRead(m){
+  if (!m) return '';
+  const bits = [];
+  if (m.p) bits.push('the median home is listed at ' + fmtMoney(m.p));
+  if (m.dom != null) bits.push('homes are taking about ' + Math.round(m.dom) + ' days to sell');
+  if (m.cut != null) bits.push(fmtPct(m.cut) + ' of listings have cut their price');
+  if (!bits.length) return '';
+  let s = 'In ' + m.area + ', ' + (bits.length > 1
+    ? bits.slice(0, -1).join(', ') + ', and ' + bits[bits.length - 1] : bits[0]);
+  if (m.mai != null) s += m.mai >= 30 ? " - still a seller's market." : ' - buyers have the leverage right now.';
+  else s += '.';
+  return s;
+}
+/* Market tokens only fill where the sentence makes their meaning certain.
+   {{Price}} and {{Pct}} also mean "your list price" or "% of list" elsewhere,
+   so those two are filled ONLY after a label that says they are the market
+   median or the price-cut share. Function replacers: no "$" surprises. */
+function marketPass(t, L, html){
+  const m = mktOn() ? leadMarket(L) : null;
+  if (!m) return t;
+  const wrap = v => html ? '<span class="mf">' + esc(v) + '</span>' : v;
+  const rules = [];
+  if (m.p) rules.push([/(MEDIAN LIST:\s*|trading around |listed around )\{\{\s*Price\s*\}\}/gi, fmtMoney(m.p)]);
+  if (m.cut != null) rules.push([/(PRICE CUTS:\s*)\{\{\s*Pct\s*\}\}/gi, String(Math.round(m.cut * 10) / 10)]);
+  if (m.dom != null) rules.push([/\{\{\s*DOM\s*\}\}/g, String(Math.round(m.dom))]);
+  if (m.rent) rules.push([/\{\{\s*MarketRent\s*\}\}/g, fmtMoney(m.rent)]);
+  for (const [rx, v] of rules)
+    t = t.replace(rx, (all, pre) => (typeof pre === 'string' ? pre : '') + wrap(v));
+  return t;
+}
+
 /* every merge value active right now: agent profile + a lead
    (defaults to the selected lead; export passes each lead explicitly) */
 function mergePairs(L = ACTIVE_LEAD){
@@ -790,7 +862,9 @@ function mergePairs(L = ACTIVE_LEAD){
     if (L.debt) p.push([RX_DEBT, fmtMoney(L.debt)]);
     if (L.pr) p.push([RX_PRICE, fmtMoney(L.pr)]);
   }
-  const city = (L && L.city) || mktCity;
+  // a lead with a ZIP but no city column still has a city once matched
+  const lm = (L && !L.city && mktOn()) ? leadMarket(L) : null;
+  const city = (L && L.city) || (lm && lm.city) || mktCity;
   if (city){ p.push([RX_CITY, city]); p.push([RX_HOOD, city]); }
   return p;
 }
@@ -828,12 +902,13 @@ function tidyMerge(s){
     '[' + String(w).replace(/([a-z])([A-Z])/g, '$1 $2').trim().toLowerCase() + ']');
 }
 function fillPlain(t, lead){
-  let out = t;
-  for (const [rx, v] of mergePairs(lead === undefined ? ACTIVE_LEAD : lead)) out = out.replace(rx, v);
+  const L = lead === undefined ? ACTIVE_LEAD : lead;
+  let out = marketPass(t, L, false);
+  for (const [rx, v] of mergePairs(L)) out = out.replace(rx, v);
   return tidyMerge(out);
 }
 function fillHTML(t){                    // escape first, then decorate the filled fields
-  let out = esc(t);
+  let out = marketPass(esc(t), ACTIVE_LEAD, true);
   for (const [rx, v] of mergePairs()) out = out.replace(rx, '<span class="mf">' + esc(v) + '</span>');
   return tidyMerge(out);
 }
@@ -1024,8 +1099,50 @@ async function exportLeadScripts(){
       const m = txt.match(/^Subject:\s*(.+)\r?\n+([\s\S]*)$/);
       return m ? {subject: m[1].trim(), body: m[2].trim()} : {subject: '', body: txt};
     };
+    // Per-lead market data: the numbers for EACH lead's own ZIP or city, as
+    // plain columns at the back of the sheet plus a ready-to-say line
+    const PER_MKT = mktOn();
+    if (PER_MKT){
+      for (const [part, label] of [['area', 'Market Area'], ['p', 'Median List Price'],
+           ['sf', 'Median $/SF'], ['dom', 'Days on Market'], ['cut', 'Listings With Price Cuts'],
+           ['rent', 'Median Rent'], ['read', 'Market Talking Point'], ['asof', 'Market Data As Of']])
+        COLS.push({ch: 'mkt', part: part, label: label});
+    }
+    // A script the agent AI-tailored to the ONE market set at the top already
+    // has that city's numbers written into it. With per-lead data on, a lead
+    // somewhere else must not be quoted another city's market - those leads
+    // get the untailored version (same voice / language) and their own numbers.
+    const ES_LIB = (PER_MKT && MARKET && SPANISH) ? await loadEsLib() : null;
+    const V_LIB = (PER_MKT && MARKET && VOICE && !SPANISH) ? await loadVoiceFile(VOICE.id) : null;
+    const MKT_CITY = MARKET ? String(MARKET.name).replace(/\s+\d{5}$/, '').trim().toLowerCase() : '';
+    const textFor = (s, lead) => {
+      if (!s.local) return s.body;
+      if (PER_MKT && MARKET && !s.preOnly){
+        const m = leadMarket(lead);
+        if (!m || String(m.city).toLowerCase() !== MKT_CITY){
+          const alt = (ES_LIB && ES_LIB[skey(s)]) || (V_LIB && V_LIB[skey(s)]);
+          return alt ? alt.script : s.body;
+        }
+      }
+      return s.local;
+    };
     const cellFor = (lead, col) => {
       if (!lead) return '';
+      if (col.ch === 'mkt'){
+        const m = leadMarket(lead);
+        if (!m) return (col.part === 'area' && (lead.zip || lead.city)) ? 'Not in weekly market data' : '';
+        switch (col.part){
+          case 'area': return m.area;
+          case 'p':    return m.p ? fmtMoney(m.p) : '';
+          case 'sf':   return m.sf ? fmtMoney(m.sf) : '';
+          case 'dom':  return m.dom != null ? String(Math.round(m.dom)) : '';
+          case 'cut':  return m.cut != null ? fmtPct(m.cut) : '';
+          case 'rent': return m.rent ? fmtMoney(m.rent) : '';
+          case 'read': return marketRead(m);
+          case 'asof': return (MD && MD.updated) || '';
+        }
+        return '';
+      }
       // a script the member asked for BY NAME wins over the diagnosis, and
       // reaches every lead whatever their type
       let s = xPinFor(col.ch, col.idx || 0);
@@ -1034,7 +1151,7 @@ async function exportLeadScripts(){
         s = xPool(lead.topic, col.ch)[col.idx || 0];
       }
       if (!s) return '';
-      const filled = fillPlain(s.local || s.body, lead);
+      const filled = fillPlain(textFor(s, lead), lead);
       return col.ch === 'email' ? emailParts(filled)[col.part] : filled;
     };
     const byIdx = {};
@@ -1087,7 +1204,11 @@ async function exportLeadScripts(){
       }
       const ws = XLSX.utils.aoa_to_sheet(aoa);
       const nOrig = aoa[hdr].length - COLS.length;
-      ws['!cols'] = aoa[hdr].map((_, i) => ({wch: i < nOrig ? 18 : 85}));
+      ws['!cols'] = aoa[hdr].map((_, i) => {
+        if (i < nOrig) return {wch: 18};
+        const c = COLS[i - nOrig];
+        return {wch: c.ch === 'mkt' ? (c.part === 'read' ? 70 : 18) : 85};
+      });
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'Leads + Scripts');
       XLSX.writeFile(wb, base + ' - with scripts.xlsx');
@@ -1310,6 +1431,15 @@ function leadsFromRows(rows){
                     .filter(i => !/tax bill|taxpayer|llc|agent|first|last|verified|age|raw/.test(hs[i]));
   const cAddr  = pickCol(hs, ['property address', 'situs address', 'site address', 'street address', 'address', 'situs']);
   const cCity  = pickCol(hs, ['property city', 'situs city', 'site city', 'city']);
+  // the PROPERTY's ZIP, never the owner's mailing ZIP - an absentee owner in
+  // Phoenix should still get the numbers for the house in Torrance
+  const cZip = (() => {
+    for (const c of ['property zip', 'situs zip', 'site zip', 'zip code', 'zip', 'postal']) {
+      const i = hs.findIndex(h => h.includes(c) && !/mail/.test(h));
+      if (i > -1) return i;
+    }
+    return -1;
+  })();
   const cType  = pickCol(hs, ['lead type', 'list type', 'lead source', 'list', 'type', 'category', 'source']);
   // Farm exports scatter a lead's situation across several columns: an explicit
   // Lead Type, a Distress Doc Type, a Tier ("T2 RECENT NOD"), a Tax Status. Any
@@ -1392,6 +1522,7 @@ function leadsFromRows(rows){
       first: (name.split(/\s+/)[0] || '').replace(/[^A-Za-z'\-].*$/, ''),
       address: cAddr > -1 ? niceCase(r[cAddr]) : '',
       city: cCity > -1 ? niceCase(r[cCity]) : '',
+      zip: leadZip(cZip > -1 ? r[cZip] : '', cAddr > -1 ? r[cAddr] : ''),
       type: type,
       topic: topic,                        // null = row didn't say; picker fills it
       rowSure: topic !== null,
@@ -1408,6 +1539,14 @@ function leadsFromRows(rows){
     if (out.length >= 2000) break;       // keep localStorage happy
   }
   return out;
+}
+
+/* "90503", 90503.0, "90503-1234", or a ZIP at the end of a one-line address */
+function leadZip(z, addr){
+  const m = String(z == null ? '' : z).match(/\d{5}/);
+  if (m) return m[0];
+  const a = String(addr || '').match(/\b(\d{5})(?:-\d{4})?\s*$/);
+  return a ? a[1] : '';
 }
 
 function parseCSV(text){
@@ -1634,6 +1773,14 @@ document.getElementById('leadClear').onclick = () => {
   document.getElementById('leadSum').textContent = 'Lead list cleared.';
 };
 document.getElementById('leadUseName').addEventListener('change', render);
+document.getElementById('leadMkt').addEventListener('change', () => {
+  render(); syncXSettings();
+  if (!document.getElementById('leadMkt').checked){ toast('Local market data off'); return; }
+  if (!LEADS.length){ toast('Upload your lead list — each lead gets its own area\'s numbers'); return; }
+  const c = mktCoverage();
+  toast(c.hit + ' of ' + LEADS.length + ' leads matched to ' + c.names.length +
+        ' local market' + (c.names.length === 1 ? '' : 's'));
+});
 document.getElementById('leadPinOn').addEventListener('change', () => {
   syncXSettings(); syncFileBtns();
   toast(document.getElementById('leadPinOn').checked
@@ -3565,6 +3712,15 @@ function xSummary(){
   if (SPANISH) how.push('in Spanish');
   if (MARKET) how.push('tailored to ' + esc(MARKET.name));
   bits.push(how.join(' · '));
+  if (mktOn()){
+    const c = mktCoverage();
+    bits.push('Local market data: <b>' + c.hit + ' of ' + LEADS.length + '</b> leads matched across ' +
+              c.names.length + ' area' + (c.names.length === 1 ? '' : 's') +
+              (c.names.length ? ' (' + c.names.slice(0, 4).map(esc).join(', ') +
+                (c.names.length > 4 ? ' +' + (c.names.length - 4) + ' more' : '') + ')' : '') +
+              (c.hit < LEADS.length ? ' <span class="warn">· ' + (LEADS.length - c.hit) +
+                ' outside the weekly market data get scripts without local numbers</span>' : ''));
+  }
   // The count is set by the DEEPEST single lead type, not the total number of
   // checks - which is the part that surprises people, so spell it out once the
   // sheet actually gets wide rather than leaving them to work it out in Excel.
