@@ -521,12 +521,13 @@ body.hasmkt .abtn.gold{display:inline-block}
       <div id="resMarket">
         <div class="locbar" id="locbar">
           <div class="ac-wrap">
-            <input id="locq" placeholder="City or ZIP — Torrance or 90277" autocomplete="off" autocapitalize="words" enterkeyhint="go">
+            <input id="locq" placeholder="LA or OC city or ZIP — Torrance or 90277" autocomplete="off" autocapitalize="words" enterkeyhint="go">
             <div class="ac-list" id="acList"></div>
           </div>
           <button class="go" id="locgo">Set My Market</button>
           <button class="clr" id="locclr">✕ Clear</button>
         </div>
+        <div class="cc-how"><b>Coverage:</b> Los Angeles &amp; Orange County · 426 ZIPs and 189 cities · refreshed weekly</div>
         <div class="locerr" id="locerr"></div>
         <div class="mkt" id="mkt"></div>
       </div>
@@ -536,7 +537,7 @@ body.hasmkt .abtn.gold{display:inline-block}
             <input id="ccCity" placeholder="City, ZIP, or property address…" autocomplete="off" autocapitalize="words" enterkeyhint="go">
             <div class="ac-list" id="ccAcList"></div>
           </div>
-          <div class="cc-how">Search by <b>city</b> (Torrance) · <b>ZIP</b> (90501) · or a <b>property address</b> (3010 Pacific Coast Hwy, Torrance) — an address pins that property and ranks comps by distance</div>
+          <div class="cc-how"><b>Coverage:</b> Los Angeles County commercial sales<br>Search by <b>city</b> (Torrance) · <b>ZIP</b> (90501) · or a <b>property address</b> (3010 Pacific Coast Hwy, Torrance) — an address pins that property and ranks comps by distance</div>
         </div>
         <div class="cc-types" id="ccTypes"></div>
         <details class="cc-adv" id="ccAdv">
@@ -634,7 +635,7 @@ body.hasmkt .abtn.gold{display:inline-block}
       <div class="lead-controls">
         <input type="file" id="leadFile" accept=".csv,.xlsx,.xls">
         <label><input type="checkbox" id="leadUseName" checked> Address each script to the lead by name</label>
-        <label title="Each lead gets the weekly market numbers for its OWN ZIP or city - a list spanning three cities gets three sets of numbers"><input type="checkbox" id="leadMkt" autocomplete="off"> Add local market data to each lead (matched by ZIP or city)</label>
+        <label title="Each lead gets the weekly market numbers for its OWN ZIP or city - a list spanning three cities gets three sets of numbers"><input type="checkbox" id="leadMkt" autocomplete="off"> Add local market data to each lead (matched by ZIP or city · LA &amp; OC)</label>
         <label id="leadPinRow" style="display:none"><input type="checkbox" id="leadPinOn" checked> <span id="leadPinLabel"></span></label>
         <button class="clr" id="leadClear" style="display:none">✕ Clear list</button>
       </div>
