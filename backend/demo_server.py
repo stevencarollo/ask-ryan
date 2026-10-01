@@ -659,7 +659,16 @@ async def admin_code(data: dict):
     if not code or len(code) > 40:
         return {"status": "error", "error": "bad code"}
     codes = _get_codes()
+
+    def _admin_codes(d):
+        return [k for k, v in d.items() if v.get("admin") and not v.get("revoked")]
+
     if data.get("delete"):
+        # Never let the owner delete their way out of the dashboard. Rotating
+        # the master code means ADD the new one, verify, THEN remove the old.
+        if codes.get(code, {}).get("admin") and len(_admin_codes(codes)) <= 1:
+            return {"status": "error",
+                    "error": "that is the only admin code - create the replacement first"}
         codes.pop(code, None)
     else:
         from datetime import datetime as _dt
@@ -672,6 +681,15 @@ async def admin_code(data: dict):
             rec["max_tailors"] = data["max_tailors"] and int(data["max_tailors"]) or None
         if "revoked" in data:
             rec["revoked"] = bool(data["revoked"])
+        # The master code is a code like any other EXCEPT that it is never
+        # published to the public door - so rotating it has to be possible
+        # here, or the owner's only option is editing storage by hand.
+        if "admin" in data:
+            want = bool(data["admin"])
+            if not want and rec.get("admin") and len(_admin_codes(codes)) <= 1:
+                return {"status": "error",
+                        "error": "that is the only admin code - create the replacement first"}
+            rec["admin"] = want
         codes[code] = rec
     ok = _store_put(CODES_PATH, codes)
     if ok:
