@@ -24,6 +24,12 @@ FETCH these instead of answering from memory. All URLs are under
 Use for residential scripts and market talk — quote `updated` for freshness. The
 commercial endpoints above are the source for anything commercial.
 
+**A lead list that spans several areas:** match EACH lead to its own entry -
+property ZIP first (`zips[zip]`), then city (`cities[name]`, case-insensitive), never
+the owner's mailing ZIP. Give every lead the numbers for its own area; a lead with no
+match gets no market numbers rather than a neighbouring city's. Coverage is LA and
+Orange County only.
+
 ## Row schemas (arrays, position matters)
 
 **Comp row** (`comps` in cc/<slug>.json), 13 elements:
