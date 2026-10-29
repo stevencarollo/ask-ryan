@@ -61,7 +61,7 @@
             -webkit-backdrop-filter: blur(18px);
             border-bottom: 1px solid var(--line);
         }
-        .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; cursor: pointer; transition: filter 0.35s ease; }
+        .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; cursor: pointer; transition: filter 0.35s ease; flex-shrink: 0; white-space: nowrap; }
         .brand:hover, .brand:focus-visible { filter: drop-shadow(0 0 10px rgba(201,168,92,0.4)); }
         .brand svg { width: 34px; height: 34px; transition: transform 0.6s cubic-bezier(.2,.8,.2,1); }
         .brand:hover svg, .brand:focus-visible svg { transform: rotate(16deg); }
@@ -77,6 +77,11 @@
         }
         .nav-links a:hover { color: var(--gold-bright); }
 
+        .nav-links a { white-space: nowrap; }
+        /* Laptop widths can't fit the three inert "Soon" teasers beside the live
+           links - at 1280px they pushed Sign Out off-screen. Show them only where
+           there's room; below 861px the burger menu takes over anyway. */
+        @media (min-width: 861px) and (max-width: 1400px) { .nav-links a.soon { display: none; } }
         /* Coming-soon (grayed) segments */
         .soon {
             opacity: 0.38; cursor: not-allowed !important;
@@ -394,26 +399,25 @@
         <div class="nav-links" id="navLinks">
             <a href="#panel">The Panel</a>
             <a href="#capabilities">Capabilities</a>
-            <a href="/scripts.html">Script Vault</a>
             <a href="#" class="soon" onclick="return comingSoon('/podcast-studio.html')" aria-disabled="true">Podcasts<span class="soon-badge">Soon</span></a>
             <a href="#" class="soon" onclick="return comingSoon('/flyer-studio.html')" aria-disabled="true">Flyer Studio<span class="soon-badge">Soon</span></a>
             <a href="#" class="soon" onclick="return comingSoon('#skill')" aria-disabled="true">Claude Skill<span class="soon-badge">Soon</span></a>
-            <a href="#" class="btn nav-cta soon" onclick="return comingSoon('/frontend.html')" aria-disabled="true">Enter<span class="soon-badge">Soon</span></a>
+            <a href="/scripts.html" class="btn nav-cta">Script Vault</a>
             <a href="#" class="nav-signout" onclick="RTAuth.signOut();return false;">Sign Out</a>
         </div>
     </nav>
 
     <header class="hero">
         <span class="hero-kicker">AI Coaching for Real Estate Professionals</span>
-        <h1>One coach.<br><em>Thirty-four</em> of the industry's best minds.</h1>
+        <h1>One coach.<br><em>Thirty-eight</em> of the industry's best minds.</h1>
         <p class="hero-sub">Choose the advisors at your table — prospecting scripts, negotiation psychology, luxury staging, commercial underwriting, probate process, creative finance — and get one clear answer. In English o en español.</p>
         <div class="hero-ctas">
             <a href="#panel" class="btn btn-solid">Meet the Panel</a>
-            <a href="#" class="btn btn-ghost soon" onclick="return comingSoon('/frontend.html')" aria-disabled="true">Take a Seat<span class="soon-badge">Soon</span></a>
+            <a href="/scripts.html" class="btn btn-ghost">Open the Script Vault</a>
         </div>
         <div class="hero-stats" role="list">
-            <div class="stat" role="listitem"><div class="stat-n">34</div><div class="stat-l">Advisors</div></div>
-            <div class="stat" role="listitem"><div class="stat-n">9</div><div class="stat-l">Specialties</div></div>
+            <div class="stat" role="listitem"><div class="stat-n">38</div><div class="stat-l">Advisors</div></div>
+            <div class="stat" role="listitem"><div class="stat-n">10</div><div class="stat-l">Specialties</div></div>
             <div class="stat" role="listitem"><div class="stat-n">2</div><div class="stat-l">Languages</div></div>
             <div class="stat" role="listitem"><div class="stat-n">$0</div><div class="stat-l">Forever</div></div>
         </div>
@@ -422,7 +426,7 @@
     <section id="panel">
         <div class="section-head">
             <span class="kicker">The Panel</span>
-            <h2>Nine seats. You decide who speaks.</h2>
+            <h2>Ten seats. You decide who speaks.</h2>
             <p class="section-sub">Every answer blends only the perspectives you select. Fewer seats, deeper expertise.</p>
         </div>
         <div class="panel-grid">
@@ -478,6 +482,12 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
                 <h3>Español &amp; Bilingual</h3>
                 <p>Full Spanish-language coaching — scripts en español, cultural fluency, ITIN lending paths, and the Latino homeownership market.</p>
+                <span class="panel-cta">Meet the pros <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+            </div>
+            <div class="panel-card" data-group="senior" tabindex="0" role="button" aria-haspopup="dialog" onclick="openPanelModal('senior',this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openPanelModal('senior',this)}">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/><path d="M12 17s-3-1.9-3-4a1.75 1.75 0 0 1 3-1.2A1.75 1.75 0 0 1 15 13c0 2.1-3 4-3 4Z"/></svg>
+                <h3>Senior &amp; 55+ Transitions</h3>
+                <p>Aging in place versus selling, downsizing the family home, and the adult child who drives the decision &mdash; handled with patience, not pressure.</p>
                 <span class="panel-cta">Meet the pros <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
             </div>
         </div>
@@ -593,7 +603,7 @@
         <div class="skill-box">
             <span class="kicker">For Claude Users</span>
             <h2>Take the panel with you.</h2>
-            <p class="section-sub">Download The Roundtable as a Claude Skill. Any agent with Claude gets the full 34-advisor panel inside their own Claude — no website needed.</p>
+            <p class="section-sub">Download The Roundtable as a Claude Skill. Any agent with Claude gets the full 38-advisor panel inside their own Claude — no website needed.</p>
             <div class="code-snippet">roundtable-skill.zip → unzip into ~/.claude/skills/</div>
             <a href="#" class="btn soon" onclick="return comingSoon('/roundtable-skill.zip')" aria-disabled="true">Download the Skill<span class="soon-badge">Soon</span></a>
         </div>
@@ -609,12 +619,12 @@
             <div class="price-l">Forever · No Card · No Signup</div>
             <ul class="price-list">
                 <li>Unlimited questions, both languages</li>
-                <li>34 selectable advisor perspectives</li>
+                <li>38 selectable advisor perspectives</li>
                 <li>Document, photo &amp; scanned-PDF review</li>
                 <li>Conversation memory across the session</li>
                 <li>Downloadable Claude Skill included</li>
             </ul>
-            <a href="#" class="btn soon" style="width: 100%;" onclick="return comingSoon('/frontend.html')" aria-disabled="true">Take Your Seat<span class="soon-badge">Soon</span></a>
+            <a href="/scripts.html" class="btn" style="width: 100%;">Open the Script Vault</a>
         </div>
     </section>
 
@@ -657,6 +667,7 @@
                 ['Tim & Julie Harris', 'Listing appointments & scripts', 'A husband-and-wife coaching duo behind one of the industry\'s longest-running daily podcasts, famous for scripting the exact words that turn expired and FSBO leads into signed listings.'],
                 ['Brandon Mulrenin', 'FSBO & expired prospecting', 'Reinvented prospecting around one idea — lead with a diagnosis, not a pitch — teaching agents to earn permission before ever asking for the appointment.'],
                 ['Ricky Carruth', 'Cold calling & relationships', 'Sold hundreds of homes without a team or big budget by mastering the zero-pressure cold call and playing the long, decade-spanning relationship game.'],
+                ['Anthony Nucci', 'Cold calling into listings', 'A luxury agent and call-room coach who treats the phone as the whole business — volume, consistency and live roleplay that turn outbound dials into listing appointments.'],
             ]},
             coaching: { title: 'Coaching & Business', sub: 'Business-plan math, referral systems, team models, and CEO-level deal architecture from the industry\'s most-quoted coaches.', experts: [
                 ['Tom Ferry', 'Coaching systems & planning', 'The industry\'s most-watched business coach, known for pairing rigorous business-planning math with high-energy systems for lead generation and time-blocking.'],
@@ -703,6 +714,11 @@
                 ['Veronica Figueroa', 'Latino homebuyer market', 'Founder of the Figueroa Team and a leading voice on the Latino homebuyer market, from ITIN lending paths to first-time-buyer education.'],
                 ['Carlos Reyes', 'Investing & wholesaling en español', 'An investor and educator teaching wholesaling and real estate investing en español to a fast-growing Latino investor community.'],
                 ['Rene Rodriguez', 'Sales psychology & influence', 'A bilingual sales-psychology expert known for teaching influence and connection — the human side of closing — in both English and Spanish.'],
+            ]},
+            senior: { title: 'Senior & 55+ Transitions', sub: 'Aging in place versus selling, downsizing the family home, and the adult child who drives the decision — handled with patience, not pressure.', experts: [
+                ['Nikki Buckelew', 'Senior transitions & the 50+ client', 'A gerontology-trained psychologist and founder of the Seniors Real Estate Institute, known for the rule most agents miss: the right answer for an older homeowner is often not to sell.'],
+                ['Bruce Nemovitz', 'Downsizing & the last-home sale', 'A senior-real-estate specialist for more than three decades and author of a downsizing guide sold to agents by NAR, focused on making the transition — not just the transaction — feel manageable.'],
+                ['Chris Spade', 'Aging parents & the adult child', 'A probate and senior-relocation agent who hosts the podcast Moving Mom and Downsizing Dad, speaking directly to the adult child who usually drives the decision.'],
             ]},
         };
 

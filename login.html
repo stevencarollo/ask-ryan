@@ -167,8 +167,8 @@
             </form>
             <div class="msg err" id="signin-err"></div>
             <p class="fine">
-                No activation code? <a onclick="showPane('request')">Request access</a><br>
-                Code stopped working? <a onclick="startChallenge()">Ask for a 7-day extension</a>
+                No activation code? <a href="#" onclick="showPane('request');return false;">Request access</a><br>
+                Code stopped working? <a href="#" onclick="startChallenge();return false;">Ask for a 7-day extension</a>
             </p>
         </div>
 
@@ -192,7 +192,7 @@
                 <input type="text" id="pr-website" placeholder="janeagenthomes.com">
                 <button type="submit" class="btn">Enter the Roundtable</button>
             </form>
-            <p class="fine"><a onclick="finishEntry({})">Skip for now — I'll fill this in later</a></p>
+            <p class="fine"><a href="#" onclick="finishEntry({});return false;">Skip for now — I'll fill this in later</a></p>
         </div>
 
         <!-- EXTENSION CHALLENGE -->
@@ -222,7 +222,7 @@
             <button class="btn" id="mercy-btn" onclick="begForMercy()">🙏 Beg for Mercy</button>
             <div class="msg ok" id="mercy-ok"></div>
             <div class="msg err" id="mercy-err"></div>
-            <p class="fine"><a onclick="showPane('signin')">Back to Sign In</a></p>
+            <p class="fine"><a href="#" onclick="showPane('signin');return false;">Back to Sign In</a></p>
         </div>
 
         <!-- REQUEST ACCESS (no code at all) -->
@@ -241,7 +241,7 @@
                 <button type="submit" class="btn" id="rq-submit">Request Access</button>
             </form>
             <div class="msg err" id="request-err"></div>
-            <p class="fine"><a onclick="showPane('signin')">Back to Sign In</a></p>
+            <p class="fine"><a href="#" onclick="showPane('signin');return false;">Back to Sign In</a></p>
         </div>
 
         <!-- REQUEST SENT -->
@@ -417,6 +417,10 @@
                     })
                 });
                 if (!res.ok) throw new Error('send failed');
+                // the relay answers 200 even when it refuses to deliver (e.g. the
+                // inbox never confirmed it) - only its own success flag means sent
+                const out = await res.json().catch(() => ({}));
+                if (String(out.success) !== 'true') throw new Error(out.message || 'not delivered');
                 flash('mercy-ok', 'Your plea has been delivered. If mercy is granted, a fresh activation code will find you.');
                 btn.textContent = 'Plea delivered';
             } catch (e) {
@@ -449,6 +453,10 @@
                     })
                 });
                 if (!res.ok) throw new Error('send failed');
+                // the relay answers 200 even when it refuses to deliver (e.g. the
+                // inbox never confirmed it) - only its own success flag means sent
+                const out = await res.json().catch(() => ({}));
+                if (String(out.success) !== 'true') throw new Error(out.message || 'not delivered');
                 showPane('sent');
             } catch (e) {
                 const body = encodeURIComponent('Roundtable access request\n\nName: ' + name + '\nEmail: ' + email + '\nPhone: ' + phone + '\nBrokerage: ' + (brokerage || '(none)'));
