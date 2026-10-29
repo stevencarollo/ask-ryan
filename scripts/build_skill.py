@@ -8,7 +8,7 @@ sys.path.insert(0, ".")
 from backend.experts_kb import EXPERTS
 
 GROUPS = [
-    ("Sales & Prospecting", ["serhant", "harris", "mulrenin", "carruthers"]),
+    ("Sales & Prospecting", ["serhant", "harris", "mulrenin", "carruthers", "nucci"]),
     ("Coaching & Business", ["ferry", "buffini", "keller", "sharran"]),
     ("Marketing & Media", ["glennda", "lazine", "burgess", "pantana", "peitz"]),
     ("Negotiation", ["voss"]),
@@ -17,6 +17,7 @@ GROUPS = [
     ("Flipping & Investing", ["tarek", "norton", "morby", "greene"]),
     ("Probate, Divorce & Distressed", ["corbett", "nicoletti", "gross", "starks", "espinosa", "ted"]),
     ("Espanol & Bilingual", ["loida", "figueroa", "creyes", "rene"]),
+    ("Senior & 55+ Transitions", ["buckelew", "nemovitz", "spade"]),
 ]
 
 lines = ["# The Roundtable - Advisor Knowledge Dossiers", ""]
